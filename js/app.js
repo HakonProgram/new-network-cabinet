@@ -99,7 +99,7 @@
       '<aside class="side">' +
         '<div class="side-inner">' +
           '<div class="brand" data-go="campaigns">' + UI.brandMark(32) +
-            '<div><div class="brand-name">New Network</div><div class="brand-sub">Advertiser</div></div>' +
+            '<div><div class="brand-name">AdAnvil</div><div class="brand-sub">Advertiser</div></div>' +
           '</div>' +
           '<nav class="nav" id="nav">' + navHtml() + '</nav>' +
           (function () {

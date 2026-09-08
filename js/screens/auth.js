@@ -20,23 +20,14 @@
       var f = form();
       var signup = f.tab === 'signup';
 
-      var points = [
-        ['bot', 'One request, the whole network', 'Set a target and a bid — the robot finds the working combination itself.'],
-        ['stats', 'Numbers you can act on', 'Thirteen metrics across placements, countries, days and devices.'],
-        ['zones', 'Placements under control', 'Turn any of them off for one campaign or for the whole account.']
-      ].map(function (p) {
-        return '<div class="apoint"><span class="apoint-i">' + icon(p[0], 18) + '</span>' +
-          '<div><div class="apoint-t">' + p[1] + '</div>' +
-          '<div class="apoint-d">' + p[2] + '</div></div></div>';
-      }).join('');
-
       return '<div class="auth">' +
         '<div class="auth-side">' +
           '<div class="auth-brand">' + UI.brandMark(34) +
-            '<div><div class="brand-name">New Network</div>' +
+            '<div><div class="brand-name">AdAnvil</div>' +
             '<div class="brand-sub">Advertiser cabinet</div></div></div>' +
-          '<h1 class="auth-h">Buy traffic without the back and forth.</h1>' +
-          '<div class="apoints">' + points + '</div>' +
+          '<h1 class="auth-h">Buy traffic <span class="hl">without the back and forth</span>.</h1>' +
+          '<p class="auth-sub">One request and a bid — the network finds the working ' +
+            'combination itself. No manager in the loop, no waiting for approval.</p>' +
         '</div>' +
 
         '<div class="auth-card">' +

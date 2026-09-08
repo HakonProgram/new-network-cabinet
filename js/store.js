@@ -60,7 +60,7 @@
       }),
       payments: fresh ? [] : DATA.PAYMENTS.map(function (p) { return Object.assign({}, p); }),
       notifications: fresh
-        ? [{ id: 1, kind: 'bot', cat: 'camp', unread: true, title: 'Welcome to New Network',
+        ? [{ id: 1, kind: 'bot', cat: 'camp', unread: true, title: 'Welcome to AdAnvil',
              text: 'Top up the balance, connect your postback and launch the first campaign — ' +
                    'the robot takes it from there.', time: 'Just now' }]
         : DATA.NOTIFICATIONS.map(function (n) { return Object.assign({}, n); }),

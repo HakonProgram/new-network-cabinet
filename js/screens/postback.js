@@ -4,7 +4,7 @@
   var icon = UI.icon, esc = UI.esc;
 
   var CLICK_PH = '{your_click_macro}';
-  var URL = 'https://track.newnetwork.io/postback?adv=4821&click_id=' + CLICK_PH;
+  var URL = 'https://track.adanvil.com/postback?adv=4821&click_id=' + CLICK_PH;
 
   w.Screens = w.Screens || {};
   w.Screens.postback = {
@@ -57,7 +57,7 @@
             '<div class="card-b" style="gap:16px">' +
               step(1, 'Copy the postback endpoint on the left.') +
               step(2, 'Replace <b>' + esc(CLICK_PH) + '</b> with your tracker’s click ID macro. The result looks like this:' +
-                '<span class="code">https://track.newnetwork.io/postback?adv=4821&amp;click_id={sub1}</span>') +
+                '<span class="code">https://track.adanvil.com/postback?adv=4821&amp;click_id={sub1}</span>') +
               step(3, 'Add that URL to your tracker as the ad network postback.') +
               step(4, 'Check that the campaign link carries the <b>{clickid}</b> macro:' +
                 '<span class="code">https://slotsroyale.io/lp/install?sub1={clickid}&amp;zone={zone}</span>') +
