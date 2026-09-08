@@ -118,7 +118,7 @@
             '<div class="hint">Bid along the horizontal axis, impressions per day along the vertical. The dashed line marks your current bid.</div>' +
           '</div></div>' +
 
-        '<div class="table pin"><div class="table-scroll">' +
+        '<div class="table"><div class="table-scroll">' +
           '<div class="tr thead" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
             '<div class="th">Country</div><div class="th">Code</div><div class="th r">Impr. / day</div>' +
             '<div class="th r">Suggested bid</div><div class="th r">Avg CPM</div><div class="th r">Win rate</div>' +
