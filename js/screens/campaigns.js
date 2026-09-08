@@ -12,8 +12,8 @@
     { key: 'archived', label: 'Archived' }
   ];
   var MODELS = ['all', 'CPA', 'Pure CPA', 'CPM', 'Smart CPM', 'CPC'];
-  var COLS = '34px 68px minmax(170px,1fr) 88px 116px 74px 66px 82px 72px 66px 118px';
-  var MINW = 'min-width:1076px';
+  var COLS = '34px 68px minmax(190px,1fr) 92px 118px 78px 70px 88px 76px 70px 126px';
+  var MINW = 'min-width:1130px'; /* влезает целиком на 1440 — кнопки всегда видны */
 
   /* Архив живёт на своей вкладке и не мешается в общем списке. */
   function visible() {
@@ -103,19 +103,17 @@
           (m === 'all' ? 'All models' : m) + '</div>';
       }).join('');
 
-      var stat = function (k, v, sub) {
-        return '<div class="stat"><span class="k">' + k + '</span><span class="v">' + v + '</span>' +
-          (sub ? '<span class="d">' + sub + '</span>' : '') + '</div>';
+      var stat = function (k, v, sub, color) {
+        return '<div class="stat"><span class="k">' + k + '</span>' +
+          '<span class="v"' + (color ? ' style="color:' + color + '"' : '') + '>' + v + '</span>' +
+          '<span class="d">' + sub + '</span></div>';
       };
-      var statbar = '<div class="statbar">' +
-        '<div class="stat hero"><span class="k">ROI · last 7 days</span>' +
-          '<span class="v" style="color:' + tm.roiColor + '">' + tm.roi + '</span>' +
-          '<span class="d">' + tm.profit + ' profit on ' + tm.cost + ' spend</span></div>' +
+      var statbar = '<div class="stats">' +
+        stat('Spend', tm.cost, 'last 7 days') +
         stat('Revenue', tm.revenue, 'reported via postback') +
+        stat('Profit', tm.profit, 'revenue minus spend', tm.profitColor) +
+        stat('ROI', tm.roi, 'return on ad spend', tm.roiColor) +
         stat('Conversions', tm.conv, 'avg CPA ' + tm.cpa) +
-        stat('Impressions', tm.impr, 'avg CPM ' + tm.cpm) +
-        stat('Win rate', tm.win, 'auctions won') +
-        stat('Campaigns', String(s.campaigns.length), tabCount('active') + ' running now') +
       '</div>';
 
       var heads = ['', 'ID', 'Campaign', 'Model', 'Status', 'Impr.', 'Conv.', 'Cost', 'ROI', 'CPA', ''];

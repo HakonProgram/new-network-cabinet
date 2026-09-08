@@ -284,9 +284,10 @@
         return '<div class="seg' + (s.ui.statsTab === x.k ? ' on' : '') + '" data-act="tab" data-arg="' + x.k + '">' + x.label + '</div>';
       }).join('');
 
-      var stat = function (k, v, sub) {
-        return '<div class="stat"><span class="k">' + k + '</span><span class="v">' + v + '</span>' +
-          (sub ? '<span class="d">' + sub + '</span>' : '') + '</div>';
+      var stat = function (k, v, sub, color) {
+        return '<div class="stat"><span class="k">' + k + '</span>' +
+          '<span class="v"' + (color ? ' style="color:' + color + '"' : '') + '>' + v + '</span>' +
+          '<span class="d">' + sub + '</span></div>';
       };
 
       var profitSeries = d.cost.map(function (c, i) { return d.revenue[i] - c; });
@@ -310,23 +311,13 @@
           '</div>' +
         '</div>' +
 
-        '<div class="statbar">' +
-          '<div class="stat hero"><span class="k">ROI · ' + period + '</span>' +
-            '<span class="v" style="color:' + tm.roiColor + '">' + tm.roi + '</span>' +
-            '<span class="d">' + tm.profit + ' profit on ' + tm.cost + ' spend</span></div>' +
+        '<div class="stats s6">' +
+          stat('Spend', tm.cost, period) +
           stat('Revenue', tm.revenue, 'reported via postback') +
+          stat('Profit', tm.profit, 'revenue minus spend', tm.profitColor) +
+          stat('ROI', tm.roi, 'return on ad spend', tm.roiColor) +
           stat('Conversions', tm.conv, 'CR ' + tm.cr) +
           stat('Avg CPA', tm.cpa, 'target $11.50') +
-          stat('Impressions', tm.impr, 'CTR ' + tm.ctr) +
-          stat('Clicks', tm.clicks, 'avg CPC ' + tm.cpc) +
-        '</div>' +
-        '<div class="statbar">' +
-          stat('Avg CPM', tm.cpm, 'blended across sources') +
-          stat('Win rate', tm.win, 'auctions won') +
-          stat('Placements', '1,482', '214 switched off by the robot') +
-          stat('Countries', String(DATA.GEO.length), 'with spend this period') +
-          stat('Campaigns', String(s.campaigns.length), 'in the account') +
-          stat('Period', d.n + ' days', 'ending today') +
         '</div>' +
 
         '<div class="charts">' +
