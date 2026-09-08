@@ -33,19 +33,19 @@
   var CAMPAIGNS = [
     { id: '4821', name: 'Slots Royale — App Install', format: 'Popunder', vertical: 'Gambling', adult: false,
       model: 'Pure CPA', status: 'active', impr: 2227000, clicks: 20940, conv: 412, cost: 4120, revenue: 5150, winRate: 22.4, bid: '10.00' },
-    { id: '4790', name: 'BitVault — Sign-up', format: 'Push', vertical: 'Crypto', adult: false,
+    { id: '4790', name: 'BitVault — Sign-up', format: 'Native', vertical: 'Crypto', adult: false,
       model: 'CPA', status: 'active', impr: 2014000, clicks: 14300, conv: 318, cost: 2860, revenue: 3340, winRate: 18.9, bid: '9.00' },
-    { id: '4744', name: 'MeetLocal — Push', format: 'Push', vertical: 'Dating', adult: false,
+    { id: '4744', name: 'MeetLocal — Push', format: 'Native', vertical: 'Dating', adult: false,
       model: 'Smart CPM', status: 'active', impr: 2152000, clicks: 27550, conv: 204, cost: 1980, revenue: 2450, winRate: 31.2, bid: '2.10' },
     { id: '4702', name: 'NightDate — Popunder', format: 'Popunder', vertical: 'Dating', adult: true,
       model: 'Smart CPM', status: 'active', impr: 2079000, clicks: 33680, conv: 389, cost: 3410, revenue: 4280, winRate: 27.6, bid: '2.40' },
-    { id: '4688', name: 'FX Prime — Broker Leads', format: 'In-Page Push', vertical: 'Finance', adult: false,
+    { id: '4688', name: 'FX Prime — Broker Leads', format: 'Interstitial', vertical: 'Finance', adult: false,
       model: 'Pure CPA', status: 'active', impr: 2230000, clicks: 14050, conv: 241, cost: 5240, revenue: 6020, winRate: 14.8, bid: '21.00' },
     { id: '4655', name: 'SlimFit — Weight Loss', format: 'Native', vertical: 'Nutra', adult: false,
       model: 'CPA', status: 'test', impr: 283000, clicks: 2490, conv: 29, cost: 340, revenue: 290, winRate: 9.4, bid: '11.50' },
     { id: '4640', name: 'iPhone 17 Giveaway', format: 'Banner', vertical: 'Sweepstakes', adult: false,
       model: 'CPM', status: 'review', impr: 0, clicks: 0, conv: 0, cost: 0, revenue: 0, winRate: 0, bid: '1.80' },
-    { id: '4602', name: 'CleanMaster — Utility', format: 'Push', vertical: 'Mobile Apps', adult: false,
+    { id: '4602', name: 'CleanMaster — Utility', format: 'Display Ads', vertical: 'Mobile Apps', adult: false,
       model: 'CPC', status: 'paused', impr: 1806000, clicks: 12460, conv: 96, cost: 1120, revenue: 960, winRate: 12.1, bid: '0.09' },
     { id: '4571', name: 'VPN Shield — Trial', format: 'Popunder', vertical: 'Software', adult: false,
       model: 'CPC', status: 'done', impr: 2583000, clicks: 28790, conv: 187, cost: 2015, revenue: 2245, winRate: 16.3, bid: '0.07' }
@@ -192,12 +192,52 @@
     { name: 'io-4821-signed.pdf',        kind: 'Document', size: '240 KB', date: '12.06.26' }
   ];
 
+  /* Откуда берём трафик. */
+  var SOURCES = [
+    { key: 'direct',  name: 'Direct sites',
+      desc: 'Our own verified inventory. Cleanest traffic, best for testing a new offer.',
+      note: 'Best for testing' },
+    { key: 'partner', name: 'Partner traffic',
+      desc: 'Wider supply through vetted partners, filtered by our anti-fraud. Volume grows, quality varies.',
+      note: 'Best for scaling' }
+  ];
+
+  /* Качество аудитории: чем свежее пользователь, тем выше конверсия и цена. */
+  var QUALITY = [
+    { key: 'fresh',   name: 'Fresh users',     desc: 'Have seen the fewest ads — the highest conversion rate', mult: 1.35, cr: '2.9%' },
+    { key: 'regular', name: 'Regular users',   desc: 'Average activity, average conversion',                   mult: 1.00, cr: '2.1%' },
+    { key: 'aged',    name: 'Aged users',      desc: 'Have seen a lot already — low conversion',               mult: 0.70, cr: '1.2%' },
+    { key: 'remnant', name: 'Remnant traffic', desc: 'Leftover inventory at the lowest price',                 mult: 0.45, cr: '0.6%' }
+  ];
+
+  var COUNTRIES = [
+    { code: 'DE', name: 'Germany' },        { code: 'US', name: 'United States' },
+    { code: 'GB', name: 'United Kingdom' }, { code: 'FR', name: 'France' },
+    { code: 'IT', name: 'Italy' },          { code: 'ES', name: 'Spain' },
+    { code: 'NL', name: 'Netherlands' },    { code: 'AT', name: 'Austria' },
+    { code: 'CH', name: 'Switzerland' },    { code: 'BE', name: 'Belgium' },
+    { code: 'PL', name: 'Poland' },         { code: 'CZ', name: 'Czechia' },
+    { code: 'SE', name: 'Sweden' },         { code: 'NO', name: 'Norway' },
+    { code: 'DK', name: 'Denmark' },        { code: 'FI', name: 'Finland' },
+    { code: 'PT', name: 'Portugal' },       { code: 'IE', name: 'Ireland' },
+    { code: 'GR', name: 'Greece' },         { code: 'RO', name: 'Romania' },
+    { code: 'HU', name: 'Hungary' },        { code: 'CA', name: 'Canada' },
+    { code: 'AU', name: 'Australia' },      { code: 'NZ', name: 'New Zealand' },
+    { code: 'JP', name: 'Japan' },          { code: 'KR', name: 'South Korea' },
+    { code: 'IN', name: 'India' },          { code: 'ID', name: 'Indonesia' },
+    { code: 'TH', name: 'Thailand' },       { code: 'VN', name: 'Vietnam' },
+    { code: 'BR', name: 'Brazil' },         { code: 'MX', name: 'Mexico' },
+    { code: 'AR', name: 'Argentina' },      { code: 'ZA', name: 'South Africa' },
+    { code: 'TR', name: 'Turkey' },         { code: 'AE', name: 'United Arab Emirates' }
+  ];
+
   w.DATA = {
     PAY_MODELS: PAY_MODELS, STATUS: STATUS, CAMPAIGNS: CAMPAIGNS,
     ZONES: buildZones(), GEO: GEO, GEO_POOL: GEO_POOL, PRESETS: PRESETS,
     PAY_METHODS: PAY_METHODS, PAYMENTS: PAYMENTS, INVOICES: INVOICES,
     NOTIFICATIONS: NOTIFICATIONS, DOCS: DOCS, FILES: FILES, PAYOUT: PAYOUT,
-    FORMATS: ['Popunder', 'Push', 'In-Page Push', 'Native', 'Banner'],
+    FORMATS: ['Popunder', 'Native', 'Banner', 'Video', 'Interstitial', 'Display Ads', 'Social'],
+    SOURCES: SOURCES, QUALITY: QUALITY, COUNTRIES: COUNTRIES,
     VERTICALS: ['Gambling', 'Crypto', 'Dating', 'Nutra', 'Finance', 'Sweepstakes', 'Mobile Apps', 'Software'],
     TOKENS: ['{clickid}', '{zone}', '{subzone}', '{geo}', '{cost}', '{device}', '{os}', '{browser}'],
     BASE_DAYS: 7

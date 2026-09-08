@@ -3,7 +3,8 @@
   'use strict';
   var icon = UI.icon, esc = UI.esc;
 
-  var F_SCALE = { 'Popunder': 1, 'Push': 0.72, 'In-Page Push': 0.55, 'Native': 0.31, 'Banner': 0.44 };
+  var F_SCALE = { 'Popunder': 1, 'Native': 0.42, 'Banner': 0.55, 'Video': 0.24,
+                  'Interstitial': 0.61, 'Display Ads': 0.68, 'Social': 0.33 };
   var P_SCALE = { 'Mobile': 1, 'Desktop': 0.58, 'Tablet': 0.14 };
   var C_SCALE = { 'Mainstream': 1, 'Adult': 0.66, 'All': 1.5 };
   var R_SCALE = { 'Europe': 1, 'North America': 0.74, 'Asia': 1.9, 'Worldwide': 4.2 };

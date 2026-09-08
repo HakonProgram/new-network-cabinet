@@ -19,6 +19,7 @@
       name: '', url: '',
       vertical: 'Gambling', format: 'Popunder', model: 'smartcpm', age: 'Mainstream',
       capping: '1 impression / 24 hours',
+      sources: ['direct'], quality: ['fresh', 'regular'],
       platforms: ['Mobile'], oses: ['Android', 'iOS'],
       conn: 'All', vpn: 'No VPN',
       preset: '', subzones: '',
@@ -50,6 +51,7 @@
       draft: seedDraft(),
       ui: {
         campStatus: 'all', campModel: 'all',
+        geoPickerOpen: false, geoSearch: '', geoPick: [], advancedOpen: false,
         statsRange: 30, statsTab: 'zones', statsCampaign: '',
         zonesTab: 'all', zonesCat: 'all', zonesVertical: 'all', zonesSort: 'cost',
         openPreset: '',

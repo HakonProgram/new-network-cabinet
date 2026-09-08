@@ -384,3 +384,18 @@ textarea.inp { height:auto; padding:10px 12px; resize:vertical; font-family:var(
 .kpis.k6 { grid-template-columns:repeat(6,minmax(0,1fr)); }
 .kpi.tight { padding:13px 14px 12px; gap:5px; }
 .kpi.tight .kpi-val { font-size:21px; }
+
+/* ─────────── выбор стран ─────────── */
+.picker { flex:1 1 460px; min-width:420px; border:1px solid var(--accent); border-radius:11px;
+  background:var(--bg); box-shadow:0 0 0 1px rgba(131,104,247,0.25); overflow:hidden; }
+.picker-h { display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--line); }
+.search-in { flex:1; display:flex; align-items:center; gap:8px; height:32px; padding:0 10px;
+  background:var(--surface); border:1px solid var(--line-2); border-radius:8px; color:var(--ink-3); }
+.search-in .inp:focus { box-shadow:none; }
+.picker-b { display:flex; flex-wrap:wrap; gap:6px; padding:12px; max-height:232px; overflow-y:auto; }
+.picker-b .opt { height:30px; font-size:12px; gap:8px; }
+.picker-b .opt .cid { font-size:10.5px; }
+.picker-f { display:flex; align-items:center; gap:10px; padding:10px 12px; border-top:1px solid var(--line);
+  background:var(--surface-2); }
+.rate-h, .rate-r { grid-template-columns:minmax(0,1fr) 150px 150px 130px 34px; }
+.meth-c .box { flex:0 0 15px; }
