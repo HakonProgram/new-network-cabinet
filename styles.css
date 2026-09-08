@@ -292,7 +292,15 @@ textarea.inp { height:auto; padding:10px var(--s3); resize:vertical; }
 .mprice { margin-left:auto; text-align:right; flex:0 0 auto; }
 .mprice b { font-size:var(--fs-3); font-weight:600; }
 .mprice span { display:block; font-size:var(--fs-1); color:var(--text-3); margin-top:2px; }
-.rate-h, .rate-r { display:grid; grid-template-columns:minmax(0,1fr) 150px 150px 130px 36px; gap:var(--s3); align-items:center; }
+.rate-h, .rate-r { display:grid; grid-template-columns:minmax(0,1fr) 150px 150px 36px; gap:var(--s3); align-items:start; }
+.rate-h { align-items:center; }
+.geo-cell { display:flex; flex-wrap:wrap; gap:var(--s2); align-items:center; min-height:var(--ctrl-lg);
+  padding:5px var(--s2) 5px var(--s2); border:1px solid var(--border-strong); border-radius:var(--r-sm); }
+.geo-tag { display:inline-flex; align-items:center; gap:6px; height:26px; padding:0 var(--s2);
+  border-radius:4px; background:var(--surface-2); font-size:var(--fs-2); }
+.geo-tag .x { cursor:pointer; display:flex; color:var(--text-3); }
+.geo-tag .x:hover { color:var(--neg); }
+.rate-r .inp { height:var(--ctrl-lg); }
 .geo-chip { height:var(--ctrl-lg); padding:0 var(--s3); display:flex; align-items:center; gap:var(--s2);
   border-radius:var(--r-sm); border:1px solid var(--border-strong); }
 .geo-x { margin-left:auto; color:var(--text-3); cursor:pointer; display:flex; }
@@ -458,3 +466,11 @@ textarea.inp { height:auto; padding:10px var(--s3); resize:vertical; }
 .row.picked { background:var(--accent-soft); }
 .row.picked:hover { background:var(--accent-soft); }
 .btn[disabled] { opacity:0.4; pointer-events:none; }
+
+/* настоящий выпадающий список */
+select.sel-inp { appearance:none; -webkit-appearance:none; cursor:pointer; padding-right:34px;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),
+    linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 18px) calc(50% + 1px), calc(100% - 13px) calc(50% + 1px);
+  background-size:5px 5px, 5px 5px; background-repeat:no-repeat; color:var(--text); }
+select.sel-inp option { background:var(--surface); color:var(--text); }

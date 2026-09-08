@@ -195,6 +195,15 @@
     return 'min-width:' + (total + gap * (parts.length - 1) + pad) + 'px';
   }
 
+  /* Настоящий <select>: значение уходит в те же обработчики, что и поля ввода. */
+  function select(name, options, value, arg) {
+    return '<select class="inp sel-inp" data-inp="' + name + '"' +
+      (arg ? ' data-arg="' + arg + '"' : '') + '>' +
+      options.map(function (o) {
+        return '<option value="' + esc(o) + '"' + (o === value ? ' selected' : '') + '>' + esc(o) + '</option>';
+      }).join('') + '</select>';
+  }
+
   function cls() {
     return Array.prototype.filter.call(arguments, Boolean).join(' ');
   }
@@ -205,6 +214,6 @@
     color: color, tone: tone,
     metrics: metrics, sum: sum,
     num: num, plural: plural, dayLabel: dayLabel, dateShort: dateShort,
-    daily: daily, ticks: ticks, cls: cls, gridMin: gridMin
+    daily: daily, ticks: ticks, cls: cls, gridMin: gridMin, select: select
   };
 })(window);

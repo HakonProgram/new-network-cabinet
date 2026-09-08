@@ -202,12 +202,12 @@
       note: 'Best for scaling' }
   ];
 
-  /* Качество аудитории: чем свежее пользователь, тем выше конверсия и цена. */
+  /* Качество аудитории: чем свежее пользователь, тем он дороже. */
   var QUALITY = [
-    { key: 'fresh',   name: 'Fresh users',     desc: 'Have seen the fewest ads — the highest conversion rate', mult: 1.35, cr: '2.9%' },
-    { key: 'regular', name: 'Regular users',   desc: 'Average activity, average conversion',                   mult: 1.00, cr: '2.1%' },
-    { key: 'aged',    name: 'Aged users',      desc: 'Have seen a lot already — low conversion',               mult: 0.70, cr: '1.2%' },
-    { key: 'remnant', name: 'Remnant traffic', desc: 'Leftover inventory at the lowest price',                 mult: 0.45, cr: '0.6%' }
+    { key: 'fresh',   name: 'Fresh users',     desc: 'Have seen the fewest ads' },
+    { key: 'regular', name: 'Regular users',   desc: 'Average activity' },
+    { key: 'aged',    name: 'Aged users',      desc: 'Have seen a lot already' },
+    { key: 'remnant', name: 'Remnant traffic', desc: 'Leftover inventory at the lowest price' }
   ];
 
   var COUNTRIES = [
@@ -238,7 +238,15 @@
     NOTIFICATIONS: NOTIFICATIONS, DOCS: DOCS, FILES: FILES, PAYOUT: PAYOUT,
     FORMATS: ['Popunder', 'Native', 'Banner', 'Video', 'Interstitial', 'Display Ads', 'Social'],
     SOURCES: SOURCES, QUALITY: QUALITY, COUNTRIES: COUNTRIES,
-    VERTICALS: ['Gambling', 'Crypto', 'Dating', 'Nutra', 'Finance', 'Sweepstakes', 'Mobile Apps', 'Software'],
+    VERTICALS: [
+      'Gambling', 'Betting', 'iGaming', 'Crypto', 'Finance', 'Forex', 'Loans', 'Insurance',
+      'Dating', 'Adult', 'Nutra', 'Health & Beauty', 'Sweepstakes', 'E-commerce',
+      'Mobile Apps', 'Games', 'Software', 'Antivirus', 'VPN', 'Streaming', 'Education', 'Travel'
+    ],
+    CAPPING: ['1 impression / 24 hours', '1 impression / 12 hours', '1 impression / 6 hours',
+              '2 impressions / 24 hours', '3 impressions / 24 hours', 'No cap'],
+    BROWSERS: ['All browsers', 'Chrome', 'Safari', 'Firefox', 'Edge', 'Opera', 'Samsung Internet'],
+    LANGUAGES: ['Any language', 'English', 'German', 'Spanish', 'French', 'Italian', 'Portuguese', 'Polish'],
     TOKENS: ['{clickid}', '{zone}', '{subzone}', '{geo}', '{cost}', '{device}', '{os}', '{browser}'],
     BASE_DAYS: 7
   };

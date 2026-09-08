@@ -2,7 +2,7 @@
 (function (w) {
   'use strict';
 
-  var KEY = 'nn-cabinet-v2';
+  var KEY = 'nn-cabinet-v3';
 
   function seedSchedule() {
     var out = [], d, h;
@@ -18,16 +18,14 @@
     return {
       name: '', url: '',
       vertical: 'Gambling', format: 'Popunder', model: 'smartcpm', age: 'Mainstream',
-      capping: '1 impression / 24 hours',
+      capping: '1 impression / 24 hours', browsers: 'All browsers', language: 'Any language',
       sources: ['direct'], quality: ['fresh', 'regular'],
       platforms: ['Mobile'], oses: ['Android', 'iOS'],
       conn: 'All', vpn: 'No VPN',
-      preset: '', subzones: '',
+      preset: '', subzones: '', subzoneMode: 'Exclude',
       daily: '400', total: '4000',
-      rates: [
-        { code: 'DE', name: 'Germany', bid: '2.40', goal: '' },
-        { code: 'AT', name: 'Austria', bid: '2.10', goal: '' }
-      ],
+      /* Группа = один бид на несколько стран. Новая строка нужна только под другой бид. */
+      rates: [],
       schedule: seedSchedule()
     };
   }
@@ -51,7 +49,7 @@
       draft: seedDraft(),
       ui: {
         campStatus: 'all', campModel: 'all', campSelection: [],
-        geoPickerOpen: false, geoSearch: '', geoPick: [], advancedOpen: false,
+        geoPickerOpen: false, geoSearch: '', geoPick: [], geoTarget: 'new', geoBid: '', advancedOpen: false,
         statsRange: 30, statsTab: 'zones', statsCampaign: '',
         zonesTab: 'all', zonesCat: 'all', zonesVertical: 'all', zonesSort: 'cost',
         openPreset: '',

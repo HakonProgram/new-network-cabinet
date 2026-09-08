@@ -38,6 +38,10 @@
     return Math.min(1, src) * q;
   }
 
+  function countryCount(d) {
+    return d.rates.reduce(function (a, g) { return a + g.codes.length; }, 0);
+  }
+
   function topBid(d) {
     var bids = d.rates.map(function (g) { return UI.num(g.bid); }).filter(function (v) { return v > 0; });
     return bids.length ? Math.max.apply(null, bids) : UI.num(model().suggested);
@@ -88,10 +92,11 @@
   function geoPicker() {
     var u = Store.get().ui, d = draft();
     if (!u.geoPickerOpen) {
-      return '<button class="btn btn-sm" data-act="openGeo">' + icon('plus', 13, 2.4) + 'Add countries</button>';
+      return '<button class="btn btn-sm" data-act="openGeo" data-arg="new">' + icon('plus', 13, 2.4) +
+        (Store.get().draft.rates.length ? 'Add countries with a different bid' : 'Add countries') + '</button>';
     }
     var q = (u.geoSearch || '').trim().toLowerCase();
-    var already = d.rates.map(function (r) { return r.code; });
+    var already = d.rates.reduce(function (a, g) { return a.concat(g.codes); }, []);
     var list = DATA.COUNTRIES.filter(function (c) {
       return !q || c.name.toLowerCase().indexOf(q) >= 0 || c.code.toLowerCase().indexOf(q) === 0;
     });
@@ -120,7 +125,13 @@
         '<span class="hint">' + (u.geoPick.length
           ? u.geoPick.length + ' ' + UI.plural(u.geoPick.length, 'country', 'countries') + ' selected'
           : 'Pick as many as you need') + '</span>' +
-        '<button class="btn btn-sm btn-pri" style="margin-left:auto" data-act="addGeo">' +
+        (u.geoTarget === 'new'
+          ? '<span class="hint" style="margin-left:auto">Bid</span>' +
+            '<input class="inp num" style="width:96px;height:32px" type="text" value="' +
+              esc(u.geoBid || model().suggested) + '" data-inp="geoBid">'
+          : '<span class="hint" style="margin-left:auto">Adding to the $' +
+            esc(draft().rates[u.geoTarget] ? draft().rates[u.geoTarget].bid : '') + ' bid</span>') +
+        '<button class="btn btn-sm btn-pri" data-act="addGeo">' +
           'Add' + (u.geoPick.length ? ' ' + u.geoPick.length : '') + '</button>' +
       '</div>' +
     '</div>';
@@ -152,15 +163,22 @@
       d.schedule.forEach(function (r) { r.forEach(function (v) { if (v) picked++; }); });
 
       var rateRows = d.rates.map(function (g, i) {
+        var chips = g.codes.map(function (code) {
+          var c = DATA.COUNTRIES.find(function (x) { return x.code === code; });
+          return '<span class="geo-tag">' + esc(c ? c.name : code) +
+            '<span class="x" data-act="dropCountry" data-arg="' + i + '|' + code + '">' +
+            icon('close', 11, 2.4) + '</span></span>';
+        }).join('');
         return '<div class="rate-r">' +
-          '<div class="geo-chip"><span>' + esc(g.name) + '</span><span class="cid mono">' + g.code + '</span>' +
-            '<span class="geo-x" data-act="delGeo" data-arg="' + i + '">' + icon('close', 13, 2.4) + '</span></div>' +
+          '<div class="geo-cell">' + chips +
+            '<button class="btn btn-xs" data-act="openGeo" data-arg="' + i + '">' +
+              icon('plus', 11, 2.4) + 'Add</button></div>' +
           '<input class="inp num" type="text" value="' + esc(g.bid) + '" data-inp="bid" data-arg="' + i + '">' +
           '<input class="inp num" type="text" value="' + esc(g.goal) + '" placeholder="optional" data-inp="goal" data-arg="' + i + '">' +
-          '<input class="inp num" type="text" value="' + UI.dateShort(new Date()) + '" readonly>' +
-          '<div class="del" data-act="delGeo" data-arg="' + i + '">' + icon('trash', 14, 1.9) + '</div>' +
+          '<div class="del" data-act="delGroup" data-arg="' + i + '" title="Remove this bid">' +
+            icon('trash', 14, 1.9) + '</div>' +
         '</div>';
-      }).join('') || '<div class="hint">No countries yet — add at least one.</div>';
+      }).join('') || '<div class="hint">No countries yet — add the first ones below.</div>';
 
       var modelRows = DATA.PAY_MODELS.map(function (x) {
         return '<div class="mrow' + (x.key === d.model ? ' on' : '') + '" data-act="model" data-arg="' + x.key + '">' +
@@ -184,10 +202,7 @@
         return '<div class="tile' + (on ? ' on' : '') + '" data-act="quality" data-arg="' + x.key + '">' +
           '<div class="tile-h"><div class="box' + (on ? ' on' : '') + '"></div>' +
             '<span class="tile-n">' + x.name + '</span></div>' +
-          '<div class="tile-d">' + x.desc + '</div>' +
-          '<div class="tile-f"><span class="tile-v">$' + (base * x.mult).toFixed(2) + '</span>' +
-            '<span class="tile-m">suggested bid</span>' +
-            '<span class="tile-m" style="margin-left:auto">CR ' + x.cr + '</span></div></div>';
+          '<div class="tile-d">' + x.desc + '</div></div>';
       }).join('');
 
       var tokens = DATA.TOKENS.map(function (t) {
@@ -249,7 +264,7 @@
               '<div class="opts">' + opts(DATA.FORMATS, d.format, 'format') + '</div></div>' +
             '<div class="g2">' +
               '<div class="field"><label class="lab">Vertical</label>' +
-                '<div class="opts">' + opts(DATA.VERTICALS.slice(0, 5), d.vertical, 'vertical') + '</div></div>' +
+                UI.select('vertical', DATA.VERTICALS, d.vertical) + '</div>' +
               '<div class="field"><label class="lab">Content category</label>' +
                 '<div class="opts">' + opts(['Mainstream', 'Adult'], d.age, 'age') + '</div></div></div>' +
             '<div class="field"><label class="lab">Pricing model</label>' +
@@ -266,8 +281,7 @@
               '<div class="hint">Pick both to start on clean inventory and scale into partner supply later.</div></div>' +
             '<div class="field"><label class="lab">Traffic quality</label>' +
               '<div class="tiles">' + qualityRows + '</div>' +
-              '<div class="hint">Fresher users convert better and cost more. Remnant is the cheapest leftover volume — ' +
-                'usually worth it only on CPM.</div></div>' +
+              '<div class="hint">Fresher audiences cost more. Remnant is the cheapest leftover volume.</div></div>' +
             '<div class="g2">' +
               '<div class="field"><label class="lab">Platform</label>' +
                 '<div class="opts">' + multi(['Desktop', 'Mobile', 'Tablet'], d.platforms, 'platform') + '</div></div>' +
@@ -279,8 +293,8 @@
         '<div class="card"><div class="card-h"><div class="card-n">03</div>' +
           '<div class="card-t">Countries and bids</div><div class="card-s">A separate bid per country</div></div>' +
           '<div class="card-b">' +
-            '<div class="rate-h"><div class="lab">Country</div><div class="lab">' + m.bidLabel + '</div>' +
-              '<div class="lab">CPA goal, $</div><div class="lab">Start date</div><div></div></div>' +
+            '<div class="rate-h"><div class="lab">Countries</div><div class="lab">' + m.bidLabel + '</div>' +
+              '<div class="lab">CPA goal, $</div><div></div></div>' +
             '<div style="display:flex;flex-direction:column;gap:10px;margin-top:-8px">' + rateRows + '</div>' +
             '<div style="display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap">' +
               geoPicker() +
@@ -333,9 +347,12 @@
           '</div>' +
           (adv ? '<div class="card-b">' +
             '<div class="g3">' +
-              '<div class="field"><label class="lab">Frequency cap</label>' + sel(d.capping) + '</div>' +
-              '<div class="field"><label class="lab">Browsers</label>' + sel('All browsers', true) + '</div>' +
-              '<div class="field"><label class="lab">Placement language</label>' + sel('Any language', true) + '</div></div>' +
+              '<div class="field"><label class="lab">Frequency cap</label>' +
+                UI.select('capping', DATA.CAPPING, d.capping) + '</div>' +
+              '<div class="field"><label class="lab">Browsers</label>' +
+                UI.select('browsers', DATA.BROWSERS, d.browsers) + '</div>' +
+              '<div class="field"><label class="lab">Placement language</label>' +
+                UI.select('language', DATA.LANGUAGES, d.language) + '</div></div>' +
             '<div class="g3">' +
               '<div class="field"><label class="lab">Connection type</label>' +
                 seg2(['All', '3G / LTE', 'Wi-Fi'], d.conn, 'conn') + '</div>' +
@@ -352,9 +369,12 @@
                 '<button class="btn btn-sm" data-act="sch" data-arg="week">Weekend</button>' +
                 '<button class="btn btn-sm" data-act="sch" data-arg="clear">Clear</button>' +
                 '<span class="hint" style="margin-left:6px">' + picked + ' of 168 hours selected</span></div></div>' +
-            '<div class="field"><label class="lab">Subzone exclusions</label>' +
+            '<div class="field"><label class="lab">Subzones</label>' +
+              seg2(['Exclude', 'Only these'], d.subzoneMode, 'subzoneMode') +
               '<textarea class="inp" style="height:56px" placeholder="Subzone IDs, comma separated" data-inp="subzones">' + esc(d.subzones) + '</textarea>' +
-              '<div class="hint">Subzones affect placement quality — exclude them individually.</div></div>' +
+              '<div class="hint">' + (d.subzoneMode === 'Exclude'
+                ? 'Listed subzones will be skipped.'
+                : 'The campaign will run only on the listed subzones.') + '</div></div>' +
           '</div>' : '') +
         '</div>' +
 
@@ -372,8 +392,8 @@
               'placements and adjusts caps and bids.</p></div></div>' +
           '<div class="bar-row">' +
             '<div class="sumline"><span>' + (d.name ? esc(d.name) : 'Untitled') + '</span><span>·</span>' +
-              '<b>' + m.name + '</b><span>·</span><b>' + d.rates.length + ' ' +
-              UI.plural(d.rates.length, 'country', 'countries') + '</b><span>·</span>' +
+              '<b>' + m.name + '</b><span>·</span><b>' + countryCount(d) + ' ' +
+              UI.plural(countryCount(d), 'country', 'countries') + '</b><span>·</span>' +
               '<span>daily cap</span><b>$' + esc(d.daily) + '</b></div>' +
             '<button class="btn" style="margin-left:auto" data-act="draft">Save draft</button>' +
             '<button class="btn btn-pri btn-lg" data-act="launch">' + icon('play', 14) + 'Launch campaign</button></div>' +
@@ -387,11 +407,11 @@
       advanced: function () { Store.set(function (s) { s.ui.advancedOpen = !s.ui.advancedOpen; }); },
 
       format:   function (v) { Store.set(function (s) { s.draft.format = v; }); },
-      vertical: function (v) { Store.set(function (s) { s.draft.vertical = v; }); },
       age:      function (v) { Store.set(function (s) { s.draft.age = v; }); },
       conn:     function (v) { Store.set(function (s) { s.draft.conn = v; }); },
       vpn:      function (v) { Store.set(function (s) { s.draft.vpn = v; }); },
       preset:   function (v) { Store.set(function (s) { s.draft.preset = v || ''; }); },
+      subzoneMode: function (v) { Store.set(function (s) { s.draft.subzoneMode = v; }); },
 
       model: function (v) {
         Store.set(function (s) {
@@ -429,7 +449,14 @@
       },
 
       /* ── страны ── */
-      openGeo:  function () { Store.set(function (s) { s.ui.geoPickerOpen = true; s.ui.geoPick = []; s.ui.geoSearch = ''; }); },
+      openGeo: function (target) {
+        Store.set(function (s) {
+          s.ui.geoPickerOpen = true;
+          s.ui.geoTarget = target === undefined || target === 'new' ? 'new' : Number(target);
+          s.ui.geoPick = [];
+          s.ui.geoSearch = '';
+        });
+      },
       closeGeo: function () { Store.set(function (s) { s.ui.geoPickerOpen = false; s.ui.geoPick = []; }); },
       pickGeo: function (code) {
         Store.set(function (s) {
@@ -440,7 +467,7 @@
       pickAllGeo: function () {
         var u = Store.get().ui, d = draft();
         var q = (u.geoSearch || '').trim().toLowerCase();
-        var already = d.rates.map(function (r) { return r.code; });
+        var already = d.rates.reduce(function (a, g) { return a.concat(g.codes); }, []);
         var codes = DATA.COUNTRIES.filter(function (c) {
           return already.indexOf(c.code) < 0 &&
             (!q || c.name.toLowerCase().indexOf(q) >= 0 || c.code.toLowerCase().indexOf(q) === 0);
@@ -448,23 +475,50 @@
         Store.set(function (s) { s.ui.geoPick = s.ui.geoPick.length === codes.length ? [] : codes; });
       },
       addGeo: function () {
-        var n = Store.get().ui.geoPick.length;
+        var u = Store.get().ui;
+        var n = u.geoPick.length;
         if (!n) { App.toast('Pick at least one country'); return; }
+        var m = model();
+        var bid = u.geoTarget === 'new' ? String(u.geoBid || m.suggested).trim() : null;
+        if (bid !== null && UI.num(bid) < m.min) {
+          App.toast('Bid is below the $' + m.min.toFixed(2) + ' minimum for ' + m.name);
+          return;
+        }
+        var merged = false;
         Store.set(function (s) {
-          var bid = s.draft.rates.length ? s.draft.rates[s.draft.rates.length - 1].bid : model().suggested;
-          s.ui.geoPick.forEach(function (code) {
-            var c = DATA.COUNTRIES.find(function (x) { return x.code === code; });
-            if (c && !s.draft.rates.some(function (r) { return r.code === code; })) {
-              s.draft.rates.push({ code: c.code, name: c.name, bid: bid, goal: '' });
+          var target = s.ui.geoTarget;
+          if (target === 'new' || !s.draft.rates[target]) {
+            /* Такой бид уже есть — доливаем страны туда, новая строка не нужна. */
+            var same = s.draft.rates.findIndex(function (g) { return UI.num(g.bid) === UI.num(bid); });
+            if (same >= 0) { target = same; merged = true; }
+            else {
+              s.draft.rates.push({ codes: [], bid: bid, goal: '' });
+              target = s.draft.rates.length - 1;
             }
+          }
+          s.ui.geoPick.forEach(function (code) {
+            if (s.draft.rates[target].codes.indexOf(code) < 0) s.draft.rates[target].codes.push(code);
           });
           s.ui.geoPick = [];
           s.ui.geoPickerOpen = false;
           s.ui.geoSearch = '';
+          s.ui.geoBid = '';
         });
-        App.toast(n + ' ' + UI.plural(n, 'country', 'countries') + ' added');
+        App.toast(n + ' ' + UI.plural(n, 'country', 'countries') +
+          (merged ? ' added to the existing $' + bid + ' bid' : ' added'));
       },
-      delGeo: function (i) { Store.set(function (s) { s.draft.rates.splice(Number(i), 1); }); },
+      /* Страна уходит из группы; пустая группа исчезает сама. */
+      dropCountry: function (arg) {
+        var p = arg.split('|'), gi = Number(p[0]), code = p[1];
+        Store.set(function (s) {
+          var g = s.draft.rates[gi];
+          if (!g) return;
+          var i = g.codes.indexOf(code);
+          if (i >= 0) g.codes.splice(i, 1);
+          if (!g.codes.length) s.draft.rates.splice(gi, 1);
+        });
+      },
+      delGroup: function (i) { Store.set(function (s) { s.draft.rates.splice(Number(i), 1); }); },
 
       cell: function (arg) {
         var p = arg.split('-'), di = Number(p[0]), hi = Number(p[1]);
@@ -492,12 +546,12 @@
         var d = Store.get().draft;
         if (!d.name.trim()) { App.toast('Give the campaign a name'); return; }
         if (!d.url.trim()) { App.toast('Add the offer link'); return; }
-        if (!d.rates.length) { App.toast('Add at least one country'); return; }
+        if (!countryCount(d)) { App.toast('Add at least one country'); return; }
 
         var m = model();
-        var low = d.rates.filter(function (r) { return UI.num(r.bid) < m.min; });
+        var low = d.rates.filter(function (g) { return UI.num(g.bid) < m.min; });
         if (low.length) {
-          App.toast(low[0].name + ': bid is below the $' + m.min.toFixed(2) + ' minimum for ' + m.name);
+          App.toast('One of the bids is below the $' + m.min.toFixed(2) + ' minimum for ' + m.name);
           return;
         }
 
@@ -519,6 +573,10 @@
     },
 
     inputs: {
+      vertical: function (v) { Store.set(function (s) { s.draft.vertical = v; }); },
+      capping:  function (v) { Store.patch(function (s) { s.draft.capping = v; }); },
+      browsers: function (v) { Store.patch(function (s) { s.draft.browsers = v; }); },
+      language: function (v) { Store.patch(function (s) { s.draft.language = v; }); },
       name:     function (v) { Store.patch(function (s) { s.draft.name = v; }); },
       url:      function (v) { Store.patch(function (s) { s.draft.url = v; }); },
       subzones: function (v) { Store.patch(function (s) { s.draft.subzones = v; }); },
@@ -528,9 +586,27 @@
       geoSearch: function (v) { Store.set(function (s) { s.ui.geoSearch = v; s.ui.geoPick = []; }); },
       /* Пока печатаешь — ничего не перерисовываем, иначе поле дёргается.
          Ставка уходит в расчёт, когда уводишь фокус. */
+      geoBid: function (v) { Store.patch(function (s) { s.ui.geoBid = v; }); },
+      /* Пока печатаешь — не перерисовываем. По уходу фокуса строки с одинаковым бидом сливаем. */
       bid: function (v, i, type) {
-        if (type === 'input') Store.patch(function (s) { s.draft.rates[Number(i)].bid = v; });
-        else Store.set(function (s) { s.draft.rates[Number(i)].bid = v; });
+        if (type === 'input') { Store.patch(function (s) { s.draft.rates[Number(i)].bid = v; }); return; }
+        var mergedInto = -1;
+        Store.set(function (s) {
+          var idx = Number(i);
+          s.draft.rates[idx].bid = v;
+          var twin = -1;
+          s.draft.rates.forEach(function (g, j) {
+            if (j !== idx && twin < 0 && UI.num(g.bid) === UI.num(v)) twin = j;
+          });
+          if (twin >= 0) {
+            s.draft.rates[idx].codes.forEach(function (code) {
+              if (s.draft.rates[twin].codes.indexOf(code) < 0) s.draft.rates[twin].codes.push(code);
+            });
+            s.draft.rates.splice(idx, 1);
+            mergedInto = twin;
+          }
+        });
+        if (mergedInto >= 0) App.toast('Same bid — countries merged into one row');
       }
     }
   };
