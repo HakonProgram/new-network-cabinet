@@ -61,9 +61,15 @@
     });
   }
 
-  function money(n) { return '$' + Math.round(n).toLocaleString('ru-RU'); }
-  function money2(n) { return '$' + (Math.round(n * 100) / 100).toFixed(2); }
-  function int(n) { return Math.round(n).toLocaleString('ru-RU'); }
+  function money(n) {
+    var sign = n < 0 ? '-' : '';
+    return sign + '$' + Math.abs(Math.round(n)).toLocaleString('en-US');
+  }
+  function money2(n) {
+    var sign = n < 0 ? '-' : '';
+    return sign + '$' + (Math.round(Math.abs(n) * 100) / 100).toFixed(2);
+  }
+  function int(n) { return Math.round(n).toLocaleString('en-US'); }
   function compact(n) {
     if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
     if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
@@ -75,18 +81,58 @@
     var n = parseFloat(String(v).replace(/[^0-9.\-]/g, ''));
     return isNaN(n) ? 0 : n;
   }
-  function plural(n, one, few, many) {
-    var a = Math.abs(Math.round(n)) % 100, b = a % 10;
-    if (a > 10 && a < 20) return many;
-    if (b > 1 && b < 5) return few;
-    if (b === 1) return one;
-    return many;
+  function plural(n, one, many) {
+    return Math.abs(Math.round(n)) === 1 ? one : many;
   }
   function dayLabel(offsetBack) {
     var d = new Date();
     d.setDate(d.getDate() - offsetBack);
-    var mo = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
-    return d.getDate() + ' ' + mo[d.getMonth()];
+    var mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return mo[d.getMonth()] + ' ' + d.getDate();
+  }
+
+  /* ── производные метрики ── */
+  var GOOD = '#3ad13a', BAD = '#f07575', MUTED = '#6A7180';
+
+  function cpm(cost, impr) { return impr > 0 ? '$' + (cost / impr * 1000).toFixed(2) : '—'; }
+  function cpc(cost, clicks) { return clicks > 0 ? '$' + (cost / clicks).toFixed(3) : '—'; }
+  function winRate(v) { return v > 0 ? v.toFixed(1) + '%' : '—'; }
+
+  function profit(revenue, cost) {
+    var p = revenue - cost;
+    return { value: p, text: money(p), color: p === 0 ? MUTED : (p > 0 ? GOOD : BAD) };
+  }
+  function roi(revenue, cost) {
+    if (!cost) return { value: 0, text: '—', color: MUTED };
+    var r = (revenue - cost) / cost * 100;
+    return {
+      value: r,
+      text: (r > 0 ? '+' : '') + r.toFixed(1) + '%',
+      color: Math.abs(r) < 0.05 ? MUTED : (r > 0 ? GOOD : BAD)
+    };
+  }
+
+  /* Полный набор метрик строки — используется всеми таблицами. */
+  function metrics(r) {
+    var p = profit(r.revenue, r.cost), R = roi(r.revenue, r.cost);
+    return {
+      impr: compact(r.impr), clicks: int(r.clicks),
+      ctr: pct(r.clicks, r.impr), conv: int(r.conv), cr: pct(r.conv, r.clicks),
+      cost: money(r.cost), revenue: money(r.revenue),
+      profit: p.text, profitColor: p.color,
+      roi: R.text, roiColor: R.color,
+      cpa: cpa(r.cost, r.conv), cpm: cpm(r.cost, r.impr), cpc: cpc(r.cost, r.clicks),
+      win: winRate(r.winRate)
+    };
+  }
+
+  function sum(rows) {
+    return rows.reduce(function (a, r) {
+      a.impr += r.impr || 0; a.clicks += r.clicks || 0; a.conv += r.conv || 0;
+      a.cost += r.cost || 0; a.revenue += r.revenue || 0;
+      a.wSum += (r.winRate || 0) * (r.cost || 0);
+      return a;
+    }, { impr: 0, clicks: 0, conv: 0, cost: 0, revenue: 0, wSum: 0 });
   }
   function dateShort(d) {
     var p = function (x) { return x < 10 ? '0' + x : String(x); };
@@ -129,7 +175,9 @@
 
   w.UI = {
     icon: icon, esc: esc, money: money, money2: money2, int: int, compact: compact,
-    pct: pct, cpa: cpa, num: num, plural: plural, dayLabel: dayLabel, dateShort: dateShort,
+    pct: pct, cpa: cpa, cpm: cpm, cpc: cpc, winRate: winRate, profit: profit, roi: roi,
+    metrics: metrics, sum: sum,
+    num: num, plural: plural, dayLabel: dayLabel, dateShort: dateShort,
     daily: daily, ticks: ticks, cls: cls
   };
 })(window);

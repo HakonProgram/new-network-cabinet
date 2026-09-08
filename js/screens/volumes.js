@@ -1,14 +1,16 @@
-/* Объёмы трафика: сколько доступно до того, как потрачен первый доллар. */
+/* Traffic volumes: what is available before the first dollar is spent. */
 (function (w) {
   'use strict';
   var icon = UI.icon, esc = UI.esc;
 
   var F_SCALE = { 'Popunder': 1, 'Push': 0.72, 'In-Page Push': 0.55, 'Native': 0.31, 'Banner': 0.44 };
   var P_SCALE = { 'Mobile': 1, 'Desktop': 0.58, 'Tablet': 0.14 };
-  var C_SCALE = { 'Обычная': 1, '18+': 0.66, 'Все': 1.5 };
-  var R_SCALE = { 'Европа': 1, 'Северная Америка': 0.74, 'Азия': 1.9, 'Весь мир': 4.2 };
+  var C_SCALE = { 'Mainstream': 1, 'Adult': 0.66, 'All': 1.5 };
+  var R_SCALE = { 'Europe': 1, 'North America': 0.74, 'Asia': 1.9, 'Worldwide': 4.2 };
   var HALF = { 'Smart CPM': 1.9, 'CPC': 0.12, 'CPA': 9.0 };
   var MIN = { 'Smart CPM': 0.15, 'CPC': 0.03, 'CPA': 3.00 };
+  var COLS = 'minmax(150px,1fr) 70px 118px 116px 92px 92px 82px 84px 170px';
+  var MINW = 'min-width:1180px';
 
   function opts(items, sel, act) {
     return items.map(function (x) {
@@ -22,10 +24,11 @@
       var u = Store.get().ui;
       var k = (F_SCALE[u.volFormat] || 1) * (P_SCALE[u.volPlatform] || 1) *
               (C_SCALE[u.volCat] || 1) * (R_SCALE[u.volRegion] || 1);
-      var maxVol = 26000000 * k;
-      var half = HALF[u.volModel] || 1.9;
+      var maxVol = 26000000 * k, half = HALF[u.volModel] || 1.9;
       var vol = function (b) { return maxVol * Math.pow(b, 1.7) / (Math.pow(b, 1.7) + Math.pow(half, 1.7)); };
       var bid = Math.max(0, UI.num(u.volBid));
+      var total = vol(bid);
+      var winRate = Math.min(62, 6 + (total / maxVol) * 56);
 
       var L = 56, R = 1096, T = 16, B = 164, W = R - L, H = B - T;
       var bMax = half * 3, pts = [], i;
@@ -47,78 +50,81 @@
         xt += '<text x="' + vx(bb).toFixed(1) + '" y="186" fill="#6A7180" font-size="10" text-anchor="middle">$' + bb.toFixed(2) + '</text>';
       }
 
-      var total = vol(bid);
       var rows = DATA.GEO.map(function (g) {
         var v = total * g.share, free = 1 - g.taken;
-        return '<div class="tr row" style="grid-template-columns:minmax(0,1fr) 78px 130px 130px 110px 92px 180px">' +
+        return '<div class="tr row" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
           '<div class="cell w">' + g.name + '</div>' +
           '<div class="cell mono muted">' + g.code + '</div>' +
           '<div class="cell w r">' + UI.compact(v) + '</div>' +
           '<div class="cell r">$' + g.bid.toFixed(2) + '</div>' +
+          '<div class="cell muted r">' + UI.cpm(g.cost, g.impr) + '</div>' +
+          '<div class="cell muted r">' + g.winRate.toFixed(1) + '%</div>' +
           '<div class="cell muted r">' + g.zones + '</div>' +
           '<div class="cell muted r">' + g.cr.toFixed(2) + '%</div>' +
           '<div><div class="bar"><i style="width:' + Math.round(free * 100) + '%"></i></div>' +
-          '<div class="hint" style="margin-top:4px">свободно ' + UI.compact(v * free) + '</div></div>' +
+          '<div class="hint" style="margin-top:4px">' + UI.compact(v * free) + ' still free</div></div>' +
         '</div>';
       }).join('');
 
-      return '<div class="page">' +
-        '<div class="head"><div><h1 class="h1">Объёмы трафика</h1>' +
-        '<p class="sub">Сколько трафика доступно под ваш таргетинг — до того, как вы потратите первый доллар.</p></div></div>' +
+      var kpiBig = function (lab, val) {
+        return '<div><div class="kpi-lab">' + lab + '</div>' +
+          '<div class="num" style="font-size:20px;font-weight:600;letter-spacing:-0.02em">' + val + '</div></div>';
+      };
 
-        '<div class="card"><div class="card-h"><div class="card-t">Параметры запроса</div>' +
-          '<div class="card-s">Оценка по проверенным площадкам сети за последние 7 дней</div></div>' +
+      return '<div class="page">' +
+        '<div class="head"><div><h1 class="h1">Traffic volumes</h1>' +
+        '<p class="sub">How much traffic your targeting can reach — before you spend the first dollar.</p></div></div>' +
+
+        '<div class="card"><div class="card-h"><div class="card-t">Query</div>' +
+          '<div class="card-s">Estimated from verified placements over the last 7 days</div></div>' +
           '<div class="card-b">' +
             '<div class="g3">' +
-              '<div class="field"><label class="lab">Формат</label><div class="opts">' +
+              '<div class="field"><label class="lab">Format</label><div class="opts">' +
                 opts(DATA.FORMATS, u.volFormat, 'format') + '</div></div>' +
-              '<div class="field"><label class="lab">Платформа</label><div class="opts">' +
+              '<div class="field"><label class="lab">Platform</label><div class="opts">' +
                 opts(['Desktop', 'Mobile', 'Tablet'], u.volPlatform, 'platform') + '</div></div>' +
-              '<div class="field"><label class="lab">Категория</label><div class="opts">' +
-                opts(['Обычная', '18+', 'Все'], u.volCat, 'cat') + '</div></div>' +
-            '</div>' +
+              '<div class="field"><label class="lab">Category</label><div class="opts">' +
+                opts(['Mainstream', 'Adult', 'All'], u.volCat, 'cat') + '</div></div></div>' +
             '<div class="g3">' +
-              '<div class="field"><label class="lab">Регион</label><div class="opts">' +
-                opts(['Европа', 'Северная Америка', 'Азия', 'Весь мир'], u.volRegion, 'region') + '</div></div>' +
-              '<div class="field"><label class="lab">Модель оплаты</label><div class="opts">' +
+              '<div class="field"><label class="lab">Region</label><div class="opts">' +
+                opts(['Europe', 'North America', 'Asia', 'Worldwide'], u.volRegion, 'region') + '</div></div>' +
+              '<div class="field"><label class="lab">Pricing model</label><div class="opts">' +
                 opts(['Smart CPM', 'CPC', 'CPA'], u.volModel, 'model') + '</div></div>' +
-              '<div class="field"><label class="lab">Ставка, $</label>' +
+              '<div class="field"><label class="lab">Bid, $</label>' +
                 '<input class="inp num" type="text" value="' + esc(u.volBid) + '" data-inp="bid">' +
-                '<div class="hint">Минимальная ставка — $' + MIN[u.volModel].toFixed(2) + '</div></div>' +
-            '</div>' +
+                '<div class="hint">Minimum bid — $' + MIN[u.volModel].toFixed(2) + '</div></div></div>' +
           '</div></div>' +
 
-        '<div class="card"><div class="card-h"><div class="card-t">Доступный объём</div>' +
+        '<div class="card"><div class="card-h"><div class="card-t">Available volume</div>' +
           '<div class="card-s">' + esc(u.volFormat + ' · ' + u.volPlatform + ' · ' + u.volRegion + ' · ' + u.volCat) + '</div></div>' +
           '<div class="card-b">' +
             '<div class="hero"><div>' +
               '<div class="hero-v">' + UI.compact(total) + '</div>' +
-              '<div class="hero-l">показов в сутки при ставке $' + bid.toFixed(2) + '</div></div>' +
+              '<div class="hero-l">impressions per day at a $' + bid.toFixed(2) + ' bid</div></div>' +
               '<div style="display:flex;gap:26px;margin-left:auto;flex-wrap:wrap">' +
-                '<div><div class="kpi-lab">Площадок в выдаче</div><div class="num" style="font-size:20px;font-weight:600;letter-spacing:-0.02em">' +
-                  Math.round(1482 * Math.min(1, k / 1.2)) + '</div></div>' +
-                '<div><div class="kpi-lab">Вы выкупаете сейчас</div><div class="num" style="font-size:20px;font-weight:600;letter-spacing:-0.02em">' +
-                  Math.round(Math.min(60, 8 + bid * 6)) + '%</div></div>' +
-                '<div><div class="kpi-lab">Средний CR по вертикали</div><div class="num" style="font-size:20px;font-weight:600;letter-spacing:-0.02em">2.31%</div></div>' +
+                kpiBig('Est. win rate', winRate.toFixed(1) + '%') +
+                kpiBig('Placements available', String(Math.round(1482 * Math.min(1, k / 1.2)))) +
+                kpiBig('Avg CPM in scope', '$' + (0.9 + bid * 0.34).toFixed(2)) +
+                kpiBig('Avg CR in vertical', '2.31%') +
               '</div></div>' +
-            '<div class="plot"><svg width="100%" height="200" viewBox="0 0 1104 200" fill="none" font-family="Archivo, sans-serif" aria-label="Доступный объём в зависимости от ставки">' +
-              grid +
-              '<path d="' + area + '" fill="#8368F7" fill-opacity="0.10"/>' +
+            '<div class="plot"><svg width="100%" height="200" viewBox="0 0 1104 200" fill="none" font-family="Archivo, sans-serif" aria-label="Available volume by bid">' +
+              grid + '<path d="' + area + '" fill="#8368F7" fill-opacity="0.10"/>' +
               '<polyline points="' + line + '" fill="none" stroke="#8368F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
               '<line x1="' + vx(bid).toFixed(1) + '" y1="16" x2="' + vx(bid).toFixed(1) + '" y2="164" stroke="#A48FFF" stroke-width="1" stroke-dasharray="3 3"/>' +
               '<circle cx="' + vx(bid).toFixed(1) + '" cy="' + vy(vol(bid)).toFixed(1) + '" r="4.5" fill="#8368F7" stroke="#13161C" stroke-width="2"/>' +
               xt + '</svg></div>' +
-            '<div class="hint">По горизонтали — ставка, по вертикали — показы в сутки. Пунктир — ваша текущая ставка.</div>' +
+            '<div class="hint">Bid along the horizontal axis, impressions per day along the vertical. The dashed line marks your current bid.</div>' +
           '</div></div>' +
 
-        '<div class="table">' +
-          '<div class="tr thead" style="grid-template-columns:minmax(0,1fr) 78px 130px 130px 110px 92px 180px">' +
-            '<div class="th">Страна</div><div class="th">Код</div><div class="th r">Показов в сутки</div>' +
-            '<div class="th r">Рекомендуемая ставка</div><div class="th r">Площадок</div>' +
-            '<div class="th r">Средний CR</div><div class="th">Свободный объём</div></div>' +
+        '<div class="table"><div class="table-scroll">' +
+          '<div class="tr thead" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
+            '<div class="th">Country</div><div class="th">Code</div><div class="th r">Impr. / day</div>' +
+            '<div class="th r">Suggested bid</div><div class="th r">Avg CPM</div><div class="th r">Win rate</div>' +
+            '<div class="th r">Placements</div><div class="th r">Avg CR</div><div class="th">Free volume</div></div>' +
           rows +
-          '<div class="foot"><span>Показано 7 стран из 34 по выбранному региону</span>' +
-          '<span style="margin-left:auto">Оценка обновляется раз в час</span></div>' +
+        '</div>' +
+        '<div class="foot"><span>Showing 7 of 34 countries in the selected region</span>' +
+        '<span style="margin-left:auto">Estimate refreshes hourly</span></div>' +
         '</div>' +
       '</div>';
     },
@@ -135,8 +141,6 @@
         });
       }
     },
-    inputs: {
-      bid: function (v) { Store.ui('volBid', v); }
-    }
+    inputs: { bid: function (v) { Store.ui('volBid', v); } }
   };
 })(window);

@@ -1,14 +1,14 @@
-/* Уведомления: что робот и система сделали с кампаниями. */
+/* Notifications: what the robot and the system did to your campaigns. */
 (function (w) {
   'use strict';
   var icon = UI.icon, esc = UI.esc;
 
   var CATS = [
-    { k: 'all',   label: 'Все' },
-    { k: 'camp',  label: 'Кампании' },
-    { k: 'zones', label: 'Площадки' },
-    { k: 'money', label: 'Финансы' },
-    { k: 'sys',   label: 'Система' }
+    { k: 'all',   label: 'All' },
+    { k: 'camp',  label: 'Campaigns' },
+    { k: 'zones', label: 'Placements' },
+    { k: 'money', label: 'Billing' },
+    { k: 'sys',   label: 'System' }
   ];
   var STYLE = {
     ok:    { bg: 'rgba(12,163,12,0.14)',   fg: '#3ad13a', ic: 'check' },
@@ -46,41 +46,41 @@
       var channels = [
         { k: 'mail',    name: 'Email',    desc: 'ops@nexoramedia.io' },
         { k: 'tg',      name: 'Telegram', desc: '@nexora_ops' },
-        { k: 'browser', name: 'Браузер',  desc: 'push, пока кабинет открыт' }
+        { k: 'browser', name: 'Browser',  desc: 'push while the dashboard is open' }
       ].map(function (c) {
         return '<div class="swr"><div style="min-width:0">' +
           '<div class="swr-t">' + c.name + '</div><div class="swr-d">' + c.desc + '</div></div>' +
           '<div class="sw' + (s.channels[c.k] ? ' on' : '') + '" style="margin-left:auto" data-act="channel" data-arg="' + c.k + '"><i></i></div></div>';
       }).join('');
 
-      var thresholds = ['1 день', '2 дня', '5 дней'].map(function (t) {
+      var thresholds = ['1 day', '2 days', '5 days'].map(function (t) {
         return '<div class="opt' + (s.threshold === t ? ' on' : '') + '" data-act="threshold" data-arg="' + esc(t) + '">' + t + '</div>';
       }).join('');
 
       return '<div class="page">' +
-        '<div class="head"><div><h1 class="h1">Уведомления</h1>' +
-          '<p class="sub">Что робот и система сделали с вашими кампаниями.</p></div>' +
-          '<button class="btn" style="margin-left:auto" data-act="readAll">Отметить все прочитанными</button></div>' +
+        '<div class="head"><div><h1 class="h1">Notifications</h1>' +
+          '<p class="sub">What the robot and the system did to your campaigns.</p></div>' +
+          '<button class="btn" style="margin-left:auto" data-act="readAll">Mark all as read</button></div>' +
 
         '<div class="nt">' +
           '<div class="card">' +
             '<div class="card-h" style="gap:10px"><div class="segs">' + tabs + '</div></div>' +
-            '<div>' + (items || '<div class="empty">В этом разделе уведомлений нет</div>') +
+            '<div>' + (items || '<div class="empty">Nothing here yet</div>') +
               '<div class="foot"><span>' +
-                (unread ? 'Непрочитанных: ' + unread + ' из ' + s.notifications.length : 'Все уведомления прочитаны') +
+                (unread ? unread + ' unread of ' + s.notifications.length : 'All notifications read') +
               '</span></div></div>' +
           '</div>' +
 
-          '<div class="card"><div class="card-h"><div class="card-t">Каналы и пороги</div></div>' +
+          '<div class="card"><div class="card-h"><div class="card-t">Channels and thresholds</div></div>' +
             '<div class="card-b" style="gap:16px">' +
-              '<div><div class="lab" style="margin-bottom:6px">Куда присылать</div>' +
+              '<div><div class="lab" style="margin-bottom:6px">Where to send</div>' +
                 '<div style="display:flex;flex-direction:column">' + channels + '</div></div>' +
-              '<div class="field"><label class="lab">Предупреждать, когда баланса хватает менее чем на</label>' +
+              '<div class="field"><label class="lab">Warn me when the balance covers less than</label>' +
                 '<div class="opts">' + thresholds + '</div>' +
-                '<div class="hint">Считается по среднему расходу за последние 7 дней.</div></div>' +
+                '<div class="hint">Based on average spend over the last 7 days.</div></div>' +
               '<div class="note">' + icon('info', 15, 2) +
-                '<p>Отключения площадок робот делает сам и всегда логирует здесь — <b>подтверждать их не нужно</b>. ' +
-                'Вмешаться можно в разделе «Площадки».</p></div>' +
+                '<p>The robot switches placements off on its own and always logs it here — <b>no approval needed</b>. ' +
+                'Step in from the Placements screen if you disagree.</p></div>' +
             '</div></div>' +
         '</div>' +
       '</div>';
@@ -96,7 +96,7 @@
       },
       readAll: function () {
         Store.set(function (s) { s.notifications.forEach(function (n) { n.unread = false; }); });
-        App.toast('Все уведомления прочитаны');
+        App.toast('All notifications marked as read');
       },
       channel: function (k) {
         Store.set(function (s) { s.channels[k] = !s.channels[k]; });

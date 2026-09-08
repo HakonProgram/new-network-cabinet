@@ -1,177 +1,204 @@
-/* Демо-данные кабинета. Все цифры — образцы, не реальные. */
+/* Demo data. Every figure is a sample, not a real metric. */
 (function (w) {
   'use strict';
 
   var PAY_MODELS = [
-    { key: 'cpa', name: 'CPA', tag: 'платный тест', price: '10.00', priceLab: 'за конверсию',
-      desc: 'Оплата за действие. Тестовый запуск оплачивает рекламодатель — система сама ищет рабочую связку.',
-      bidLabel: 'Выплата за конверсию, $', min: 3.00, half: 9.0 },
-    { key: 'purecpa', name: 'Pure CPA', tag: 'бесплатный тест', price: '10.00', priceLab: 'за конверсию',
-      desc: 'То же, но тест за счёт сети: риск неудачного трафика берём на себя. Для топовых рекламодателей.',
-      bidLabel: 'Выплата за конверсию, $', min: 3.00, half: 9.0 },
-    { key: 'cpm', name: 'CPM', tag: 'классическая', price: '1.80', priceLab: 'за 1000 показов',
-      desc: 'Фиксированная цена за тысячу показов. Понятная модель для тех, кто закупает объём.',
-      bidLabel: 'Ставка CPM, $', min: 0.15, half: 1.9 },
-    { key: 'smartcpm', name: 'Smart CPM', tag: 'аукцион второй цены', price: '2.40', priceLab: 'максимальная ставка',
-      desc: 'Победитель платит не свою ставку, а цену ближайшего конкурента. Тот же охват выходит дешевле.',
-      bidLabel: 'Максимальная ставка, $', min: 0.15, half: 1.9 },
-    { key: 'cpc', name: 'CPC', tag: 'оплата за клики', price: '0.09', priceLab: 'за клик',
-      desc: 'Базовая модель с минимальным порогом входа. Обычно первый шаг нового рекламодателя.',
-      bidLabel: 'Ставка CPC, $', min: 0.03, half: 0.12 }
+    { key: 'cpa', name: 'CPA', tag: 'paid test', price: '10.00', priceLab: 'per conversion',
+      desc: 'Pay per action. The advertiser funds the test run — the system finds a working combination on its own.',
+      bidLabel: 'Payout per conversion, $', min: 3.00, half: 9.0 },
+    { key: 'purecpa', name: 'Pure CPA', tag: 'free test', price: '10.00', priceLab: 'per conversion',
+      desc: 'Same model, but the network funds the test: we take the risk of unprofitable traffic. For top advertisers.',
+      bidLabel: 'Payout per conversion, $', min: 3.00, half: 9.0 },
+    { key: 'cpm', name: 'CPM', tag: 'classic', price: '1.80', priceLab: 'per 1,000 impressions',
+      desc: 'Fixed price per thousand impressions. A clear model for buying volume.',
+      bidLabel: 'CPM bid, $', min: 0.15, half: 1.9 },
+    { key: 'smartcpm', name: 'Smart CPM', tag: 'second-price auction', price: '2.40', priceLab: 'max bid',
+      desc: 'The winner pays the runner-up price, not their own bid. The same reach costs less.',
+      bidLabel: 'Max bid, $', min: 0.15, half: 1.9 },
+    { key: 'cpc', name: 'CPC', tag: 'pay per click', price: '0.09', priceLab: 'per click',
+      desc: 'Entry-level model with the lowest threshold. Usually a new advertiser’s first step.',
+      bidLabel: 'CPC bid, $', min: 0.03, half: 0.12 }
   ];
 
   var STATUS = {
-    active: { label: 'Активна',        color: '#0ca30c', ink: '#EEF2FA' },
-    test:   { label: 'Тест',            color: '#8368F7', ink: '#EEF2FA' },
-    review: { label: 'На автопроверке', color: '#fab219', ink: '#EEF2FA' },
-    paused: { label: 'Остановлена',     color: '#6A7180', ink: '#9AA1AE' },
-    done:   { label: 'Завершена',       color: '#2E323B', ink: '#6A7180' }
+    active: { label: 'Active',        color: '#0ca30c', ink: '#EEF2FA' },
+    test:   { label: 'Test',          color: '#8368F7', ink: '#EEF2FA' },
+    review: { label: 'Auto-check',    color: '#fab219', ink: '#EEF2FA' },
+    paused: { label: 'Stopped',       color: '#6A7180', ink: '#9AA1AE' },
+    done:   { label: 'Finished',      color: '#2E323B', ink: '#6A7180' }
   };
 
-  /* Показатели кампаний — за последние 7 дней. */
+  /* Campaign figures — last 7 days. Everything else scales from this base. */
   var CAMPAIGNS = [
     { id: '4821', name: 'Slots Royale — App Install', format: 'Popunder', vertical: 'Gambling', adult: false,
-      model: 'Pure CPA', status: 'active', impr: 2100000, ctr: 0.94, conv: 412, spend: 4120, bid: '10.00' },
-    { id: '4790', name: 'BitVault — Регистрация', format: 'Push', vertical: 'Crypto', adult: false,
-      model: 'CPA', status: 'active', impr: 1440000, ctr: 0.71, conv: 318, spend: 2860, bid: '9.00' },
+      model: 'Pure CPA', status: 'active', impr: 2227000, clicks: 20940, conv: 412, cost: 4120, revenue: 5150, winRate: 22.4, bid: '10.00' },
+    { id: '4790', name: 'BitVault — Sign-up', format: 'Push', vertical: 'Crypto', adult: false,
+      model: 'CPA', status: 'active', impr: 2014000, clicks: 14300, conv: 318, cost: 2860, revenue: 3340, winRate: 18.9, bid: '9.00' },
     { id: '4744', name: 'MeetLocal — Push', format: 'Push', vertical: 'Dating', adult: false,
-      model: 'Smart CPM', status: 'active', impr: 6020000, ctr: 1.28, conv: 204, spend: 1980, bid: '2.10' },
-    { id: '4702', name: 'NightDate — Popunder', format: 'Popunder', vertical: '18+', adult: true,
-      model: 'Smart CPM', status: 'active', impr: 9850000, ctr: 1.62, conv: 389, spend: 3410, bid: '2.40' },
+      model: 'Smart CPM', status: 'active', impr: 2152000, clicks: 27550, conv: 204, cost: 1980, revenue: 2450, winRate: 31.2, bid: '2.10' },
+    { id: '4702', name: 'NightDate — Popunder', format: 'Popunder', vertical: 'Dating', adult: true,
+      model: 'Smart CPM', status: 'active', impr: 2079000, clicks: 33680, conv: 389, cost: 3410, revenue: 4280, winRate: 27.6, bid: '2.40' },
     { id: '4688', name: 'FX Prime — Broker Leads', format: 'In-Page Push', vertical: 'Finance', adult: false,
-      model: 'Pure CPA', status: 'active', impr: 1880000, ctr: 0.63, conv: 241, spend: 5240, bid: '21.00' },
+      model: 'Pure CPA', status: 'active', impr: 2230000, clicks: 14050, conv: 241, cost: 5240, revenue: 6020, winRate: 14.8, bid: '21.00' },
     { id: '4655', name: 'SlimFit — Weight Loss', format: 'Native', vertical: 'Nutra', adult: false,
-      model: 'CPA', status: 'test', impr: 210000, ctr: 0.88, conv: 29, spend: 340, bid: '11.50' },
+      model: 'CPA', status: 'test', impr: 283000, clicks: 2490, conv: 29, cost: 340, revenue: 290, winRate: 9.4, bid: '11.50' },
     { id: '4640', name: 'iPhone 17 Giveaway', format: 'Banner', vertical: 'Sweepstakes', adult: false,
-      model: 'CPM', status: 'review', impr: 0, ctr: 0, conv: 0, spend: 0, bid: '1.80' },
+      model: 'CPM', status: 'review', impr: 0, clicks: 0, conv: 0, cost: 0, revenue: 0, winRate: 0, bid: '1.80' },
     { id: '4602', name: 'CleanMaster — Utility', format: 'Push', vertical: 'Mobile Apps', adult: false,
-      model: 'CPC', status: 'paused', impr: 3040000, ctr: 0.42, conv: 96, spend: 1120, bid: '0.09' },
+      model: 'CPC', status: 'paused', impr: 1806000, clicks: 12460, conv: 96, cost: 1120, revenue: 960, winRate: 12.1, bid: '0.09' },
     { id: '4571', name: 'VPN Shield — Trial', format: 'Popunder', vertical: 'Software', adult: false,
-      model: 'CPC', status: 'done', impr: 5110000, ctr: 0.55, conv: 187, spend: 2015, bid: '0.07' }
+      model: 'CPC', status: 'done', impr: 2583000, clicks: 28790, conv: 187, cost: 2015, revenue: 2245, winRate: 16.3, bid: '0.07' }
   ];
 
-  /* Показатели площадок — за 30 дней, масштабируются периодом отчёта. */
-  var ZONES = [
-    { id: 'NN-40218', cat: 'Обычная', vertical: 'Gambling', impr: 4820000, clicks: 44900, conv: 1284, spend: 8860,  robot: false },
-    { id: 'NN-40194', cat: '18+',     vertical: 'Dating',   impr: 6110000, clicks: 71200, conv: 1602, spend: 11860, robot: false },
-    { id: 'NN-39877', cat: 'Обычная', vertical: 'Crypto',   impr: 3240000, clicks: 26800, conv: 902,  spend: 7760,  robot: false },
-    { id: 'NN-39640', cat: 'Обычная', vertical: 'Finance',  impr: 2910000, clicks: 21400, conv: 744,  spend: 6850,  robot: false },
-    { id: 'NN-39412', cat: '18+',     vertical: 'Dating',   impr: 5280000, clicks: 58100, conv: 1188, spend: 9620,  robot: false },
-    { id: 'NN-38905', cat: 'Обычная', vertical: 'Nutra',    impr: 1980000, clicks: 12900, conv: 402,  spend: 4990,  robot: false },
-    { id: 'NN-38744', cat: 'Обычная', vertical: 'Gambling', impr: 1640000, clicks: 9800,  conv: 214,  spend: 3380,  robot: false },
-    { id: 'NN-38201', cat: '18+',     vertical: 'Dating',   impr: 1210000, clicks: 8400,  conv: 96,   spend: 2140,  robot: true },
-    { id: 'NN-37988', cat: 'Обычная', vertical: 'Software', impr: 980000,  clicks: 5100,  conv: 41,   spend: 1280,  robot: true },
-    { id: 'NN-37540', cat: 'Обычная', vertical: 'Gambling', impr: 760000,  clicks: 3200,  conv: 18,   spend: 880,   robot: false }
+  /* Placements: compact seeds → deterministic 7-day figures.
+     w — share of volume, q — quality (drives CTR, CR, CPA and win rate). */
+  var PAYOUT = {
+    Gambling: 12.50, Dating: 11.00, Crypto: 10.50, Finance: 25.00,
+    Nutra: 13.00, Sweepstakes: 9.00, 'Mobile Apps': 11.50, Software: 12.00
+  };
+
+  var ZONE_SEEDS = [
+    ['NN-40218', 'Mainstream', 'Gambling',    4.8, 0.94], ['NN-40194', 'Adult', 'Dating',      5.4, 0.90],
+    ['NN-39877', 'Mainstream', 'Crypto',      3.2, 0.86], ['NN-39640', 'Mainstream', 'Finance', 2.9, 0.83],
+    ['NN-39412', 'Adult', 'Dating',           4.6, 0.81], ['NN-39208', 'Mainstream', 'Gambling', 3.6, 0.78],
+    ['NN-39044', 'Mainstream', 'Nutra',       2.4, 0.76], ['NN-38905', 'Mainstream', 'Nutra',   2.0, 0.72],
+    ['NN-38871', 'Adult', 'Dating',           3.1, 0.70], ['NN-38744', 'Mainstream', 'Gambling', 1.7, 0.68],
+    ['NN-38602', 'Mainstream', 'Finance',     2.2, 0.65], ['NN-38455', 'Mainstream', 'Software', 1.9, 0.62],
+    ['NN-38312', 'Adult', 'Dating',           2.7, 0.60], ['NN-38201', 'Adult', 'Dating',       1.3, 0.57],
+    ['NN-38077', 'Mainstream', 'Crypto',      1.6, 0.55], ['NN-37988', 'Mainstream', 'Software', 1.0, 0.52],
+    ['NN-37844', 'Mainstream', 'Mobile Apps', 2.1, 0.50], ['NN-37701', 'Mainstream', 'Gambling', 1.4, 0.47],
+    ['NN-37655', 'Adult', 'Dating',           1.8, 0.45], ['NN-37540', 'Mainstream', 'Gambling', 0.8, 0.42],
+    ['NN-37402', 'Mainstream', 'Sweepstakes', 1.5, 0.40], ['NN-37288', 'Mainstream', 'Crypto',   1.1, 0.37],
+    ['NN-37166', 'Mainstream', 'Nutra',       0.9, 0.35], ['NN-37041', 'Adult', 'Dating',        1.2, 0.32],
+    ['NN-36922', 'Mainstream', 'Mobile Apps', 1.0, 0.30], ['NN-36804', 'Mainstream', 'Software', 0.7, 0.27],
+    ['NN-36713', 'Mainstream', 'Sweepstakes', 1.3, 0.25], ['NN-36588', 'Mainstream', 'Gambling', 0.6, 0.22],
+    ['NN-36471', 'Adult', 'Dating',           0.9, 0.20], ['NN-36350', 'Mainstream', 'Finance',  0.5, 0.18],
+    ['NN-36244', 'Mainstream', 'Crypto',      0.8, 0.15], ['NN-36122', 'Mainstream', 'Nutra',    0.6, 0.13],
+    ['NN-36008', 'Mainstream', 'Mobile Apps', 0.7, 0.11], ['NN-35901', 'Adult', 'Dating',        0.5, 0.09],
+    ['NN-35788', 'Mainstream', 'Sweepstakes', 0.4, 0.07], ['NN-35640', 'Mainstream', 'Gambling', 0.3, 0.04]
   ];
 
-  /* Кампании в отчёте статистики — за 30 дней. */
-  var STAT_CAMPAIGNS = [
-    { name: 'Slots Royale — App Install', model: 'Pure CPA',  impr: 9030000,  clicks: 84900,  conv: 1772, spend: 17720 },
-    { name: 'FX Prime — Broker Leads',    model: 'Pure CPA',  impr: 8080000,  clicks: 50900,  conv: 1036, spend: 22520 },
-    { name: 'NightDate — Popunder',       model: 'Smart CPM', impr: 42360000, clicks: 686400, conv: 1673, spend: 14670 },
-    { name: 'BitVault — Регистрация',     model: 'CPA',       impr: 6190000,  clicks: 43950,  conv: 1367, spend: 12290 },
-    { name: 'MeetLocal — Push',           model: 'Smart CPM', impr: 25890000, clicks: 331400, conv: 877,  spend: 8520 },
-    { name: 'CleanMaster — Utility',      model: 'CPC',       impr: 13070000, clicks: 54900,  conv: 413,  spend: 4820 },
-    { name: 'VPN Shield — Trial',         model: 'CPC',       impr: 21970000, clicks: 120800, conv: 804,  spend: 8670 },
-    { name: 'SlimFit — Weight Loss',      model: 'CPA',       impr: 900000,   clicks: 7900,   conv: 125,  spend: 1470 }
-  ];
+  /* Zones the robot has already switched off — the worst tail. */
+  var ROBOT_OFF = ['NN-36122', 'NN-36008', 'NN-35901', 'NN-35788', 'NN-35640', 'NN-36244'];
 
+  function buildZones() {
+    return ZONE_SEEDS.map(function (z) {
+      var id = z[0], cat = z[1], vert = z[2], wgt = z[3], q = z[4];
+      var impr = Math.round(wgt * 50000);
+      var clicks = Math.round(impr * (0.006 + q * 0.011));
+      var conv = Math.round(clicks * (0.005 + q * 0.022));
+      var payout = PAYOUT[vert];
+      var cpa = payout * (1.45 - q * 0.75);
+      var cost = Math.round(conv * cpa);
+      return {
+        id: id, cat: cat, vertical: vert,
+        impr: impr, clicks: clicks, conv: conv,
+        cost: cost, revenue: Math.round(conv * payout),
+        winRate: Math.round((8 + q * 34) * 10) / 10,
+        robot: ROBOT_OFF.indexOf(id) >= 0
+      };
+    });
+  }
+
+  /* Geo — last 7 days, roughly summing to the account totals. */
   var GEO = [
-    { code: 'DE', name: 'Германия',   impr: 44000000, clicks: 476000, conv: 2780, spend: 28910, share: 0.240, bid: 2.40, zones: 268, cr: 2.86, taken: 0.42 },
-    { code: 'US', name: 'США',        impr: 31200000, clicks: 337000, conv: 1940, spend: 25610, share: 0.185, bid: 3.10, zones: 341, cr: 2.24, taken: 0.31 },
-    { code: 'AT', name: 'Австрия',    impr: 17900000, clicks: 193000, conv: 1180, spend: 11920, share: 0.098, bid: 2.10, zones: 112, cr: 2.61, taken: 0.55 },
-    { code: 'CH', name: 'Швейцария',  impr: 13300000, clicks: 144000, conv: 894,  spend: 10640, share: 0.074, bid: 3.05, zones: 86,  cr: 2.48, taken: 0.48 },
-    { code: 'NL', name: 'Нидерланды', impr: 10500000, clicks: 113000, conv: 690,  spend: 6760,  share: 0.086, bid: 1.85, zones: 124, cr: 2.19, taken: 0.28 },
-    { code: 'PL', name: 'Польша',     impr: 6400000,  clicks: 69000,  conv: 380,  spend: 3190,  share: 0.112, bid: 0.95, zones: 156, cr: 1.74, taken: 0.14 },
-    { code: 'FR', name: 'Франция',    impr: 4230000,  clicks: 45000,  conv: 203,  spend: 3650,  share: 0.105, bid: 1.40, zones: 148, cr: 1.62, taken: 0.09 }
+    { code: 'DE', name: 'Germany',     impr: 5240000, clicks: 52800, conv: 646, cost: 6720, revenue: 8740, winRate: 26.4, share: 0.240, bid: 2.40, zones: 268, cr: 2.86, taken: 0.42 },
+    { code: 'US', name: 'United States', impr: 3620000, clicks: 37400, conv: 451, cost: 5960, revenue: 6640, winRate: 18.2, share: 0.185, bid: 3.10, zones: 341, cr: 2.24, taken: 0.31 },
+    { code: 'AT', name: 'Austria',     impr: 2080000, clicks: 21400, conv: 274, cost: 2770, revenue: 3220, winRate: 29.1, share: 0.098, bid: 2.10, zones: 112, cr: 2.61, taken: 0.55 },
+    { code: 'CH', name: 'Switzerland', impr: 1546000, clicks: 15900, conv: 208, cost: 2475, revenue: 2740, winRate: 24.7, share: 0.074, bid: 3.05, zones: 86,  cr: 2.48, taken: 0.48 },
+    { code: 'NL', name: 'Netherlands', impr: 1221000, clicks: 12500, conv: 160, cost: 1572, revenue: 1840, winRate: 21.3, share: 0.086, bid: 1.85, zones: 124, cr: 2.19, taken: 0.28 },
+    { code: 'PL', name: 'Poland',      impr: 744000,  clicks: 7600,  conv: 88,  cost: 742,  revenue: 1010, winRate: 15.6, share: 0.112, bid: 0.95, zones: 156, cr: 1.74, taken: 0.14 },
+    { code: 'FR', name: 'France',      impr: 926000,  clicks: 9600,  conv: 49,  cost: 846,  revenue: 545,  winRate: 12.8, share: 0.105, bid: 1.40, zones: 148, cr: 1.62, taken: 0.09 }
   ];
 
   var GEO_POOL = [
-    { code: 'IT', name: 'Италия' }, { code: 'ES', name: 'Испания' },
-    { code: 'SE', name: 'Швеция' }, { code: 'CZ', name: 'Чехия' }, { code: 'PT', name: 'Португалия' }
+    { code: 'IT', name: 'Italy' }, { code: 'ES', name: 'Spain' },
+    { code: 'SE', name: 'Sweden' }, { code: 'CZ', name: 'Czechia' }, { code: 'PT', name: 'Portugal' }
   ];
 
   var PAY_METHODS = [
-    { key: 'card',   name: 'Банковская карта',  desc: 'Visa · Mastercard',      min: 50,   feePct: 1.5, speed: 'мгновенно',       req: 'подтверждённый профиль' },
-    { key: 'crypto', name: 'Криптовалюта',      desc: 'BTC · USDT · ETH',       min: 100,  feePct: 0,   speed: 'до 1 часа',       req: 'подтверждённый профиль' },
-    { key: 'psys',   name: 'Платёжная система', desc: 'по запросу менеджера',   min: 50,   feePct: 0.5, speed: 'мгновенно',       req: 'подтверждённый профиль' },
-    { key: 'wire',   name: 'Банковский перевод', desc: 'по счёту, для юрлиц',   min: 1000, feePct: 0,   speed: '1–3 рабочих дня', req: 'юр. данные и счёт' }
+    { key: 'card',   name: 'Bank card',      desc: 'Visa · Mastercard',       min: 50,   feePct: 1.5, speed: 'instant',        req: 'verified profile' },
+    { key: 'crypto', name: 'Crypto',         desc: 'BTC · USDT · ETH',        min: 100,  feePct: 0,   speed: 'up to 1 hour',   req: 'verified profile' },
+    { key: 'psys',   name: 'Payment system', desc: 'on manager request',      min: 50,   feePct: 0.5, speed: 'instant',        req: 'verified profile' },
+    { key: 'wire',   name: 'Wire transfer',  desc: 'by invoice, for companies', min: 1000, feePct: 0, speed: '1–3 business days', req: 'legal details and invoice' }
   ];
 
   var PAYMENTS = [
-    { date: '05.09.26', meth: 'Банковская карта',   sum: 20000, fee: 300, ok: 'ok',  st: 'Зачислено', doc: 'Квитанция' },
-    { date: '29.08.26', meth: 'Криптовалюта',       sum: 25000, fee: 0,   ok: 'ok',  st: 'Зачислено', doc: 'Квитанция' },
-    { date: '21.08.26', meth: 'Банковский перевод', sum: 30000, fee: 0,   ok: 'ok',  st: 'Зачислено', doc: 'Счёт · Акт' },
-    { date: '14.08.26', meth: 'Банковская карта',   sum: 10000, fee: 150, ok: 'ok',  st: 'Зачислено', doc: 'Квитанция' },
-    { date: '09.08.26', meth: 'Платёжная система',  sum: 8000,  fee: 40,  ok: 'ok',  st: 'Зачислено', doc: 'Квитанция' },
-    { date: '07.08.26', meth: 'Банковская карта',   sum: 2000,  fee: 30,  ok: 'bad', st: 'Отклонено', doc: '—' }
+    { date: '05.09.26', meth: 'Bank card',     sum: 20000, fee: 300, ok: 'ok',  st: 'Credited', doc: 'Receipt' },
+    { date: '29.08.26', meth: 'Crypto',        sum: 25000, fee: 0,   ok: 'ok',  st: 'Credited', doc: 'Receipt' },
+    { date: '21.08.26', meth: 'Wire transfer', sum: 30000, fee: 0,   ok: 'ok',  st: 'Credited', doc: 'Invoice · Act' },
+    { date: '14.08.26', meth: 'Bank card',     sum: 10000, fee: 150, ok: 'ok',  st: 'Credited', doc: 'Receipt' },
+    { date: '09.08.26', meth: 'Payment system', sum: 8000, fee: 40,  ok: 'ok',  st: 'Credited', doc: 'Receipt' },
+    { date: '07.08.26', meth: 'Bank card',     sum: 2000,  fee: 30,  ok: 'bad', st: 'Declined', doc: '—' }
   ];
 
   var INVOICES = [
-    { num: 'INV-2026-0455', date: '07.09.26', period: '01.09 — 07.09.26', sum: 18000, ok: 'wait', st: 'Ожидает оплаты' },
-    { num: 'INV-2026-0412', date: '21.08.26', period: '01.08 — 21.08.26', sum: 30000, ok: 'ok',   st: 'Оплачен' },
-    { num: 'INV-2026-0388', date: '02.08.26', period: '01.07 — 31.07.26', sum: 42000, ok: 'ok',   st: 'Оплачен' }
+    { num: 'INV-2026-0455', date: '07.09.26', period: 'Sep 1 — Sep 7, 2026', sum: 18000, ok: 'wait', st: 'Awaiting payment' },
+    { num: 'INV-2026-0412', date: '21.08.26', period: 'Aug 1 — Aug 21, 2026', sum: 30000, ok: 'ok',  st: 'Paid' },
+    { num: 'INV-2026-0388', date: '02.08.26', period: 'Jul 1 — Jul 31, 2026', sum: 42000, ok: 'ok',  st: 'Paid' }
   ];
 
   var NOTIFICATIONS = [
-    { id: 1, kind: 'bot', cat: 'zones', title: 'Робот отключил 7 площадок',
-      text: 'Кампания NN-C-4702 · CPA на этих площадках был выше цели в 2.4 раза. Расход остановлен, объём перераспределён.',
-      time: 'Сегодня, 06:00 UTC', unread: true },
-    { id: 2, kind: 'ok', cat: 'camp', title: 'Кампания прошла автопроверку',
-      text: 'NN-C-4640 «iPhone 17 Giveaway» · тематика обычная, ссылка отвечает 200 OK. Старт по расписанию.',
-      time: 'Сегодня, 05:12 UTC', unread: true },
-    { id: 3, kind: 'warn', cat: 'money', title: 'Баланса хватит примерно на 4 дня',
-      text: 'При среднем расходе $3 023 в сутки. Пополните заранее — иначе кампании остановятся автоматически.',
-      time: 'Сегодня, 04:30 UTC', unread: true },
-    { id: 4, kind: 'bot', cat: 'camp', title: 'Изменена ставка по кампании',
-      text: 'NN-C-4744 · робот поднял максимальную ставку с $2.10 до $2.40 в Германии: объём падал ниже дневного лимита.',
-      time: 'Вчера, 21:40 UTC', unread: false },
-    { id: 5, kind: 'money', cat: 'money', title: 'Платёж зачислен',
-      text: '$20 000 картой · комиссия $300 · зачислено $19 700.',
-      time: '05.09.26, 11:05 UTC', unread: false },
-    { id: 6, kind: 'ok', cat: 'zones', title: 'Открыты новые площадки',
-      text: '34 площадки в вертикали Gambling прошли проверку и добавлены в вашу выдачу.',
-      time: '04.09.26, 09:20 UTC', unread: false },
-    { id: 7, kind: 'warn', cat: 'camp', title: 'Кампания остановлена вручную',
-      text: 'NN-C-4602 «CleanMaster — Utility» остановлена пользователем ops@nexoramedia.io.',
-      time: '03.09.26, 15:02 UTC', unread: false },
-    { id: 8, kind: 'money', cat: 'sys', title: 'Счёт INV-2026-0455 сформирован',
-      text: 'Период 01.09 — 07.09.26 на сумму $18 000. Документ доступен в профиле.',
-      time: '07.09.26, 08:00 UTC', unread: false }
+    { id: 1, kind: 'bot', cat: 'zones', unread: true, title: 'Robot switched off 7 placements',
+      text: 'Campaign NN-C-4702 · CPA on these placements ran 2.4× above target. Spend stopped, volume redistributed.',
+      time: 'Today, 06:00 UTC' },
+    { id: 2, kind: 'ok', cat: 'camp', unread: true, title: 'Campaign passed the auto-check',
+      text: 'NN-C-4640 “iPhone 17 Giveaway” · mainstream category, link returns 200 OK. Starts on schedule.',
+      time: 'Today, 05:12 UTC' },
+    { id: 3, kind: 'warn', cat: 'money', unread: true, title: 'Balance covers about 4 more days',
+      text: 'At the current $3,023 daily spend. Top up in advance — otherwise campaigns stop automatically.',
+      time: 'Today, 04:30 UTC' },
+    { id: 4, kind: 'bot', cat: 'camp', unread: false, title: 'Bid changed on a campaign',
+      text: 'NN-C-4744 · robot raised the max bid from $2.10 to $2.40 in Germany: volume was falling short of the daily cap.',
+      time: 'Yesterday, 21:40 UTC' },
+    { id: 5, kind: 'money', cat: 'money', unread: false, title: 'Payment credited',
+      text: '$20,000 by card · $300 fee · $19,700 credited.',
+      time: 'Sep 5, 11:05 UTC' },
+    { id: 6, kind: 'ok', cat: 'zones', unread: false, title: 'New placements opened up',
+      text: '34 Gambling placements passed review and were added to your inventory.',
+      time: 'Sep 4, 09:20 UTC' },
+    { id: 7, kind: 'warn', cat: 'camp', unread: false, title: 'Campaign stopped manually',
+      text: 'NN-C-4602 “CleanMaster — Utility” stopped by ops@nexoramedia.io.',
+      time: 'Sep 3, 15:02 UTC' },
+    { id: 8, kind: 'money', cat: 'sys', unread: false, title: 'Invoice INV-2026-0455 issued',
+      text: 'Sep 1 — Sep 7, 2026 for $18,000. Available in your profile.',
+      time: 'Sep 7, 08:00 UTC' }
   ];
 
-  var GROUPS = [
-    { name: 'Gambling · топ по CR',  meta: '128 площадок · применена к 2 кампаниям', kind: 'Белый список',  pill: 'pill pill-ok' },
-    { name: '18+ · проверенные',     meta: '96 площадок · применена к 1 кампании',   kind: 'Белый список',  pill: 'pill pill-ok' },
-    { name: 'Мусор за август',       meta: '214 площадок · применена ко всем',       kind: 'Чёрный список', pill: 'pill pill-bad' },
-    { name: 'Тест новых источников', meta: '41 площадка · не применена',             kind: 'Белый список',  pill: 'pill' }
+  /* Presets (placement groups) — the main tool on the Placements screen. */
+  var PRESETS = [
+    { id: 'p1', name: 'Gambling · top CR', kind: 'whitelist',
+      zones: ['NN-40218', 'NN-39208', 'NN-38744', 'NN-37701'], appliedTo: ['4821', '4655'] },
+    { id: 'p2', name: 'Adult · verified', kind: 'whitelist',
+      zones: ['NN-40194', 'NN-39412', 'NN-38871', 'NN-38312'], appliedTo: ['4702'] },
+    { id: 'p3', name: 'August waste', kind: 'blacklist',
+      zones: ['NN-36122', 'NN-36008', 'NN-35901', 'NN-35788', 'NN-35640', 'NN-36244'], appliedTo: ['4821', '4790', '4744', '4702', '4688'] },
+    { id: 'p4', name: 'New source test', kind: 'whitelist',
+      zones: ['NN-36713', 'NN-36588', 'NN-36471'], appliedTo: [] }
   ];
 
   var DOCS = [
-    { name: 'Insertion Order № IO-4821', meta: 'Рамочный документ · подписан 12.06.26', status: 'Подписан',       pill: 'pill pill-ok' },
-    { name: 'Счёт INV-2026-0455',        meta: 'Период 01.09 — 07.09.26 · $18 000',     status: 'Ожидает оплаты', pill: 'pill pill-wait' },
-    { name: 'Акт за август 2026',        meta: 'Период 01.08 — 31.08.26 · $42 000',     status: 'Готов',          pill: 'pill pill-ok' },
-    { name: 'Акт за июль 2026',          meta: 'Период 01.07 — 31.07.26 · $38 400',     status: 'Готов',          pill: 'pill pill-ok' }
+    { name: 'Insertion Order IO-4821', meta: 'Master agreement · signed Jun 12, 2026', status: 'Signed',          pill: 'pill pill-ok' },
+    { name: 'Invoice INV-2026-0455',   meta: 'Sep 1 — Sep 7, 2026 · $18,000',          status: 'Awaiting payment', pill: 'pill pill-wait' },
+    { name: 'Act for August 2026',     meta: 'Aug 1 — Aug 31, 2026 · $42,000',         status: 'Ready',            pill: 'pill pill-ok' },
+    { name: 'Act for July 2026',       meta: 'Jul 1 — Jul 31, 2026 · $38,400',         status: 'Ready',            pill: 'pill pill-ok' }
   ];
 
   var FILES = [
-    { name: 'slots-royale-icon-192.png', kind: 'Иконка',   size: '48 КБ',  date: '05.09.26' },
-    { name: 'nightdate-icon-192.png',    kind: 'Иконка',   size: '52 КБ',  date: '02.09.26' },
-    { name: 'zones-blacklist-sep.csv',   kind: 'Список',   size: '860 КБ', date: '01.09.26' },
-    { name: 'io-4821-signed.pdf',        kind: 'Документ', size: '240 КБ', date: '12.06.26' }
+    { name: 'slots-royale-icon-192.png', kind: 'Icon',     size: '48 KB',  date: '05.09.26' },
+    { name: 'nightdate-icon-192.png',    kind: 'Icon',     size: '52 KB',  date: '02.09.26' },
+    { name: 'zones-blacklist-sep.csv',   kind: 'List',     size: '860 KB', date: '01.09.26' },
+    { name: 'io-4821-signed.pdf',        kind: 'Document', size: '240 KB', date: '12.06.26' }
   ];
 
-  /* Итоги кабинета за 30 дней — от них считаются графики и отчёты. */
-  var TOTALS_30D = { spend: 90680, impr: 127530000, clicks: 1381150, conv: 8067 };
-
   w.DATA = {
-    PAY_MODELS: PAY_MODELS, STATUS: STATUS, CAMPAIGNS: CAMPAIGNS, ZONES: ZONES,
-    STAT_CAMPAIGNS: STAT_CAMPAIGNS, GEO: GEO, GEO_POOL: GEO_POOL,
+    PAY_MODELS: PAY_MODELS, STATUS: STATUS, CAMPAIGNS: CAMPAIGNS,
+    ZONES: buildZones(), GEO: GEO, GEO_POOL: GEO_POOL, PRESETS: PRESETS,
     PAY_METHODS: PAY_METHODS, PAYMENTS: PAYMENTS, INVOICES: INVOICES,
-    NOTIFICATIONS: NOTIFICATIONS, GROUPS: GROUPS, DOCS: DOCS, FILES: FILES,
-    TOTALS_30D: TOTALS_30D,
+    NOTIFICATIONS: NOTIFICATIONS, DOCS: DOCS, FILES: FILES, PAYOUT: PAYOUT,
     FORMATS: ['Popunder', 'Push', 'In-Page Push', 'Native', 'Banner'],
     VERTICALS: ['Gambling', 'Crypto', 'Dating', 'Nutra', 'Finance', 'Sweepstakes', 'Mobile Apps', 'Software'],
-    TOKENS: ['{clickid}', '{zone}', '{subzone}', '{geo}', '{cost}', '{device}', '{os}', '{browser}']
+    TOKENS: ['{clickid}', '{zone}', '{subzone}', '{geo}', '{cost}', '{device}', '{os}', '{browser}'],
+    BASE_DAYS: 7
   };
 })(window);

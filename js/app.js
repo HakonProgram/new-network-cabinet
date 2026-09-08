@@ -5,31 +5,31 @@
   var icon = UI.icon;
 
   var NAV = [
-    { cap: 'Кабинет' },
-    { key: 'stats',         icon: 'stats',  label: 'Статистика' },
-    { key: 'campaigns',     icon: 'camp',   label: 'Кампании',       badge: 'campaigns' },
-    { key: 'zones',         icon: 'zones',  label: 'Площадки' },
-    { key: 'volumes',       icon: 'volume', label: 'Объёмы трафика' },
-    { cap: 'Интеграции' },
-    { key: 'postback',      icon: 'post',   label: 'Постбек' },
-    { cap: 'Аккаунт' },
-    { key: 'payments',      icon: 'pay',    label: 'Платежи' },
-    { key: 'profile',       icon: 'user',   label: 'Профиль' },
-    { key: 'notifications', icon: 'bell',   label: 'Уведомления',    badge: 'unread', hot: true },
-    { key: 'support',       icon: 'help',   label: 'Поддержка' }
+    { cap: 'Workspace' },
+    { key: 'stats',         icon: 'stats',  label: 'Statistics' },
+    { key: 'campaigns',     icon: 'camp',   label: 'Campaigns',      badge: 'campaigns' },
+    { key: 'zones',         icon: 'zones',  label: 'Placements' },
+    { key: 'volumes',       icon: 'volume', label: 'Traffic volumes' },
+    { cap: 'Integrations' },
+    { key: 'postback',      icon: 'post',   label: 'Postback' },
+    { cap: 'Account' },
+    { key: 'payments',      icon: 'pay',    label: 'Billing' },
+    { key: 'profile',       icon: 'user',   label: 'Profile' },
+    { key: 'notifications', icon: 'bell',   label: 'Notifications',  badge: 'unread', hot: true },
+    { key: 'support',       icon: 'help',   label: 'Support' }
   ];
 
   var ROUTES = {
-    'campaigns':     { screen: 'campaigns',     nav: 'campaigns',     title: 'Кампании' },
-    'campaigns/new': { screen: 'newCampaign',   nav: 'campaigns',     title: 'Новая кампания', parent: ['Кампании', 'campaigns'] },
-    'stats':         { screen: 'stats',         nav: 'stats',         title: 'Статистика' },
-    'zones':         { screen: 'zones',         nav: 'zones',         title: 'Площадки' },
-    'volumes':       { screen: 'volumes',       nav: 'volumes',       title: 'Объёмы трафика' },
-    'payments':      { screen: 'payments',      nav: 'payments',      title: 'Платежи' },
-    'profile':       { screen: 'profile',       nav: 'profile',       title: 'Профиль' },
-    'postback':      { screen: 'postback',      nav: 'postback',      title: 'Постбек' },
-    'notifications': { screen: 'notifications', nav: 'notifications', title: 'Уведомления' },
-    'support':       { screen: 'support',       nav: 'support',       title: 'Поддержка' }
+    'campaigns':     { screen: 'campaigns',     nav: 'campaigns',     title: 'Campaigns' },
+    'campaigns/new': { screen: 'newCampaign',   nav: 'campaigns',     title: 'New campaign', parent: ['Campaigns', 'campaigns'] },
+    'stats':         { screen: 'stats',         nav: 'stats',         title: 'Statistics' },
+    'zones':         { screen: 'zones',         nav: 'zones',         title: 'Placements' },
+    'volumes':       { screen: 'volumes',       nav: 'volumes',       title: 'Traffic volumes' },
+    'payments':      { screen: 'payments',      nav: 'payments',      title: 'Billing' },
+    'profile':       { screen: 'profile',       nav: 'profile',       title: 'Profile' },
+    'postback':      { screen: 'postback',      nav: 'postback',      title: 'Postback' },
+    'notifications': { screen: 'notifications', nav: 'notifications', title: 'Notifications' },
+    'support':       { screen: 'support',       nav: 'support',       title: 'Support' }
   };
 
   var current = 'campaigns';
@@ -104,10 +104,10 @@
         '<div class="topbar">' +
           '<div class="crumbs" id="crumbs">' + crumbsHtml() + '</div>' +
           '<div class="balance">' +
-            '<div><div class="bal-lab">Баланс</div><div class="bal-val num" id="balance">' + UI.money2(s.balance) + '</div></div>' +
-            '<button class="btn btn-pri btn-sm" data-go="payments">' + icon('plus', 13, 2.4) + 'Пополнить</button>' +
+            '<div><div class="bal-lab">Balance</div><div class="bal-val num" id="balance">' + UI.money2(s.balance) + '</div></div>' +
+            '<button class="btn btn-pri btn-sm" data-go="payments">' + icon('plus', 13, 2.4) + 'Add funds</button>' +
           '</div>' +
-          '<div class="icon-btn" data-go="notifications" title="Уведомления">' + icon('bell', 16) +
+          '<div class="icon-btn" data-go="notifications" title="Notifications">' + icon('bell', 16) +
             (badges().unread !== '0' ? '<span class="bell-dot"></span>' : '') + '</div>' +
         '</div>' +
         '<div id="view"></div>' +
@@ -119,27 +119,27 @@
   w.Screens.support = {
     render: function () {
       return '<div class="page">' +
-        '<div class="head"><div><h1 class="h1">Поддержка</h1>' +
-        '<p class="sub">Вопросы по кампаниям, модерации и выплатам — к вашему менеджеру.</p></div></div>' +
+        '<div class="head"><div><h1 class="h1">Support</h1>' +
+        '<p class="sub">Questions about campaigns, moderation and payouts go to your account manager.</p></div></div>' +
         '<div class="card"><div class="card-b">' +
           '<div class="doc"><div class="doc-ic">' + icon('user', 17) + '</div>' +
-            '<div><div class="doc-n">Антон — ваш менеджер</div>' +
-            '<div class="doc-d">Отвечает в рабочие часы UTC 08:00 — 20:00</div></div>' +
-            '<button class="btn btn-sm" style="margin-left:auto" data-act="soon">Написать в Telegram</button></div>' +
+            '<div><div class="doc-n">Anton — your account manager</div>' +
+            '<div class="doc-d">Available 08:00 — 20:00 UTC on business days</div></div>' +
+            '<button class="btn btn-sm" style="margin-left:auto" data-act="soon">Message on Telegram</button></div>' +
           '<div class="doc"><div class="doc-ic">' + icon('doc', 17) + '</div>' +
-            '<div><div class="doc-n">База знаний</div>' +
-            '<div class="doc-d">Требования к креативам, запрещённые тематики, работа автопроверки</div></div>' +
-            '<button class="btn btn-sm" style="margin-left:auto" data-act="soon">Открыть</button></div>' +
+            '<div><div class="doc-n">Knowledge base</div>' +
+            '<div class="doc-d">Creative requirements, restricted verticals, how the auto-check works</div></div>' +
+            '<button class="btn btn-sm" style="margin-left:auto" data-act="soon">Open</button></div>' +
           '<div class="note">' + icon('info', 15, 2) +
-            '<p>Это <b>кликабельный прототип</b>. Данные демонстрационные и хранятся только в вашем браузере — ' +
-            'сбросить их можно кнопкой ниже.</p></div>' +
-          '<div><button class="btn btn-danger" data-act="reset">Сбросить демо-данные</button></div>' +
+            '<p>This is a <b>clickable prototype</b>. All figures are sample data kept in your browser only — ' +
+            'reset them with the button below.</p></div>' +
+          '<div><button class="btn btn-danger" data-act="reset">Reset demo data</button></div>' +
         '</div></div>' +
       '</div>';
     },
     actions: {
-      soon: function () { toast('В прототипе этот переход не реализован'); },
-      reset: function () { Store.reset(); toast('Демо-данные сброшены'); }
+      soon: function () { toast('Not wired up in this prototype'); },
+      reset: function () { Store.reset(); toast('Demo data reset'); }
     }
   };
 

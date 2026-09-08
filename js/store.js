@@ -2,7 +2,7 @@
 (function (w) {
   'use strict';
 
-  var KEY = 'nn-cabinet-v1';
+  var KEY = 'nn-cabinet-v2';
 
   function seedSchedule() {
     var out = [], d, h;
@@ -16,25 +16,16 @@
 
   function seedDraft() {
     return {
-      name: '',
-      url: '',
-      vertical: 'Gambling',
-      format: 'Popunder',
-      model: 'smartcpm',
-      age: 'Обычная',
-      capping: '1 показ / 24 часа',
-      platforms: ['Mobile'],
-      oses: ['Android', 'iOS'],
-      conn: 'Все',
-      vpn: 'Без VPN',
-      listKind: 'Белый список',
-      zones: '',
-      subzones: '',
-      daily: '400',
-      total: '4000',
+      name: '', url: '',
+      vertical: 'Gambling', format: 'Popunder', model: 'smartcpm', age: 'Mainstream',
+      capping: '1 impression / 24 hours',
+      platforms: ['Mobile'], oses: ['Android', 'iOS'],
+      conn: 'All', vpn: 'No VPN',
+      preset: '', subzones: '',
+      daily: '400', total: '4000',
       rates: [
-        { code: 'DE', name: 'Германия', bid: '2.40', goal: '' },
-        { code: 'AT', name: 'Австрия', bid: '2.10', goal: '' }
+        { code: 'DE', name: 'Germany', bid: '2.40', goal: '' },
+        { code: 'AT', name: 'Austria', bid: '2.10', goal: '' }
       ],
       schedule: seedSchedule()
     };
@@ -45,21 +36,25 @@
       balance: 12480.50,
       campaigns: DATA.CAMPAIGNS.map(function (c) { return Object.assign({}, c); }),
       blockedZones: { 'NN-37540': true },
-      scaledZones: {},
+      selection: [],
+      presets: DATA.PRESETS.map(function (p) {
+        return Object.assign({}, p, { zones: p.zones.slice(), appliedTo: p.appliedTo.slice() });
+      }),
       payments: DATA.PAYMENTS.map(function (p) { return Object.assign({}, p); }),
       notifications: DATA.NOTIFICATIONS.map(function (n) { return Object.assign({}, n); }),
       channels: { mail: true, tg: true, browser: false },
-      threshold: '2 дня',
+      threshold: '2 days',
       draft: seedDraft(),
       ui: {
         campStatus: 'all', campModel: 'all',
         statsRange: 30, statsTab: 'zones',
-        zonesTab: 'work', zonesCat: 'all',
+        zonesTab: 'all', zonesCat: 'all', zonesVertical: 'all', zonesSort: 'cost',
+        openPreset: '',
         payMethod: 'card', payAmount: '5000', payTab: 'pay', payRange: '30',
         profileTab: 'acct',
         notifTab: 'all',
-        volFormat: 'Popunder', volPlatform: 'Mobile', volCat: 'Обычная',
-        volRegion: 'Европа', volModel: 'Smart CPM', volBid: '2.40',
+        volFormat: 'Popunder', volPlatform: 'Mobile', volCat: 'Mainstream',
+        volRegion: 'Europe', volModel: 'Smart CPM', volBid: '2.40',
         postbackTested: false
       }
     };
@@ -73,7 +68,6 @@
       var raw = localStorage.getItem(KEY);
       if (raw) {
         var parsed = JSON.parse(raw);
-        // Дозаполняем ключи, добавленные после сохранения.
         var base = seed();
         state = Object.assign({}, base, parsed);
         state.ui = Object.assign({}, base.ui, parsed.ui || {});
@@ -94,10 +88,7 @@
   }
 
   /* Изменить состояние без перерисовки (для полей ввода). */
-  function patch(fn) {
-    fn(get());
-    save();
-  }
+  function patch(fn) { fn(get()); save(); }
 
   /* Изменить состояние и перерисовать экран. */
   function set(fn) {
