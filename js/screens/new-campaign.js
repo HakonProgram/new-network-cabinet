@@ -172,21 +172,26 @@
 
       var sourceCards = DATA.SOURCES.map(function (x) {
         var on = d.sources.indexOf(x.key) >= 0;
-        return '<div class="meth-c' + (on ? ' on' : '') + '" data-act="source" data-arg="' + x.key + '">' +
-          '<div class="box' + (on ? ' on' : '') + '" style="margin-top:2px"></div>' +
-          '<div><div class="meth-n">' + x.name + '</div>' +
-          '<div class="meth-d">' + x.desc + '</div>' +
-          '<div class="mtag" style="display:inline-block;margin-top:7px">' + x.note + '</div></div></div>';
+        return '<div class="tile' + (on ? ' on' : '') + '" data-act="source" data-arg="' + x.key + '">' +
+          '<div class="tile-h"><div class="box' + (on ? ' on' : '') + '"></div>' +
+            '<span class="tile-n">' + x.name + '</span>' +
+            '<span class="tile-badge">' + x.note + '</span></div>' +
+          '<div class="tile-d">' + x.desc + '</div></div>';
       }).join('');
 
       var qualityRows = DATA.QUALITY.map(function (x) {
         var on = d.quality.indexOf(x.key) >= 0;
-        return '<div class="mrow' + (on ? ' on' : '') + '" data-act="quality" data-arg="' + x.key + '">' +
-          '<div class="box' + (on ? ' on' : '') + '"></div>' +
-          '<div style="min-width:0"><div class="mname">' + x.name + '</div>' +
-          '<div class="mdesc">' + x.desc + '</div></div>' +
-          '<div class="mprice"><b>$' + (base * x.mult).toFixed(2) + '</b>' +
-          '<span>suggested bid · CR ' + x.cr + '</span></div></div>';
+        return '<div class="tile' + (on ? ' on' : '') + '" data-act="quality" data-arg="' + x.key + '">' +
+          '<div class="tile-h"><div class="box' + (on ? ' on' : '') + '"></div>' +
+            '<span class="tile-n">' + x.name + '</span></div>' +
+          '<div class="tile-d">' + x.desc + '</div>' +
+          '<div class="tile-f"><span class="tile-v">$' + (base * x.mult).toFixed(2) + '</span>' +
+            '<span class="tile-m">suggested bid</span>' +
+            '<span class="tile-m" style="margin-left:auto">CR ' + x.cr + '</span></div></div>';
+      }).join('');
+
+      var tokens = DATA.TOKENS.map(function (t) {
+        return '<div class="tok" data-act="copyToken" data-arg="' + esc(t) + '">' + icon('copy', 11, 1.9) + esc(t) + '</div>';
       }).join('');
 
       var presetRows = [{ id: '', name: 'No preset — full inventory', kind: '', zones: [] }]
@@ -200,10 +205,6 @@
             '<div style="min-width:0"><div class="mname">' + esc(p.name) + '</div>' +
             '<div class="mdesc">' + meta + '</div></div></div>';
         }).join('');
-
-      var tokens = DATA.TOKENS.map(function (t) {
-        return '<div class="tok" data-act="copyToken" data-arg="' + esc(t) + '">' + icon('copy', 11, 1.9) + esc(t) + '</div>';
-      }).join('');
 
       var hasUrl = !!d.url.trim(), hasName = !!d.name.trim(), hasGeo = d.rates.length > 0;
       var checks = [
@@ -231,11 +232,19 @@
         '<div class="card"><div class="card-h"><div class="card-n">01</div>' +
           '<div class="card-t">Basics</div><div class="card-s">Offer, format and pricing model</div></div>' +
           '<div class="card-b">' +
-            '<div class="g2">' +
-              '<div class="field"><label class="lab">Campaign name</label>' +
-                '<input class="inp" type="text" value="' + esc(d.name) + '" data-inp="name" placeholder="e.g. Slots Royale — App Install"></div>' +
-              '<div class="field"><label class="lab">Offer link</label>' +
-                '<input class="inp inp-mono" type="text" value="' + esc(d.url) + '" data-inp="url" placeholder="https://"></div></div>' +
+            '<div class="field"><label class="lab">Campaign name</label>' +
+              '<input class="inp" type="text" value="' + esc(d.name) + '" data-inp="name" placeholder="e.g. Slots Royale — App Install"></div>' +
+            '<div class="field"><label class="lab">Target URL</label>' +
+              '<div class="url-field">' +
+                '<input class="inp inp-mono" type="text" value="' + esc(d.url) + '" data-inp="url" ' +
+                  'placeholder="https://your-offer.com/landing?click_id={clickid}">' +
+                '<div>' +
+                  '<div class="hint" style="margin-bottom:8px">Click a macro to copy it and paste it into the URL:</div>' +
+                  '<div class="opts">' + tokens + '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="hint">Conversions come back to this campaign through the postback — ' +
+                'the click ID macro is what ties them together.</div></div>' +
             '<div class="field"><label class="lab">Ad format</label>' +
               '<div class="opts">' + opts(DATA.FORMATS, d.format, 'format') + '</div></div>' +
             '<div class="g2">' +
@@ -253,10 +262,10 @@
           '<div class="card-t">Traffic</div><div class="card-s">Where it comes from and how fresh the audience is</div></div>' +
           '<div class="card-b">' +
             '<div class="field"><label class="lab">Source</label>' +
-              '<div class="meth">' + sourceCards + '</div>' +
+              '<div class="tiles t2">' + sourceCards + '</div>' +
               '<div class="hint">Pick both to start on clean inventory and scale into partner supply later.</div></div>' +
             '<div class="field"><label class="lab">Traffic quality</label>' +
-              '<div style="display:flex;flex-direction:column;gap:8px">' + qualityRows + '</div>' +
+              '<div class="tiles">' + qualityRows + '</div>' +
               '<div class="hint">Fresher users convert better and cost more. Remnant is the cheapest leftover volume — ' +
                 'usually worth it only on CPM.</div></div>' +
             '<div class="g2">' +
@@ -311,9 +320,6 @@
                 '<div class="field"><label class="lab">Total budget, $</label>' +
                   '<input class="inp num" type="text" value="' + esc(d.total) + '" data-inp="total">' +
                   '<div class="hint">Minimum $50</div></div></div>' +
-              '<div class="field"><label class="lab">Macros</label>' +
-                '<div class="opts">' + tokens + '</div>' +
-                '<div class="hint">Click to copy and paste into the link.</div></div>' +
             '</div></div></div>' +
 
         /* 06 — сложное спрятано */
