@@ -53,10 +53,8 @@
         '<div class="cmeta"><span class="cid">' + esc(c.format) + '</span>' +
         '<span class="tag' + (c.adult ? ' tag-18' : '') + '">' + esc(c.vertical) + '</span></div></div>' +
       '<div><span class="model">' + esc(c.model) + '</span></div>' +
-      '<div style="min-width:0"><div class="status"><span class="dot' + (c.status === 'review' ? ' pulse' : '') +
-        '" style="background:' + meta.color + '"></span>' +
-        '<span style="color:' + meta.ink + '">' + meta.label + '</span></div>' +
-        (c.status === 'review' ? '<div class="cid" style="margin-top:2px">starting itself…</div>' : '') + '</div>' +
+      '<div class="status"><span class="dot' + (c.status === 'review' ? ' pulse' : '') +
+        '" style="background:' + UI.tone(meta.tone) + '"></span><span>' + meta.label + '</span></div>' +
       '<div class="cell muted r">' + dash(m.impr) + '</div>' +
       '<div class="cell w r">' + dash(m.conv) + '</div>' +
       '<div class="cell w r">' + dash(m.cost) + '</div>' +
@@ -121,9 +119,7 @@
 
       return '<div class="page">' +
         '<div class="head">' +
-          '<div><h1 class="h1">Campaigns</h1>' +
-          '<p class="sub">One campaign, one request — the system distributes it on its own. Last 7 days · ' +
-          'click a row for the full report. New campaigns start by themselves once the auto-check passes.</p></div>' +
+          '<div><h1 class="h1">Campaigns</h1></div>' +
           '<button class="btn btn-pri" style="margin-left:auto;height:36px" data-go="campaigns/new">' +
             icon('plus', 14, 2.4) + 'Create campaign</button>' +
         '</div>' +

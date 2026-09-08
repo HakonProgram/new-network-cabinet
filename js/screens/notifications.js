@@ -3,6 +3,8 @@
   'use strict';
   var icon = UI.icon, esc = UI.esc;
 
+  var KIND_ICON = { ok: 'check', warn: 'alert', bot: 'bot', money: 'pay' };
+
   var CATS = [
     { k: 'all',   label: 'All' },
     { k: 'camp',  label: 'Campaigns' },
@@ -10,12 +12,7 @@
     { k: 'money', label: 'Billing' },
     { k: 'sys',   label: 'System' }
   ];
-  var STYLE = {
-    ok:    { bg: 'rgba(99,164,113,0.13)',   fg: '#63A471', ic: 'check' },
-    warn:  { bg: 'rgba(198,158,88,0.13)',  fg: '#C69E58', ic: 'alert' },
-    bot:   { bg: 'rgba(196,153,91,0.14)', fg: '#D7B174', ic: 'bot' },
-    money: { bg: 'rgba(86,161,158,0.13)',   fg: '#6DB6B3', ic: 'pay' }
-  };
+
 
   w.Screens = w.Screens || {};
   w.Screens.notifications = {
@@ -32,9 +29,8 @@
       }).join('');
 
       var items = shown.map(function (n) {
-        var st = STYLE[n.kind];
         return '<div class="item' + (n.unread ? ' new' : '') + '" data-act="read" data-arg="' + n.id + '">' +
-          '<div class="it-ic" style="background:' + st.bg + ';color:' + st.fg + '">' + icon(st.ic, 16, 2) + '</div>' +
+          '<div class="it-ic ' + n.kind + '">' + icon(KIND_ICON[n.kind], 16, 2) + '</div>' +
           '<div style="min-width:0;flex:1">' +
             '<div class="it-t">' + esc(n.title) + '</div>' +
             '<div class="it-d">' + esc(n.text) + '</div>' +

@@ -34,6 +34,18 @@
 
   var current = 'campaigns';
 
+  function theme() {
+    return d.documentElement.getAttribute('data-theme') || 'dark';
+  }
+  function toggleTheme() {
+    var next = theme() === 'light' ? 'dark' : 'light';
+    d.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('nn-theme', next); } catch (e) {}
+    /* Шапка пересобирается целиком: в ней иконка темы. */
+    d.getElementById('app').innerHTML = shellHtml();
+    render();
+  }
+
   function route() {
     var h = (location.hash || '').replace(/^#\/?/, '');
     return ROUTES[h] ? h : 'campaigns';
@@ -107,6 +119,7 @@
             '<div><div class="bal-lab">Balance</div><div class="bal-val num" id="balance">' + UI.money2(s.balance) + '</div></div>' +
             '<button class="btn btn-pri btn-sm" data-go="payments">' + icon('plus', 13, 2.4) + 'Add funds</button>' +
           '</div>' +
+          '<div class="icon-btn" data-act="theme" title="Switch theme">' + icon(theme() === 'light' ? 'moon' : 'sun', 16) + '</div>' +
           '<div class="icon-btn" data-go="notifications" title="Notifications">' + icon('bell', 16) +
             (badges().unread !== '0' ? '<span class="bell-dot"></span>' : '') + '</div>' +
         '</div>' +
@@ -253,6 +266,7 @@
       }
       var actEl = ev.target.closest('[data-act]');
       if (!actEl) return;
+      if (actEl.dataset.act === 'theme') { ev.preventDefault(); toggleTheme(); return; }
       var sc = screen();
       var fn = sc.actions && sc.actions[actEl.dataset.act];
       if (fn) {

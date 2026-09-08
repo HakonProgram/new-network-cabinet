@@ -37,6 +37,8 @@
     legal:   '<rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/>',
     gear:    '<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1"/>',
     refresh: '<path d="M20 11a8 8 0 1 0-.6 4"/><path d="M20 5v6h-6"/>',
+    sun:     '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>',
+    moon:    '<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/>',
     clock:   '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 1.8"/>',
     archive: '<rect x="3" y="4" width="18" height="4.5" rx="1.5"/><path d="M5 8.5V19a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19V8.5"/><path d="M10 12.5h4"/>',
     unarchive: '<rect x="3" y="4" width="18" height="4.5" rx="1.5"/><path d="M5 8.5V19a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19V8.5"/><path d="M12 17v-5"/><path d="m9.5 14.5 2.5-2.5 2.5 2.5"/>'
@@ -94,24 +96,30 @@
     return mo[d.getMonth()] + ' ' + d.getDate();
   }
 
-  /* ── производные метрики ── */
-  var GOOD = '#63A471', BAD = '#C56B65', MUTED = '#625E59';
+  /* ── цвета берём из токенов темы ── */
+  function color(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+  var TONES = { pos: '--pos', neg: '--neg', warn: '--warn', info: '--info',
+                accent: '--accent', muted: '--text-3', text: '--text' };
+  function tone(name) { return color(TONES[name] || '--text-3'); }
 
+  /* ── производные метрики ── */
   function cpm(cost, impr) { return impr > 0 ? '$' + (cost / impr * 1000).toFixed(2) : '—'; }
   function cpc(cost, clicks) { return clicks > 0 ? '$' + (cost / clicks).toFixed(3) : '—'; }
   function winRate(v) { return v > 0 ? v.toFixed(1) + '%' : '—'; }
 
   function profit(revenue, cost) {
     var p = revenue - cost;
-    return { value: p, text: money(p), color: p === 0 ? MUTED : (p > 0 ? GOOD : BAD) };
+    return { value: p, text: money(p), color: tone(p === 0 ? 'muted' : (p > 0 ? 'pos' : 'neg')) };
   }
   function roi(revenue, cost) {
-    if (!cost) return { value: 0, text: '—', color: MUTED };
+    if (!cost) return { value: 0, text: '—', color: tone('muted') };
     var r = (revenue - cost) / cost * 100;
     return {
       value: r,
       text: (r > 0 ? '+' : '') + r.toFixed(1) + '%',
-      color: Math.abs(r) < 0.05 ? MUTED : (r > 0 ? GOOD : BAD)
+      color: tone(Math.abs(r) < 0.05 ? 'muted' : (r > 0 ? 'pos' : 'neg'))
     };
   }
 
@@ -179,6 +187,7 @@
   w.UI = {
     icon: icon, esc: esc, money: money, money2: money2, int: int, compact: compact,
     pct: pct, cpa: cpa, cpm: cpm, cpc: cpc, winRate: winRate, profit: profit, roi: roi,
+    color: color, tone: tone,
     metrics: metrics, sum: sum,
     num: num, plural: plural, dayLabel: dayLabel, dateShort: dateShort,
     daily: daily, ticks: ticks, cls: cls

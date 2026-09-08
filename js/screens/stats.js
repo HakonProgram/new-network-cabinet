@@ -102,8 +102,8 @@
   function axis(t, fmt) {
     return t.values.map(function (v) {
       var y = G.B - (v / t.top) * (G.B - G.T);
-      return '<line x1="' + G.L + '" y1="' + y.toFixed(1) + '" x2="' + G.R + '" y2="' + y.toFixed(1) + '" stroke="#252220" stroke-width="1"/>' +
-        '<text x="' + (G.L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="#625E59" font-size="10" text-anchor="end">' + fmt(v) + '</text>';
+      return '<line x1="' + G.L + '" y1="' + y.toFixed(1) + '" x2="' + G.R + '" y2="' + y.toFixed(1) + '" stroke="' + UI.color('--border') + '" stroke-width="1"/>' +
+        '<text x="' + (G.L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="' + UI.color('--text-3') + '" font-size="10" text-anchor="end">' + fmt(v) + '</text>';
     }).join('');
   }
 
@@ -112,7 +112,7 @@
     for (i = 0; i < n; i += step) idx.push(i);
     if (idx[idx.length - 1] !== n - 1) idx.push(n - 1);
     return idx.map(function (j) {
-      return '<text x="' + fx(j).toFixed(1) + '" y="170" fill="#625E59" font-size="10" text-anchor="middle">' +
+      return '<text x="' + fx(j).toFixed(1) + '" y="170" fill="' + UI.color('--text-3') + '" font-size="10" text-anchor="middle">' +
         UI.dayLabel(n - 1 - j) + '</text>';
     }).join('');
   }
@@ -133,8 +133,8 @@
     return svgOpen(id, label) + axis(t, fmt) +
       '<path d="' + area + '" fill="' + color + '" fill-opacity="0.10"/>' +
       '<polyline points="' + line + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '<line class="cross" x1="0" y1="14" x2="0" y2="150" stroke="#312F2C" stroke-width="1" opacity="0"/>' +
-      '<circle class="mark" cx="0" cy="0" r="4.5" fill="' + color + '" stroke="#12100E" stroke-width="2" opacity="0"/>' +
+      '<line class="cross" x1="0" y1="14" x2="0" y2="150" stroke="' + UI.color('--border-strong') + '" stroke-width="1" opacity="0"/>' +
+      '<circle class="mark" cx="0" cy="0" r="4.5" fill="' + color + '" stroke="' + UI.color('--surface') + '" stroke-width="2" opacity="0"/>' +
       xTicks(n, px) + '</svg>';
   }
 
@@ -161,8 +161,8 @@
     var grid = [-1, -0.5, 0, 0.5, 1].map(function (q) {
       var y = zero - q * half;
       return '<line x1="' + G.L + '" y1="' + y.toFixed(1) + '" x2="' + G.R + '" y2="' + y.toFixed(1) +
-        '" stroke="' + (q === 0 ? '#312F2C' : '#252220') + '" stroke-width="1"/>' +
-        '<text x="' + (G.L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="#625E59" font-size="10" text-anchor="end">' +
+        '" stroke="' + (q === 0 ? '' + UI.color('--border-strong') + '' : '' + UI.color('--border') + '') + '" stroke-width="1"/>' +
+        '<text x="' + (G.L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="' + UI.color('--text-3') + '" font-size="10" text-anchor="end">' +
         (q === 0 ? '0' : (q > 0 ? '' : '-') + '$' + UI.compact(t.top * Math.abs(q))) + '</text>';
     }).join('');
 
@@ -170,7 +170,7 @@
       var h = Math.max(2, Math.abs(v) / t.top * half);
       var y = v >= 0 ? zero - h : zero;
       return '<rect data-i="' + i + '" x="' + (G.L + i * band + (band - bw) / 2).toFixed(1) + '" y="' + y.toFixed(1) +
-        '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3" fill="' + (v >= 0 ? '#63A471' : '#C56B65') + '"/>';
+        '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3" fill="' + (v >= 0 ? '' + UI.color('--pos') + '' : '' + UI.color('--neg') + '') + '"/>';
     }).join('');
 
     return svgOpen(id, label) + grid + bars +
@@ -200,7 +200,7 @@
         rows: DATA.ZONES.map(function (z, i) {
           var st = Store.zoneState(z, cid), on = st === 'live';
           return '<div class="cell mono w">' + z.id + '</div>' +
-            '<div class="cell"><span class="dot" style="background:' + (z.cat === 'Adult' ? '#B9829C' : '#56A19E') + '"></span>' + z.cat + '</div>' +
+            '<div class="cell"><span class="dot" style="background:' + (z.cat === 'Adult' ? '' + UI.color('--warn') + '' : '' + UI.color('--info') + '') + '"></span>' + z.cat + '</div>' +
             '<div class="cell muted">' + z.vertical + '</div>' + metricCells(zr[i]) +
             '<div><span class="' + ZSTATE[st].pill + '">' + ZSTATE[st].label + '</span></div>' +
             '<div class="acts"><button class="btn btn-xs ' + (on ? 'btn-danger' : 'btn-up') +
@@ -322,13 +322,13 @@
 
         '<div class="charts">' +
           chartCard('Cost by day', period + ', dollars', tm.cost, 'A',
-            lineChart(d.cost, 'svgA', 'Cost by day', '#C4995B', function (v) { return v === 0 ? '0' : '$' + UI.compact(v); })) +
+            lineChart(d.cost, 'svgA', 'Cost by day', '' + UI.color('--accent') + '', function (v) { return v === 0 ? '0' : '$' + UI.compact(v); })) +
           chartCard('Conversions by day', period + ', confirmed actions', tm.conv, 'B',
-            barChart(d.conv, 'svgB', 'Conversions by day', '#56A19E', function (v) { return UI.int(v); })) +
+            barChart(d.conv, 'svgB', 'Conversions by day', '' + UI.color('--info') + '', function (v) { return UI.int(v); })) +
           chartCard('Profit by day', period + ', revenue minus cost', tm.profit, 'C',
             divChart(profitSeries, 'svgC', 'Profit by day')) +
           chartCard('Win rate by day', period + ', share of auctions won', tm.win, 'D',
-            lineChart(d.win, 'svgD', 'Win rate by day', '#56A19E', function (v) { return v.toFixed(0) + '%'; })) +
+            lineChart(d.win, 'svgD', 'Win rate by day', '' + UI.color('--info') + '', function (v) { return v.toFixed(0) + '%'; })) +
         '</div>' +
 
         '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
@@ -435,7 +435,7 @@
       var x = (ev.clientX - rect.left) / rect.width * G.W;
       var i = Math.max(0, Math.min(n - 1, Math.floor((x - G.L) / band)));
       bars.forEach(function (b, j) {
-        b.setAttribute('fill', j === i ? (diverging ? (series[j] >= 0 ? '#74B382' : '#CE7A74') : '#6DB6B3') : base[j]);
+        b.setAttribute('fill', j === i ? (diverging ? (series[j] >= 0 ? '' + UI.color('--pos') + '' : '' + UI.color('--neg') + '') : '' + UI.color('--info') + '') : base[j]);
       });
       var b = bars[i];
       var cy = diverging
