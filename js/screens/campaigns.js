@@ -91,6 +91,8 @@
   w.Screens.campaigns = {
     render: function () {
       var s = Store.get(), rows = visible(), sel = selected();
+      /* Пустой аккаунт: вместо таблицы ни о чём — путь до первой кампании. */
+      if (!s.campaigns.length) return '<div class="page">' + Welcome.html() + '</div>';
       var t = UI.sum(s.campaigns);
       var tm = UI.metrics({ impr: t.impr, clicks: t.clicks, conv: t.conv, cost: t.cost,
                             revenue: t.revenue, winRate: t.cost ? t.wSum / t.cost : 0 });
@@ -193,6 +195,10 @@
     },
 
     actions: {
+      loadDemo: function () {
+        Store.signIn('Nexora Media', 'demo');
+        App.toast('Demo account loaded');
+      },
       tab: function (key) { Store.set(function (s) { s.ui.campStatus = key; s.ui.campSelection = []; }); },
       model: function (key) { Store.set(function (s) { s.ui.campModel = key; s.ui.campSelection = []; }); },
 

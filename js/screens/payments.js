@@ -139,9 +139,12 @@
               '<div class="tr thead" style="grid-template-columns:' + cols + ';' + minw(cols) + '">' +
                 heads.map(function (h, i) { return '<div class="th ' + align[i] + '">' + h + '</div>'; }).join('') +
               '</div>' +
-              rows.map(function (r) {
-                return '<div class="tr row" style="grid-template-columns:' + cols + ';' + minw(cols) + '">' + r + '</div>';
-              }).join('') + '</div>' +
+              (rows.length
+                ? rows.map(function (r) {
+                    return '<div class="tr row" style="grid-template-columns:' + cols + ';' + minw(cols) + '">' + r + '</div>';
+                  }).join('')
+                : UI.blank('pay', 'No payments yet',
+                    'Top up the balance and the receipt shows up here right away.', '', '')) + '</div>' +
               '<div class="foot"><span>' + footLeft + '</span>' +
               '<span style="margin-left:auto">Updated an hour ago</span></div>' +
             '</div>' +

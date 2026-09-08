@@ -124,6 +124,16 @@
         'stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>';
   }
 
+  /* Пустое состояние: не «нет данных», а что сделать, чтобы они появились. */
+  function blank(name, title, text, cta, go) {
+    return '<div class="blank">' +
+      '<div class="blank-i">' + icon(name, 26) + '</div>' +
+      '<div class="blank-t">' + esc(title) + '</div>' +
+      '<div class="blank-d">' + esc(text) + '</div>' +
+      (cta ? '<button class="btn btn-pri" data-go="' + go + '">' + esc(cta) + '</button>' : '') +
+    '</div>';
+  }
+
   function icon(name, size) {
     size = size || 16;
     var g = ICONS[name];
@@ -298,7 +308,7 @@
   }
 
   w.UI = {
-    icon: icon, brandMark: brandMark, spark: spark, esc: esc, money: money, money2: money2, int: int, compact: compact,
+    icon: icon, brandMark: brandMark, spark: spark, blank: blank, esc: esc, money: money, money2: money2, int: int, compact: compact,
     pct: pct, cpa: cpa, cpm: cpm, cpc: cpc, winRate: winRate, profit: profit, roi: roi,
     color: color, tone: tone,
     metrics: metrics, sum: sum,

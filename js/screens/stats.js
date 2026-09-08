@@ -457,6 +457,18 @@
       var s = Store.get(), d = model(), t = table(d);
       var tm = UI.metrics(d.tot);
 
+      /* Считать нечего — показываем путь к данным, а не нули и плоские графики. */
+      if (!s.campaigns.length) {
+        return '<div class="page">' +
+          '<div class="head"><div><h1 class="h1">Statistics</h1>' +
+          '<p class="sub">Reports appear as soon as the first campaign starts spending.</p></div></div>' +
+          '<div class="card"><div class="card-b">' +
+            UI.blank('stats', 'No data yet',
+              'Launch a campaign and this page fills with placements, countries and days.',
+              'Create campaign', 'campaigns/new') +
+          '</div></div></div>';
+      }
+
       var form = s.ui.statsForm;
       var dirty = JSON.stringify(form) !== JSON.stringify(s.ui.statsApplied);
 

@@ -42,20 +42,28 @@
     };
   }
 
-  function seed() {
+  /* Два состояния аккаунта: демонстрационный со статистикой и пустой,
+     каким его видит человек, только что зарегистрировавшийся в сети. */
+  function seed(mode) {
+    var fresh = mode === 'fresh';
     return {
-      balance: 12480.50,
-      campaigns: DATA.CAMPAIGNS.map(function (c) { return Object.assign({}, c); }),
-      blockedZones: { 'NN-37540': true },
+      session: null,
+      balance: fresh ? 0 : 12480.50,
+      campaigns: fresh ? [] : DATA.CAMPAIGNS.map(function (c) { return Object.assign({}, c); }),
+      blockedZones: fresh ? {} : { 'NN-37540': true },
       forcedZones: {},
       campaignBlocks: {},
       campaignForced: {},
       selection: [],
-      presets: DATA.PRESETS.map(function (p) {
+      presets: fresh ? [] : DATA.PRESETS.map(function (p) {
         return Object.assign({}, p, { zones: p.zones.slice(), appliedTo: p.appliedTo.slice() });
       }),
-      payments: DATA.PAYMENTS.map(function (p) { return Object.assign({}, p); }),
-      notifications: DATA.NOTIFICATIONS.map(function (n) { return Object.assign({}, n); }),
+      payments: fresh ? [] : DATA.PAYMENTS.map(function (p) { return Object.assign({}, p); }),
+      notifications: fresh
+        ? [{ id: 1, kind: 'bot', cat: 'camp', unread: true, title: 'Welcome to New Network',
+             text: 'Top up the balance, connect your postback and launch the first campaign — ' +
+                   'the robot takes it from there.', time: 'Just now' }]
+        : DATA.NOTIFICATIONS.map(function (n) { return Object.assign({}, n); }),
       channels: { mail: true, tg: true, browser: false },
       threshold: '2 days',
       draft: seedDraft(),
@@ -71,7 +79,8 @@
         notifTab: 'all',
         volFormat: 'Popunder', volPlatform: 'Mobile', volCat: 'Mainstream',
         volRegion: 'Europe', volModel: 'Smart CPM', volBid: '2.40',
-        postbackTested: false
+        postbackTested: false,
+        auth: { tab: 'signin', login: '', password: '', email: '', company: '', error: '' }
       }
     };
   }
@@ -84,14 +93,14 @@
       var raw = localStorage.getItem(KEY);
       if (raw) {
         var parsed = JSON.parse(raw);
-        var base = seed();
+        var base = seed(parsed.session ? parsed.session.mode : 'demo');
         state = Object.assign({}, base, parsed);
         state.ui = Object.assign({}, base.ui, parsed.ui || {});
         state.draft = Object.assign({}, base.draft, parsed.draft || {});
         return;
       }
     } catch (e) { /* повреждённое хранилище — начинаем заново */ }
-    state = seed();
+    state = seed('demo');
   }
 
   function save() {
@@ -118,7 +127,9 @@
   }
 
   function reset() {
-    state = seed();
+    var session = get().session;
+    state = seed(session ? session.mode : 'demo');
+    state.session = session;
     save();
     listeners.forEach(function (l) { l(); });
   }
@@ -188,8 +199,25 @@
     return out;
   }
 
+  /* Вход: аккаунт пересобирается под выбранный режим, поэтому демо и
+     пустой кабинет никогда не смешиваются между собой. */
+  function signIn(user, mode) {
+    state = seed(mode);
+    state.session = { user: user, mode: mode, since: Date.now() };
+    save();
+    listeners.forEach(function (l) { l(); });
+  }
+
+  function signOut() {
+    state = seed('demo');
+    state.session = null;
+    save();
+    listeners.forEach(function (l) { l(); });
+  }
+
   w.Store = {
     get: get, db: db, commit: commit, set: set, patch: patch, ui: ui, reset: reset,
+    signIn: signIn, signOut: signOut,
     subscribe: subscribe, seedDraft: seedDraft, seedSchedule: seedSchedule,
     seedStatsFilters: seedStatsFilters,
     zoneState: zoneState, zoneIsOn: zoneIsOn, setZone: setZone, toggleZone: toggleZone

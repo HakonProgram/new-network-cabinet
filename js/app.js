@@ -2,7 +2,7 @@
 (function (w, d) {
   'use strict';
 
-  var icon = UI.icon;
+  var icon = UI.icon, esc = UI.esc;
 
   var NAV = [
     { cap: 'Workspace' },
@@ -102,11 +102,17 @@
             '<div><div class="brand-name">New Network</div><div class="brand-sub">Advertiser</div></div>' +
           '</div>' +
           '<nav class="nav" id="nav">' + navHtml() + '</nav>' +
-          '<div class="acct" data-go="profile">' +
-            '<div class="avatar">NM</div>' +
-            '<div style="min-width:0"><div style="font-size:12.5px;font-weight:600">Nexora Media</div>' +
-            '<div class="cid mono">adv-4821</div></div>' +
-          '</div>' +
+          (function () {
+            var ses = Store.get().session || {};
+            var name = ses.user || 'Advertiser';
+            var initials = name.split(/\s+/).slice(0, 2).map(function (x) { return x[0]; }).join('').toUpperCase();
+            return '<div class="acct">' +
+              '<div class="avatar" data-go="profile">' + esc(initials) + '</div>' +
+              '<div style="min-width:0" data-go="profile"><div class="acct-n">' + esc(name) + '</div>' +
+              '<div class="cid mono">' + (ses.mode === 'demo' ? 'adv-4821' : 'adv-new') + '</div></div>' +
+              '<div class="icon-btn acct-out" data-act="signOut" title="Sign out">' + icon('right', 15) + '</div>' +
+            '</div>';
+          })() +
         '</div>' +
       '</aside>' +
       '<div class="scrim" data-act="closeNav"></div>' +
@@ -189,7 +195,10 @@
   }
 
   /* ── отрисовка ── */
+  function authed() { return !!Store.get().session; }
+
   function screen() {
+    if (!authed()) return w.Screens.auth;
     return w.Screens[ROUTES[current].screen];
   }
 
@@ -235,10 +244,18 @@
     }
   }
 
+  /* Каркас нужен только внутри кабинета: вход рисуется на весь экран. */
   function render() {
-    refreshShell();
+    var app = d.getElementById('app');
+    var isAuth = !authed();
+    var wasAuth = app.classList.contains('shell-auth');
+    if (isAuth !== wasAuth || !d.getElementById('view')) {
+      app.className = isAuth ? 'shell-auth' : 'app';
+      app.innerHTML = isAuth ? '<div id="view"></div>' : shellHtml();
+    }
+    if (!isAuth) refreshShell();
     renderView();
-    scheduleAutoChecks();
+    if (!isAuth) scheduleAutoChecks();
   }
 
   /* ── события ── */
@@ -257,6 +274,12 @@
       if (!actEl) return;
       if (actEl.dataset.act === 'theme') { ev.preventDefault(); toggleTheme(); return; }
       if (actEl.dataset.act === 'openNav') { ev.preventDefault(); nav(true); return; }
+      if (actEl.dataset.act === 'signOut') {
+        ev.preventDefault();
+        Store.signOut();
+        toast('Signed out');
+        return;
+      }
       if (actEl.dataset.act === 'closeNav') { ev.preventDefault(); nav(false); return; }
       var sc = screen();
       var fn = sc.actions && sc.actions[actEl.dataset.act];
@@ -292,7 +315,6 @@
 
   function start() {
     current = route();
-    d.getElementById('app').innerHTML = shellHtml();
     bind();
     render();
   }
