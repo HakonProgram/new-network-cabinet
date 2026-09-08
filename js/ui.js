@@ -2,63 +2,138 @@
 (function (w) {
   'use strict';
 
-  var PATHS = {
-    stats:   '<path d="M3 20h18"/><path d="M6 16v-5"/><path d="M11 16V6"/><path d="M16 16v-8"/><path d="M21 16v-3"/>',
-    camp:    '<rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="11" height="6" rx="2"/>',
-    zones:   '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
-    volume:  '<path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M14.5 2.6A9 9 0 0 1 21.4 9.5h-6.9z"/>',
-    pay:     '<rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/><path d="M6 14.5h4"/>',
-    post:    '<path d="M10 13.5a4 4 0 0 0 5.7.3l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5"/><path d="M14 10.5a4 4 0 0 0-5.7-.3l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/>',
-    user:    '<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>',
-    bell:    '<path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"/><path d="M10.5 19a1.8 1.8 0 0 0 3 0"/>',
-    help:    '<circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.3 2.4c-.6.2-.9.7-.9 1.3v.5"/><path d="M12 17h.01"/>',
-    plus:    '<path d="M12 5v14M5 12h14"/>',
-    menu:    '<path d="M4 7h16M4 12h16M4 17h16"/>',
-    search:  '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
-    right:   '<path d="m9 6 6 6-6 6"/>',
-    left:    '<path d="m15 6-6 6 6 6"/>',
-    down:    '<path d="m6 9 6 6 6-6"/>',
-    copy:    '<rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M15 5.5A2.5 2.5 0 0 0 12.5 3h-7A2.5 2.5 0 0 0 3 5.5v7A2.5 2.5 0 0 0 5.5 15"/>',
-    edit:    '<path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17v3z"/>',
-    chart:   '<path d="M4 19h16"/><path d="M7 16v-4"/><path d="M12 16V6"/><path d="M17 16v-7"/>',
-    check:   '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
-    download:'<path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4.5 19.5h15"/>',
-    upload:  '<path d="M12 19V6"/><path d="m7.5 10.5 4.5-4.5 4.5 4.5"/><path d="M4.5 20h15"/>',
-    trash:   '<path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6.5 7l1 12h9l1-12"/>',
-    close:   '<path d="M6 6l12 12M18 6L6 18"/>',
-    up:      '<path d="M12 19V5M6 11l6-6 6 6"/>',
-    dn:      '<path d="M12 5v14M6 13l6 6 6-6"/>',
-    info:    '<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6h.01"/>',
-    alert:   '<path d="M12 8v5"/><path d="M12 16.5h.01"/><path d="M10.3 3.9 2.6 17.2A2 2 0 0 0 4.3 20h15.4a2 2 0 0 0 1.7-2.8L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
-    bot:     '<rect x="4" y="7" width="16" height="12" rx="3"/><path d="M12 4v3"/><circle cx="9" cy="13" r="1"/><circle cx="15" cy="13" r="1"/>',
-    image:   '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.8" cy="9" r="1.8"/><path d="m4 17 5-5 4.5 4.5L17 13l3 3"/>',
-    doc:     '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
-    folder:  '<path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h3.2l2 2.5h7.8A2.5 2.5 0 0 1 21 10v7.5a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/>',
-    key:     '<circle cx="8" cy="12" r="3.5"/><path d="M11.5 12H21l-2 2.5"/><path d="M17 12v3"/>',
-    legal:   '<rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/>',
-    gear:    '<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1"/>',
-    refresh: '<path d="M20 11a8 8 0 1 0-.6 4"/><path d="M20 5v6h-6"/>',
-    sun:     '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>',
-    moon:    '<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/>',
-    clock:   '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 1.8"/>',
-    archive: '<rect x="3" y="4" width="18" height="4.5" rx="1.5"/><path d="M5 8.5V19a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19V8.5"/><path d="M10 12.5h4"/>',
-    unarchive: '<rect x="3" y="4" width="18" height="4.5" rx="1.5"/><path d="M5 8.5V19a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19V8.5"/><path d="M12 17v-5"/><path d="m9.5 14.5 2.5-2.5 2.5 2.5"/>'
+/* ── фирменный набор иконок ──
+     Каждая иконка собрана из трёх слоёв: b — приглушённая подложка,
+     f — залитая основа, s — тонкая деталь обводкой. Общий словарь форм
+     (скруглённый прямоугольник, круг, восходящий столбик) держит набор
+     единым и отличает его от стандартных штриховых библиотек.
+     Все слои красятся currentColor, поэтому иконка живёт в теме сама. */
+  var ICONS = {
+    stats:   { b: '<rect x="2.6" y="10" width="5" height="11" rx="2"/><rect x="16.4" y="6" width="5" height="15" rx="2"/>',
+               f: '<rect x="9.5" y="2.6" width="5" height="18.4" rx="2"/>' },
+    camp:    { b: '<rect x="2.6" y="3.4" width="18.8" height="7.4" rx="2.6"/>',
+               f: '<rect x="2.6" y="13.2" width="11.4" height="7.4" rx="2.6"/>' },
+    zones:   { b: '<rect x="2.6" y="2.6" width="8" height="8" rx="2.4"/><rect x="13.4" y="13.4" width="8" height="8" rx="2.4"/>',
+               f: '<rect x="13.4" y="2.6" width="8" height="8" rx="2.4"/><rect x="2.6" y="13.4" width="8" height="8" rx="2.4"/>' },
+    volume:  { b: '<path d="M11 2.6a9.4 9.4 0 1 0 10.4 10.4H11z"/>',
+               f: '<path d="M13.4 2.9A9.4 9.4 0 0 1 21.1 10.6h-7.7z"/>' },
+    pay:     { b: '<rect x="2" y="4.6" width="20" height="14.8" rx="3.4"/>',
+               f: '<rect x="2" y="8.6" width="20" height="3.2"/><rect x="5.4" y="14.4" width="6" height="2.6" rx="1.3"/>' },
+    post:    { b: '<rect x="1.8" y="8.8" width="12.6" height="6.4" rx="3.2"/>',
+               f: '<rect x="9.6" y="8.8" width="12.6" height="6.4" rx="3.2"/>' },
+    user:    { b: '<path d="M12 13.4c4.3 0 7.8 2.9 8.4 6.7a1.2 1.2 0 0 1-1.2 1.3H4.8a1.2 1.2 0 0 1-1.2-1.3c.6-3.8 4.1-6.7 8.4-6.7z"/>',
+               f: '<circle cx="12" cy="7.4" r="4.3"/>' },
+    bell:    { b: '<path d="M12 2.4a6.6 6.6 0 0 1 6.6 6.6c0 4.4 1.6 5.6 2.1 6.2a.9.9 0 0 1-.7 1.5H4a.9.9 0 0 1-.7-1.5c.5-.6 2.1-1.8 2.1-6.2A6.6 6.6 0 0 1 12 2.4z"/>',
+               f: '<path d="M9.4 18.4h5.2a2.6 2.6 0 0 1-5.2 0z"/>' },
+    help:    { b: '<circle cx="12" cy="12" r="9.4"/>',
+               f: '<circle cx="12" cy="16.6" r="1.4"/>',
+               s: '<path d="M9.5 9.4a2.6 2.6 0 1 1 3.4 2.5c-.6.2-.9.7-.9 1.3"/>' },
+    bot:     { b: '<rect x="3" y="6.6" width="18" height="13.4" rx="4"/>',
+               f: '<circle cx="9" cy="13" r="1.7"/><circle cx="15" cy="13" r="1.7"/><rect x="11" y="2.4" width="2" height="4" rx="1"/>' },
+    doc:     { b: '<path d="M5 4.4A2.4 2.4 0 0 1 7.4 2h6.2l6 6v13.6A2.4 2.4 0 0 1 17.2 24H7.4A2.4 2.4 0 0 1 5 21.6z" transform="translate(0,-1)"/>',
+               f: '<path d="M13.6 1v5a2 2 0 0 0 2 2h4z"/>' },
+    folder:  { b: '<path d="M2.6 7.4A2.6 2.6 0 0 1 5.2 4.8h3.4l2.2 2.6h8A2.6 2.6 0 0 1 21.4 10v7.6a2.6 2.6 0 0 1-2.6 2.6H5.2a2.6 2.6 0 0 1-2.6-2.6z"/>',
+               f: '<rect x="2.6" y="11.4" width="18.8" height="2.4"/>' },
+    key:     { b: '<circle cx="8" cy="12" r="5.2"/>',
+               f: '<path d="M12.4 9.6h9v4.8h-2.2v-2.2h-1.8v2.2h-5z"/>' },
+    legal:   { b: '<rect x="3.6" y="2.6" width="16.8" height="18.8" rx="3.2"/>',
+               f: '<rect x="7" y="7" width="10" height="2.2" rx="1.1"/><rect x="7" y="11" width="10" height="2.2" rx="1.1"/><rect x="7" y="15" width="6" height="2.2" rx="1.1"/>' },
+    gear:    { b: '<path d="M10.2 2.6h3.6l.5 2.6 2.2 1.3 2.5-.9 1.8 3.1-2 1.7v2.6l2 1.7-1.8 3.1-2.5-.9-2.2 1.3-.5 2.6h-3.6l-.5-2.6-2.2-1.3-2.5.9-1.8-3.1 2-1.7v-2.6l-2-1.7 1.8-3.1 2.5.9 2.2-1.3z"/>',
+               f: '<circle cx="12" cy="12" r="3.2"/>' },
+    image:   { b: '<rect x="2.6" y="3.6" width="18.8" height="16.8" rx="3.4"/>',
+               f: '<circle cx="8.4" cy="9" r="2"/><path d="M2.6 17.6l4.6-4.6 4.2 4.2 3.4-3.4 6.6 6.6H5a2.4 2.4 0 0 1-2.4-2.4z"/>' },
+    clock:   { b: '<circle cx="12" cy="12" r="9.4"/>',
+               f: '<path d="M11 6.4h2v6l3.6 2.1-1 1.8-4.6-2.7z"/>' },
+    info:    { b: '<circle cx="12" cy="12" r="9.4"/>',
+               f: '<circle cx="12" cy="7.6" r="1.4"/><rect x="10.9" y="10.4" width="2.2" height="7" rx="1.1"/>' },
+    alert:   { b: '<path d="M10.3 3.5a2 2 0 0 1 3.4 0l7.7 13.6a2 2 0 0 1-1.7 3H4.3a2 2 0 0 1-1.7-3z"/>',
+               f: '<rect x="10.9" y="8" width="2.2" height="6.2" rx="1.1"/><circle cx="12" cy="17" r="1.4"/>' },
+    archive: { b: '<rect x="3.4" y="7.4" width="17.2" height="13" rx="2.8"/>',
+               f: '<rect x="2.2" y="3.4" width="19.6" height="4.6" rx="1.8"/><rect x="9.4" y="11.4" width="5.2" height="2.2" rx="1.1"/>' },
+    unarchive:{ b: '<rect x="3.4" y="7.4" width="17.2" height="13" rx="2.8"/>',
+               f: '<rect x="2.2" y="3.4" width="19.6" height="4.6" rx="1.8"/><path d="M12 10.6l3.4 3.6h-2.2v3.4h-2.4v-3.4H8.6z"/>' },
+    trash:   { b: '<path d="M5.4 7.6h13.2l-1 12a2.4 2.4 0 0 1-2.4 2.2H8.8a2.4 2.4 0 0 1-2.4-2.2z"/>',
+               f: '<path d="M3.4 5.2h17.2v2.4H3.4z"/><path d="M9 2.6h6v2.6H9z"/>' },
+    copy:    { b: '<rect x="8.4" y="8.4" width="12.4" height="12.4" rx="3.2"/>',
+               f: '<path d="M3.2 6a2.8 2.8 0 0 1 2.8-2.8h6.4A2.8 2.8 0 0 1 15.2 6v.9h-4a4.3 4.3 0 0 0-4.3 4.3v4h-.9A2.8 2.8 0 0 1 3.2 12.4z"/>' },
+    edit:    { b: '<path d="M3 17.2 15.6 4.6l4.4 4.4L7.4 21.6H3z"/>',
+               f: '<path d="M16.8 3.4a2.4 2.4 0 0 1 3.4 0l1.2 1.2a2.4 2.4 0 0 1 0 3.4l-.8.8-4.6-4.6z"/>' },
+    /* Отчёт: столбики с точкой роста. Сплошной квадрат здесь читался пятном. */
+    chart:   { b: '<rect x="3" y="12.6" width="4" height="8.4" rx="2"/><rect x="16.8" y="9.6" width="4" height="11.4" rx="2"/>',
+               f: '<rect x="9.9" y="7.6" width="4" height="13.4" rx="2"/><circle cx="18.8" cy="4.4" r="2.6"/>' },
+    search:  { b: '<circle cx="10.6" cy="10.6" r="7.4"/>',
+               f: '<rect x="15.4" y="16.6" width="7" height="2.8" rx="1.4" transform="rotate(45 15.4 16.6)"/>' },
+    download:{ b: '<rect x="2.8" y="17.6" width="18.4" height="3.2" rx="1.6"/>',
+               f: '<path d="M10.6 2.6h2.8v8.2h3.6L12 16.6 7 10.8h3.6z"/>' },
+    upload:  { b: '<rect x="2.8" y="17.6" width="18.4" height="3.2" rx="1.6"/>',
+               f: '<path d="M13.4 15.6h-2.8V7.4H7L12 1.6l5 5.8h-3.6z"/>' },
+    refresh: { b: '<path d="M12 3.4a8.6 8.6 0 1 1-8.3 10.8l2.7-.7A5.8 5.8 0 1 0 12 6.2z"/>',
+               f: '<path d="M13.6 2.2v7.2l-5.4-3.6z"/>' },
+    sun:     { b: '<path d="M11 1.6h2v3.4h-2zm0 17.4h2v3.4h-2zM1.6 11h3.4v2H1.6zm17.4 0h3.4v2H19zM4.2 5.6l1.4-1.4 2.4 2.4-1.4 1.4zm12 12l1.4-1.4 2.4 2.4-1.4 1.4zm3.8-12l-2.4 2.4-1.4-1.4 2.4-2.4zM6.6 17.6l-2.4 2.4 1.4 1.4 2.4-2.4z"/>',
+               f: '<circle cx="12" cy="12" r="4.6"/>' },
+    moon:    { b: '<path d="M21.4 14.4A9.6 9.6 0 0 1 9.6 2.6a9.6 9.6 0 1 0 11.8 11.8z"/>',
+               f: '<circle cx="17.6" cy="5.4" r="1.6"/>' },
+    play:    { f: '<path d="M7.4 4.6a1.2 1.2 0 0 1 1.8-1l10 6.4a1.2 1.2 0 0 1 0 2l-10 6.4a1.2 1.2 0 0 1-1.8-1z"/>' },
+    pause:   { f: '<rect x="6" y="4.6" width="4.2" height="14.8" rx="1.6"/><rect x="13.8" y="4.6" width="4.2" height="14.8" rx="1.6"/>' },
+    plus:    { f: '<path d="M10.7 4.4h2.6v5.9h5.9v2.6h-5.9v5.9h-2.6v-5.9H4.8v-2.6h5.9z"/>' },
+    close:   { f: '<path d="M5.6 7.4 7.4 5.6 12 10.2l4.6-4.6 1.8 1.8L13.8 12l4.6 4.6-1.8 1.8L12 13.8l-4.6 4.6-1.8-1.8L10.2 12z"/>' },
+    check:   { f: '<path d="M9.6 16.2 5.4 12l-1.8 1.8 6 6L20.4 8.4l-1.8-1.8z"/>' },
+    right:   { f: '<path d="M8.6 4.8 15.8 12l-7.2 7.2-1.8-1.8L12.2 12 6.8 6.6z"/>' },
+    left:    { f: '<path d="M15.4 19.2 8.2 12l7.2-7.2 1.8 1.8L11.8 12l5.4 5.4z"/>' },
+    down:    { f: '<path d="M4.8 8.6 12 15.8l7.2-7.2-1.8-1.8L12 12.2 6.6 6.8z"/>' },
+    up:      { f: '<path d="M12 4.8 19.2 12l-1.8 1.8L12 8.4 6.6 13.8 4.8 12z"/>' },
+    dn:      { f: '<path d="M12 19.2 4.8 12l1.8-1.8L12 15.6l5.4-5.4L19.2 12z"/>' },
+    dots:    { f: '<circle cx="12" cy="4.8" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19.2" r="1.9"/>' },
+    menu:    { f: '<rect x="3" y="5.2" width="18" height="2.6" rx="1.3"/><rect x="3" y="10.7" width="18" height="2.6" rx="1.3"/><rect x="3" y="16.2" width="18" height="2.6" rx="1.3"/>' }
   };
 
-  var FILLED = {
-    play:  '<path d="M7 5.5 18.5 12 7 18.5z"/>',
-    pause: '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>',
-    dots:  '<circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/>'
-  };
+  /* Иконка ссылки на «свой» бренд: восходящий сигнал в скруглённом квадрате. */
+  function brandMark(size) {
+    size = size || 30;
+    return '<svg class="mark" width="' + size + '" height="' + size + '" viewBox="0 0 32 32" aria-hidden="true">' +
+      '<rect width="32" height="32" rx="9" fill="var(--accent-solid)"/>' +
+      '<g fill="var(--on-accent)">' +
+        '<rect x="7" y="17.5" width="4.4" height="7.5" rx="2.2" opacity="0.55"/>' +
+        '<rect x="13.8" y="13" width="4.4" height="12" rx="2.2" opacity="0.8"/>' +
+        '<rect x="20.6" y="7" width="4.4" height="18" rx="2.2"/>' +
+      '</g></svg>';
+  }
 
-  function icon(name, size, sw) {
+  /* Спарклайн: заливка под кривой плюс сама кривая. Ширина в процентах,
+     поэтому карточка любого размера получает график по своей ширине. */
+  function spark(values, tone, h) {
+    h = h || 34;
+    var w = 100, n = values.length;
+    if (n < 2) return '';
+    var min = Math.min.apply(null, values), max = Math.max.apply(null, values);
+    var span = (max - min) || 1;
+    var x = function (i) { return (i / (n - 1)) * w; };
+    var y = function (v) { return h - 3 - ((v - min) / span) * (h - 8); };
+    var line = values.map(function (v, i) {
+      return (i ? 'L' : 'M') + x(i).toFixed(2) + ' ' + y(v).toFixed(2);
+    }).join(' ');
+    var area = line + ' L' + w + ' ' + h + ' L0 ' + h + ' Z';
+    var c = color(tone || '--accent');
+    var id = 'sp' + Math.random().toString(36).slice(2, 8);
+    return '<svg class="spark" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" aria-hidden="true">' +
+      '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="' + c + '" stop-opacity="0.30"/>' +
+        '<stop offset="1" stop-color="' + c + '" stop-opacity="0"/></linearGradient></defs>' +
+      '<path d="' + area + '" fill="url(#' + id + ')"/>' +
+      '<path d="' + line + '" fill="none" stroke="' + c + '" stroke-width="1.6" ' +
+        'stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>';
+  }
+
+  function icon(name, size) {
     size = size || 16;
-    if (FILLED[name]) {
-      return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' + FILLED[name] + '</svg>';
-    }
-    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-      'stroke-width="' + (sw || 1.8) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-      (PATHS[name] || '') + '</svg>';
+    var g = ICONS[name];
+    if (!g) return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" aria-hidden="true"></svg>';
+    return '<svg class="ic" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" ' +
+      'fill="currentColor" aria-hidden="true">' +
+      (g.b ? '<g class="ic-b" opacity="0.28">' + g.b + '</g>' : '') +
+      (g.f || '') +
+      (g.s ? '<g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round">' + g.s + '</g>' : '') +
+      '</svg>';
   }
 
   function esc(s) {
@@ -223,7 +298,7 @@
   }
 
   w.UI = {
-    icon: icon, esc: esc, money: money, money2: money2, int: int, compact: compact,
+    icon: icon, brandMark: brandMark, spark: spark, esc: esc, money: money, money2: money2, int: int, compact: compact,
     pct: pct, cpa: cpa, cpm: cpm, cpc: cpc, winRate: winRate, profit: profit, roi: roi,
     color: color, tone: tone,
     metrics: metrics, sum: sum,

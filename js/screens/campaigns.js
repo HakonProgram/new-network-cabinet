@@ -47,7 +47,7 @@
       : (running ? 'Stop campaign' : 'Start campaign');
 
     return '<div class="tr row clickable' + (running ? '' : ' off') + (picked ? ' picked' : '') +
-      '" data-act="pick" data-arg="' + c.id + '" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
+      '" data-st="' + meta.tone + '" data-act="pick" data-arg="' + c.id + '" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
       '<div class="box' + (picked ? ' on' : '') + '"></div>' +
       '<div class="' + runCls + '" data-act="toggle" data-arg="' + c.id + '" title="' + runTitle + '">' +
         icon(running ? 'pause' : 'play', 12) + '</div>' +
@@ -109,10 +109,12 @@
           (m === 'all' ? 'All models' : m) + '</div>';
       }).join('');
 
-      var stat = function (k, v, sub, color) {
+      /* У каждой метрики свой ряд за период — карточка перестаёт быть просто числом. */
+      var stat = function (k, v, sub, color, seed, tone) {
         return '<div class="stat"><span class="k">' + k + '</span>' +
           '<span class="v"' + (color ? ' style="color:' + color + '"' : '') + '>' + v + '</span>' +
-          '<span class="d">' + sub + '</span></div>';
+          '<span class="d">' + sub + '</span>' +
+          (seed ? UI.spark(UI.daily(14, seed, 1000), tone || '--accent') : '') + '</div>';
       };
       var bulk = '';
       if (sel.length) {
@@ -135,11 +137,11 @@
       }
 
       var statbar = '<div class="stats">' +
-        stat('Spend', tm.cost, 'last 7 days') +
-        stat('Revenue', tm.revenue, 'reported via postback') +
-        stat('Profit', tm.profit, 'revenue minus spend', tm.profitColor) +
-        stat('ROI', tm.roi, 'return on ad spend', tm.roiColor) +
-        stat('Conversions', tm.conv, 'avg CPA ' + tm.cpa) +
+        stat('Spend', tm.cost, 'last 7 days', '', 90341, '--accent') +
+        stat('Revenue', tm.revenue, 'reported via postback', '', 41207, '--accent') +
+        stat('Profit', tm.profit, 'revenue minus spend', tm.profitColor, 77413, '--pos') +
+        stat('ROI', tm.roi, 'return on ad spend', tm.roiColor, 20881, '--pos') +
+        stat('Conversions', tm.conv, 'avg CPA ' + tm.cpa, '', 55129, '--info') +
       '</div>';
 
       var heads = ['', '', 'ID', 'Campaign', 'Model', 'Status', 'Impr.', 'Conv.', 'Cost', 'ROI', ''];

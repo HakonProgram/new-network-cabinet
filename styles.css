@@ -629,3 +629,37 @@ select.sel-inp option { background:var(--surface); color:var(--text); }
   .repbar { padding:var(--s4); }
   .rb-acts { flex-wrap:wrap; }
 }
+
+/* ── фирменные детали ──
+   Иконки залитые: подложка живёт своей прозрачностью, а в активном
+   состоянии становится плотнее — элемент читается как включённый. */
+.ic { flex:0 0 auto; }
+.nav-i.on .ic-b, .btn-pri .ic-b, .act:hover .ic-b { opacity:0.55; }
+.brand .mark { border-radius:9px; box-shadow:0 2px 8px rgba(0,0,0,0.18); }
+
+/* Активный пункт меню помечен полосой — меню перестаёт быть плоским списком. */
+.nav-i { position:relative; }
+.nav-i.on::before { content:''; position:absolute; left:-12px; top:6px; bottom:6px;
+  width:3px; border-radius:0 3px 3px 0; background:var(--accent); }
+
+/* Цвет статуса выходит на край строки. */
+.row[data-st]::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; }
+.row[data-st] { position:relative; }
+.row[data-st="pos"]::before { background:var(--pos); }
+.row[data-st="warn"]::before { background:var(--warn); }
+.row[data-st="neg"]::before { background:var(--neg); }
+.row[data-st="info"]::before { background:var(--info); }
+.row[data-st="muted"]::before { background:var(--border-strong); }
+
+/* Спарклайн прижат к низу карточки метрики. */
+/* График не лезет под подпись: она заканчивается там, где он начинается. */
+.stat { position:relative; overflow:hidden; padding-bottom:30px; }
+.spark { position:absolute; left:0; right:0; bottom:0; width:100%; height:26px; display:block; }
+.stat .k, .stat .v, .stat .d { position:relative; z-index:1; }
+
+/* Баланс в шапке — не просто текст, а отдельная поверхность. */
+.balance { padding:6px var(--s3) 6px var(--s4); border:1px solid var(--border);
+  border-radius:99px; background:var(--surface); }
+.bal-val { letter-spacing:-0.01em; }
+
+.act .ic-b, .btn-xs .ic-b { opacity:0.38; }
