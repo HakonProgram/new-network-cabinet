@@ -11,7 +11,8 @@
   var HALF = { 'Smart CPM': 1.9, 'CPC': 0.12, 'CPA': 9.0 };
   var MIN = { 'Smart CPM': 0.15, 'CPC': 0.03, 'CPA': 3.00 };
   var COLS = 'minmax(150px,1fr) 70px 118px 116px 92px 92px 82px 84px 170px';
-  var MINW = 'min-width:1180px';
+  var MINW = '';
+  function minw() { if (!MINW) MINW = UI.gridMin(COLS); return MINW; }
 
   function opts(items, sel, act) {
     return items.map(function (x) {
@@ -53,7 +54,7 @@
 
       var rows = DATA.GEO.map(function (g) {
         var v = total * g.share, free = 1 - g.taken;
-        return '<div class="tr row" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
+        return '<div class="tr row" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
           '<div class="cell w">' + g.name + '</div>' +
           '<div class="cell mono muted">' + g.code + '</div>' +
           '<div class="cell w r">' + UI.compact(v) + '</div>' +
@@ -118,7 +119,7 @@
           '</div></div>' +
 
         '<div class="table"><div class="table-scroll">' +
-          '<div class="tr thead" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
+          '<div class="tr thead" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
             '<div class="th">Country</div><div class="th">Code</div><div class="th r">Impr. / day</div>' +
             '<div class="th r">Suggested bid</div><div class="th r">Avg CPM</div><div class="th r">Win rate</div>' +
             '<div class="th r">Placements</div><div class="th r">Avg CR</div><div class="th">Free volume</div></div>' +

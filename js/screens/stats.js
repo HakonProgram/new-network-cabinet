@@ -13,6 +13,8 @@
   var G = { L: 48, R: 524, T: 14, B: 150, W: 532, H: 184 };
 
   var M_HEADS = ['Impr.', 'Clicks', 'CTR', 'Conv.', 'CR', 'Cost', 'Revenue', 'Profit', 'ROI', 'CPA', 'CPM', 'CPC', 'Win rate'];
+  /* min-width строки = сумма колонок + 12px на каждый зазор + 32px отступов.
+     Если объявить меньше — колонки вылезут за элемент и подложка оборвётся. */
   var M_COLS = '78px 78px 58px 66px 58px 84px 88px 88px 76px 68px 66px 68px 74px';
 
   /* Первые колонки строки «Итого»: подпись плюс пустые ячейки под остальные разрезы. */
@@ -193,7 +195,7 @@
       var zr = DATA.ZONES.map(function (z) { return scale(z, k * d.share); });
       var cid = d.scoped ? d.scoped.id : null;
       return {
-        cols: '104px 96px 110px ' + M_COLS + ' 128px 96px', minw: 'min-width:1660px',
+        cols: '104px 96px 110px ' + M_COLS + ' 128px 96px', minw: UI.gridMin('104px 96px 110px ' + M_COLS + ' 128px 96px'),
         heads: ['Zone ID', 'Category', 'Vertical'].concat(M_HEADS).concat(['Status', '']),
         align: ['', '', ''].concat(M_HEADS.map(function () { return 'r'; })).concat(['', '']),
         tail: 2,
@@ -218,7 +220,7 @@
       var list = d.scoped ? [d.scoped] : s.campaigns;
       var cr = list.map(function (c) { return scale(c, k); });
       return {
-        cols: 'minmax(200px,1fr) 92px ' + M_COLS, minw: 'min-width:1450px',
+        cols: 'minmax(200px,1fr) 92px ' + M_COLS, minw: UI.gridMin('minmax(200px,1fr) 92px ' + M_COLS),
         heads: ['Campaign', 'Model'].concat(M_HEADS),
         align: ['', ''].concat(M_HEADS.map(function () { return 'r'; })),
         rows: list.map(function (c, i) {
@@ -234,7 +236,7 @@
     if (tab === 'geo') {
       var gr = DATA.GEO.map(function (g) { return scale(g, k * d.share); });
       return {
-        cols: 'minmax(160px,1fr) 70px ' + M_COLS, minw: 'min-width:1380px',
+        cols: 'minmax(160px,1fr) 70px ' + M_COLS, minw: UI.gridMin('minmax(160px,1fr) 70px ' + M_COLS),
         heads: ['Country', 'Code'].concat(M_HEADS),
         align: ['', ''].concat(M_HEADS.map(function () { return 'r'; })),
         rows: DATA.GEO.map(function (g, i) {
@@ -261,7 +263,7 @@
       rows.push('<div class="cell w">' + UI.dayLabel(j) + '</div>' + metricCells(row));
     }
     return {
-      cols: '120px ' + M_COLS, minw: 'min-width:1310px',
+      cols: '120px ' + M_COLS, minw: UI.gridMin('120px ' + M_COLS),
       heads: ['Date'].concat(M_HEADS),
       align: [''].concat(M_HEADS.map(function () { return 'r'; })),
       rows: rows, totals: totals, totalLabel: shown + ' ' + UI.plural(shown, 'day', 'days'),

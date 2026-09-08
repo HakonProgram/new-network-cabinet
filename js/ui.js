@@ -180,6 +180,21 @@
     return { values: values, top: top };
   }
 
+  /* Минимальная ширина строки таблицы: сумма колонок + зазоры + отступы.
+     Считаем из самого grid-template-columns, чтобы не разъезжалось. */
+  function gridMin(cols, gap, pad) {
+    gap = gap === undefined ? 12 : gap;
+    pad = pad === undefined ? 32 : pad;
+    var parts = String(cols).trim().split(/\s+(?![^(]*\))/);
+    var total = parts.reduce(function (a, p) {
+      var m = /minmax\((\d+)px/.exec(p);
+      if (m) return a + Number(m[1]);
+      if (/^\d+px$/.test(p)) return a + parseInt(p, 10);
+      return a + 120;
+    }, 0);
+    return 'min-width:' + (total + gap * (parts.length - 1) + pad) + 'px';
+  }
+
   function cls() {
     return Array.prototype.filter.call(arguments, Boolean).join(' ');
   }
@@ -190,6 +205,6 @@
     color: color, tone: tone,
     metrics: metrics, sum: sum,
     num: num, plural: plural, dayLabel: dayLabel, dateShort: dateShort,
-    daily: daily, ticks: ticks, cls: cls
+    daily: daily, ticks: ticks, cls: cls, gridMin: gridMin
   };
 })(window);

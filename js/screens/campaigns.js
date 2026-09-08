@@ -12,9 +12,10 @@
     { key: 'archived', label: 'Archived' }
   ];
   var MODELS = ['all', 'CPA', 'Pure CPA', 'CPM', 'Smart CPM', 'CPC'];
-  /* 4 кнопки по 30px + зазоры = 136px; минимум таблицы честно равен сумме колонок */
-  var COLS = '32px 64px minmax(180px,1fr) 88px 112px 76px 68px 86px 74px 68px 136px';
-  var MINW = 'min-width:1104px';
+  /* min-width = сумма колонок + 12px на зазор + 32px отступов. */
+  var COLS = '30px 32px 64px minmax(180px,1fr) 88px 112px 76px 68px 86px 74px 136px';
+  var MINW = '';
+  function minw() { if (!MINW) MINW = UI.gridMin(COLS); return MINW; }
 
   /* Архив живёт на своей вкладке и не мешается в общем списке. */
   function visible() {
@@ -35,17 +36,19 @@
     var meta = DATA.STATUS[c.status];
     var running = c.status === 'active' || c.status === 'test';
     var controllable = c.status !== 'review' && c.status !== 'done';
+    var archived = c.status === 'archived';
     var m = UI.metrics(c);
     var noData = !c.impr;
     var dash = function (v) { return noData ? '—' : v; };
-    var archived = c.status === 'archived';
+    var picked = selected().indexOf(c.id) >= 0;
     var runCls = !controllable ? 'act act-off' : (running ? 'act act-stop' : 'act act-run');
     var runTitle = !controllable
       ? (c.status === 'review' ? 'Starts by itself once the auto-check passes' : 'Controls unavailable')
       : (running ? 'Stop campaign' : 'Start campaign');
 
-    return '<div class="tr row clickable' + (running ? '' : ' off') + '" data-act="open" data-arg="' + c.id +
-      '" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
+    return '<div class="tr row clickable' + (running ? '' : ' off') + (picked ? ' picked' : '') +
+      '" data-act="pick" data-arg="' + c.id + '" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
+      '<div class="box' + (picked ? ' on' : '') + '"></div>' +
       '<div class="' + runCls + '" data-act="toggle" data-arg="' + c.id + '" title="' + runTitle + '">' +
         icon(running ? 'pause' : 'play', 12) + '</div>' +
       '<div class="cid mono">' + esc(c.id) + '</div>' +
@@ -60,17 +63,18 @@
       '<div class="cell w r">' + dash(m.conv) + '</div>' +
       '<div class="cell w r">' + dash(m.cost) + '</div>' +
       '<div class="cell w r" style="color:' + m.roiColor + '">' + dash(m.roi) + '</div>' +
-      '<div class="cell muted r">' + m.cpa + '</div>' +
       '<div class="acts">' +
         '<div class="act" data-act="dup" data-arg="' + c.id + '" title="Duplicate">' + icon('copy', 13, 1.9) + '</div>' +
         '<div class="act" data-act="edit" data-arg="' + c.id + '" title="Edit">' + icon('edit', 13, 1.9) + '</div>' +
-        '<div class="act act-chart" data-act="stats" data-arg="' + c.id + '" title="Statistics">' + icon('chart', 13, 1.9) + '</div>' +
+        '<div class="act act-chart" data-act="stats" data-arg="' + c.id + '" title="Open report">' + icon('chart', 13, 1.9) + '</div>' +
         '<div class="act" data-act="' + (archived ? 'restore' : 'archive') + '" data-arg="' + c.id +
           '" title="' + (archived ? 'Restore from archive' : 'Archive') + '">' +
           icon(archived ? 'unarchive' : 'archive', 13, 1.9) + '</div>' +
       '</div>' +
     '</div>';
   }
+
+  function selected() { return Store.get().ui.campSelection; }
 
   /* Провалиться в кампанию: отчёт, сужённый до неё. */
   function openReport(id) {
@@ -83,7 +87,7 @@
   w.Screens = w.Screens || {};
   w.Screens.campaigns = {
     render: function () {
-      var s = Store.get(), rows = visible();
+      var s = Store.get(), rows = visible(), sel = selected();
       var t = UI.sum(s.campaigns);
       var tm = UI.metrics({ impr: t.impr, clicks: t.clicks, conv: t.conv, cost: t.cost,
                             revenue: t.revenue, winRate: t.cost ? t.wSum / t.cost : 0 });
@@ -107,6 +111,26 @@
           '<span class="v"' + (color ? ' style="color:' + color + '"' : '') + '>' + v + '</span>' +
           '<span class="d">' + sub + '</span></div>';
       };
+      var bulk = '';
+      if (sel.length) {
+        var picked = s.campaigns.filter(function (c) { return sel.indexOf(c.id) >= 0; });
+        var canStart = picked.filter(function (c) { return c.status === 'paused'; }).length;
+        var canStop = picked.filter(function (c) { return c.status === 'active' || c.status === 'test'; }).length;
+        bulk = '<div class="bulk">' +
+          '<span class="bulk-n">' + sel.length + ' selected</span>' +
+          '<button class="btn btn-xs btn-up" data-act="startSel"' + (canStart ? '' : ' disabled') + '>' +
+            icon('play', 11) + 'Start' + (canStart ? ' ' + canStart : '') + '</button>' +
+          '<button class="btn btn-xs btn-danger" data-act="stopSel"' + (canStop ? '' : ' disabled') + '>' +
+            icon('pause', 11) + 'Stop' + (canStop ? ' ' + canStop : '') + '</button>' +
+          '<button class="btn btn-xs" data-act="dupSel">' + icon('copy', 11, 1.9) + 'Duplicate</button>' +
+          '<button class="btn btn-xs" data-act="archiveSel">' + icon('archive', 11, 1.9) + 'Archive</button>' +
+          (sel.length === 1
+            ? '<button class="btn btn-xs" data-act="reportSel">' + icon('chart', 11, 1.9) + 'Open report</button>'
+            : '') +
+          '<button class="btn btn-xs btn-ghost" style="margin-left:auto" data-act="clearSel">Clear</button>' +
+        '</div>';
+      }
+
       var statbar = '<div class="stats">' +
         stat('Spend', tm.cost, 'last 7 days') +
         stat('Revenue', tm.revenue, 'reported via postback') +
@@ -115,8 +139,8 @@
         stat('Conversions', tm.conv, 'avg CPA ' + tm.cpa) +
       '</div>';
 
-      var heads = ['', 'ID', 'Campaign', 'Model', 'Status', 'Impr.', 'Conv.', 'Cost', 'ROI', 'CPA', ''];
-      var align = ['', '', '', '', '', 'r', 'r', 'r', 'r', 'r', ''];
+      var heads = ['', '', 'ID', 'Campaign', 'Model', 'Status', 'Impr.', 'Conv.', 'Cost', 'ROI', ''];
+      var align = ['', '', '', '', '', '', 'r', 'r', 'r', 'r', ''];
 
       return '<div class="page">' +
         '<div class="head">' +
@@ -132,21 +156,28 @@
           '<div class="chips" style="margin-left:auto">' + chips + '</div>' +
         '</div>' +
 
+        bulk +
         '<div class="table">' +
           '<div class="table-scroll">' +
-            '<div class="tr thead" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
-              heads.map(function (h, i) { return '<div class="th ' + align[i] + '">' + h + '</div>'; }).join('') +
+            '<div class="tr thead" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
+              heads.map(function (h, i) {
+                if (i === 0) {
+                  var all = rows.length > 0 && sel.length === rows.length;
+                  return '<div class="box' + (all ? ' on' : '') + '" data-act="pickAll"></div>';
+                }
+                return '<div class="th ' + align[i] + '">' + h + '</div>';
+              }).join('') +
             '</div>' +
             (rows.length
-              ? '<div class="tr totals" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
-                  '<div></div><div class="tot-lab">Total</div>' +
+              ? '<div class="tr totals" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
+                  '<div></div><div></div><div class="tot-lab">Total</div>' +
                   '<div class="cell muted">' + rows.length + ' ' + UI.plural(rows.length, 'campaign', 'campaigns') + ' shown</div>' +
                   '<div></div><div></div>' +
                   '<div class="cell r">' + vm.impr + '</div>' +
                   '<div class="cell r">' + vm.conv + '</div>' +
                   '<div class="cell r">' + vm.cost + '</div>' +
                   '<div class="cell r" style="color:' + vm.roiColor + '">' + vm.roi + '</div>' +
-                  '<div class="cell r">' + vm.cpa + '</div><div></div>' +
+                  '<div></div>' +
                 '</div>' + rows.map(rowHtml).join('')
               : '<div class="empty">No campaigns match these filters</div>') +
           '</div>' +
@@ -157,8 +188,77 @@
     },
 
     actions: {
-      tab: function (key) { Store.ui('campStatus', key); },
-      model: function (key) { Store.ui('campModel', key); },
+      tab: function (key) { Store.set(function (s) { s.ui.campStatus = key; s.ui.campSelection = []; }); },
+      model: function (key) { Store.set(function (s) { s.ui.campModel = key; s.ui.campSelection = []; }); },
+
+      pick: function (id) {
+        Store.set(function (s) {
+          var i = s.ui.campSelection.indexOf(id);
+          if (i >= 0) s.ui.campSelection.splice(i, 1); else s.ui.campSelection.push(id);
+        });
+      },
+      pickAll: function () {
+        var ids = visible().map(function (c) { return c.id; });
+        var all = selected().length === ids.length && ids.length > 0;
+        Store.set(function (s) { s.ui.campSelection = all ? [] : ids; });
+      },
+      clearSel: function () { Store.set(function (s) { s.ui.campSelection = []; }); },
+
+      startSel: function () {
+        var n = 0;
+        Store.set(function (s) {
+          s.ui.campSelection.forEach(function (id) {
+            var c = s.campaigns.find(function (x) { return x.id === id; });
+            if (c && c.status === 'paused') { c.status = c.wasTest ? 'test' : 'active'; n++; }
+          });
+        });
+        App.toast(n ? n + ' ' + UI.plural(n, 'campaign', 'campaigns') + ' started' : 'Nothing to start');
+      },
+      stopSel: function () {
+        var n = 0;
+        Store.set(function (s) {
+          s.ui.campSelection.forEach(function (id) {
+            var c = s.campaigns.find(function (x) { return x.id === id; });
+            if (c && (c.status === 'active' || c.status === 'test')) {
+              c.wasTest = c.status === 'test'; c.status = 'paused'; n++;
+            }
+          });
+        });
+        App.toast(n ? n + ' ' + UI.plural(n, 'campaign', 'campaigns') + ' stopped' : 'Nothing to stop');
+      },
+      dupSel: function () {
+        var n = 0;
+        Store.set(function (s) {
+          s.ui.campSelection.forEach(function (id) {
+            var c = s.campaigns.find(function (x) { return x.id === id; });
+            if (!c) return;
+            n++;
+            s.campaigns.unshift(Object.assign({}, c, {
+              id: String(4900 + s.campaigns.length), name: c.name + ' — copy', status: 'paused',
+              impr: 0, clicks: 0, conv: 0, cost: 0, revenue: 0, winRate: 0
+            }));
+          });
+          s.ui.campSelection = [];
+        });
+        App.toast(n + ' ' + UI.plural(n, 'copy', 'copies') + ' created — stopped');
+      },
+      archiveSel: function () {
+        var n = 0;
+        Store.set(function (s) {
+          s.ui.campSelection.forEach(function (id) {
+            var c = s.campaigns.find(function (x) { return x.id === id; });
+            if (!c || c.status === 'archived') return;
+            c.beforeArchive = c.status; c.status = 'archived'; n++;
+          });
+          s.ui.campSelection = [];
+        });
+        App.toast(n + ' ' + UI.plural(n, 'campaign', 'campaigns') + ' archived');
+      },
+      reportSel: function () {
+        var id = selected()[0];
+        Store.set(function (s) { s.ui.campSelection = []; });
+        openReport(id);
+      },
 
       toggle: function (id) {
         Store.set(function (s) {

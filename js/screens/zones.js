@@ -4,7 +4,8 @@
   var icon = UI.icon, esc = UI.esc;
 
   var COLS = '24px 108px 92px 104px 74px 74px 56px 62px 56px 80px 84px 74px 66px 64px 68px 112px 96px';
-  var MINW = 'min-width:1500px';
+  var MINW = '';
+  function minw() { if (!MINW) MINW = UI.gridMin(COLS); return MINW; }
   var HEADS = ['', 'Zone ID', 'Category', 'Vertical', 'Impr.', 'Clicks', 'CTR', 'Conv.', 'CR',
                'Cost', 'Revenue', 'ROI', 'CPA', 'CPM', 'Win rate', 'Status', ''];
   var ALIGN = ['', '', '', '', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', '', ''];
@@ -52,7 +53,7 @@
     var on = st === 'live';
 
     return '<div class="tr row' + (st === 'live' ? '' : ' off') + (blocked ? ' blocked' : '') +
-      '" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
+      '" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
       '<div class="box' + (picked ? ' on' : '') + '" data-act="pick" data-arg="' + z.id + '"></div>' +
       '<div style="min-width:0"><div class="cell mono w">' + z.id + '</div>' +
         (inPresets.length ? '<div class="cid" style="margin-top:2px">in ' + inPresets.length + ' ' +
@@ -182,7 +183,7 @@
         var tm = UI.metrics({ impr: t.impr, clicks: t.clicks, conv: t.conv, cost: t.cost,
                               revenue: t.revenue, winRate: t.cost ? t.wSum / t.cost : 0 });
         body = '<div class="table"><div class="table-scroll">' +
-          '<div class="tr thead" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
+          '<div class="tr thead" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
             HEADS.map(function (h, i) {
               if (i === 0) {
                 return '<div class="box' + (sel.length && sel.length === rows.length ? ' on' : '') + '" data-act="pickAll"></div>';
@@ -191,7 +192,7 @@
             }).join('') +
           '</div>' +
           (rows.length
-            ? '<div class="tr totals" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
+            ? '<div class="tr totals" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
                 '<div></div><div class="tot-lab">Total</div>' +
                 '<div class="cell muted">' + rows.length + ' shown</div><div></div>' +
                 '<div class="cell r">' + tm.impr + '</div><div class="cell r">' + tm.clicks + '</div>' +

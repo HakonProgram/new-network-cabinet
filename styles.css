@@ -453,3 +453,8 @@ textarea.inp { height:auto; padding:10px var(--s3); resize:vertical; }
 .url-field { display:flex; flex-direction:column; gap:var(--s3); padding:var(--s4);
   border:1px solid var(--border); border-radius:var(--r-sm); background:var(--surface-2); }
 .url-field .inp { height:44px; font-size:var(--fs-3); background:var(--surface); }
+
+/* выделенная строка */
+.row.picked { background:var(--accent-soft); }
+.row.picked:hover { background:var(--accent-soft); }
+.btn[disabled] { opacity:0.4; pointer-events:none; }

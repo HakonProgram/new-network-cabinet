@@ -50,7 +50,7 @@
       threshold: '2 days',
       draft: seedDraft(),
       ui: {
-        campStatus: 'all', campModel: 'all',
+        campStatus: 'all', campModel: 'all', campSelection: [],
         geoPickerOpen: false, geoSearch: '', geoPick: [], advancedOpen: false,
         statsRange: 30, statsTab: 'zones', statsCampaign: '',
         zonesTab: 'all', zonesCat: 'all', zonesVertical: 'all', zonesSort: 'cost',
