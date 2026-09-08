@@ -31,7 +31,8 @@
     var runCls = !controllable ? 'act' : (running ? 'act act-stop' : 'act act-run');
     var runTitle = !controllable ? 'Controls unavailable' : (running ? 'Stop' : 'Start');
 
-    return '<div class="tr row' + (running ? '' : ' off') + '" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
+    return '<div class="tr row clickable' + (running ? '' : ' off') + '" data-act="open" data-arg="' + c.id +
+      '" title="Open the report for this campaign" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
       '<div class="cid mono">NN-C-' + esc(c.id) + '</div>' +
       '<div style="min-width:0">' +
         '<div class="cname">' + esc(c.name) + '</div>' +
@@ -57,6 +58,13 @@
         '<div class="act act-chart" data-act="stats" data-arg="' + c.id + '" title="Statistics">' + icon('chart', 13, 1.9) + '</div>' +
       '</div>' +
     '</div>';
+  }
+
+  function openReport(id) {
+    var c = Store.get().campaigns.find(function (x) { return x.id === id; });
+    Store.set(function (s) { s.ui.statsCampaign = id; });
+    App.go('stats');
+    App.toast('Report for ' + (c ? c.name : 'NN-C-' + id));
   }
 
   w.Screens = w.Screens || {};
@@ -183,11 +191,8 @@
         App.go('campaigns/new');
       },
 
-      stats: function (id) {
-        Store.set(function (s) { s.ui.statsTab = 'campaigns'; });
-        App.go('stats');
-        App.toast('Report for campaign NN-C-' + id);
-      }
+      open: function (id) { openReport(id); },
+      stats: function (id) { openReport(id); }
     }
   };
 })(window);

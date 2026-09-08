@@ -47,7 +47,7 @@
       draft: seedDraft(),
       ui: {
         campStatus: 'all', campModel: 'all',
-        statsRange: 30, statsTab: 'zones',
+        statsRange: 30, statsTab: 'zones', statsCampaign: '',
         zonesTab: 'all', zonesCat: 'all', zonesVertical: 'all', zonesSort: 'cost',
         openPreset: '',
         payMethod: 'card', payAmount: '5000', payTab: 'pay', payRange: '30',

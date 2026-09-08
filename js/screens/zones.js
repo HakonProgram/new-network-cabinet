@@ -259,7 +259,7 @@
             '<span class="hint">Sort by</span><div class="segs">' + sorts + '</div>') +
         '</div>' +
         (isPresets ? '' : '<div class="chips">' + verticals + '</div>') +
-        body + bulk +
+        bulk + body +
       '</div>';
     },
 

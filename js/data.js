@@ -3,21 +3,21 @@
   'use strict';
 
   var PAY_MODELS = [
-    { key: 'cpa', name: 'CPA', tag: 'paid test', price: '10.00', priceLab: 'per conversion',
+    { key: 'cpa', name: 'CPA', tag: 'paid test', unit: 'per conversion',
       desc: 'Pay per action. The advertiser funds the test run — the system finds a working combination on its own.',
-      bidLabel: 'Payout per conversion, $', min: 3.00, half: 9.0 },
-    { key: 'purecpa', name: 'Pure CPA', tag: 'free test', price: '10.00', priceLab: 'per conversion',
+      bidLabel: 'Your payout per conversion, $', min: 3.00, suggested: '10.00', half: 9.0 },
+    { key: 'purecpa', name: 'Pure CPA', tag: 'free test', unit: 'per conversion',
       desc: 'Same model, but the network funds the test: we take the risk of unprofitable traffic. For top advertisers.',
-      bidLabel: 'Payout per conversion, $', min: 3.00, half: 9.0 },
-    { key: 'cpm', name: 'CPM', tag: 'classic', price: '1.80', priceLab: 'per 1,000 impressions',
+      bidLabel: 'Your payout per conversion, $', min: 3.00, suggested: '10.00', half: 9.0 },
+    { key: 'cpm', name: 'CPM', tag: 'classic', unit: 'per 1,000 impressions',
       desc: 'Fixed price per thousand impressions. A clear model for buying volume.',
-      bidLabel: 'CPM bid, $', min: 0.15, half: 1.9 },
-    { key: 'smartcpm', name: 'Smart CPM', tag: 'second-price auction', price: '2.40', priceLab: 'max bid',
+      bidLabel: 'Your CPM bid, $', min: 0.15, suggested: '1.80', half: 1.9 },
+    { key: 'smartcpm', name: 'Smart CPM', tag: 'second-price auction', unit: 'max bid per 1,000 impressions',
       desc: 'The winner pays the runner-up price, not their own bid. The same reach costs less.',
-      bidLabel: 'Max bid, $', min: 0.15, half: 1.9 },
-    { key: 'cpc', name: 'CPC', tag: 'pay per click', price: '0.09', priceLab: 'per click',
-      desc: 'Entry-level model with the lowest threshold. Usually a new advertiser’s first step.',
-      bidLabel: 'CPC bid, $', min: 0.03, half: 0.12 }
+      bidLabel: 'Your max bid, $', min: 0.15, suggested: '2.40', half: 1.9 },
+    { key: 'cpc', name: 'CPC', tag: 'pay per click', unit: 'per click',
+      desc: 'Entry-level model with the lowest threshold. Usually a new advertiser\u2019s first step.',
+      bidLabel: 'Your CPC bid, $', min: 0.03, suggested: '0.09', half: 0.12 }
   ];
 
   var STATUS = {

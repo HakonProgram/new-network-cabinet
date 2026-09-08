@@ -31,7 +31,7 @@
   function volumeChart(d) {
     var m = model();
     var bids = d.rates.map(function (g) { return UI.num(g.bid); }).filter(function (v) { return v > 0; });
-    var topBid = bids.length ? Math.max.apply(null, bids) : UI.num(m.price);
+    var topBid = bids.length ? Math.max.apply(null, bids) : UI.num(m.suggested);
     var maxVol = 9200000, half = m.half;
     var vol = function (b) { return maxVol * Math.pow(b, 1.7) / (Math.pow(b, 1.7) + Math.pow(half, 1.7)); };
 
@@ -110,7 +110,7 @@
           '<div style="min-width:0"><div style="display:flex;align-items:center;gap:9px">' +
             '<span class="mname">' + x.name + '</span><span class="mtag">' + x.tag + '</span></div>' +
             '<div class="mdesc">' + x.desc + '</div></div>' +
-          '<div class="mprice"><b>$' + x.price + '</b><span>' + x.priceLab + '</span></div></div>';
+          '<div class="mprice"><b>from $' + x.min.toFixed(2) + '</b><span>' + x.unit + '</span></div></div>';
       }).join('');
 
       var presetRows = [{ id: '', name: 'No preset — full inventory', kind: '', zones: [] }]
@@ -158,7 +158,8 @@
                 '<div class="opts">' + opts(DATA.FORMATS, d.format, 'format') + '</div></div></div>' +
             '<div class="field"><label class="lab">Pricing model</label>' +
               '<div style="display:flex;flex-direction:column;gap:8px">' + modelRows + '</div>' +
-              '<div class="hint">The model can only be changed before the campaign starts.</div></div>' +
+              '<div class="hint">You set the rate yourself — per country, in the next block. ' +
+                'The network only defines the floor. The model can only be changed before the campaign starts.</div></div>' +
             '<div class="g2">' +
               '<div class="field"><label class="lab">Vertical</label>' +
                 '<div class="opts">' + opts(DATA.VERTICALS.slice(0, 5), d.vertical, 'vertical') + '</div></div>' +
@@ -184,7 +185,7 @@
             '<div style="display:flex;flex-direction:column;gap:10px;margin-top:-8px">' + rateRows + '</div>' +
             '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">' +
               '<button class="btn btn-sm" data-act="addGeo">' + icon('plus', 13, 2.4) + 'Add country</button>' +
-              '<div class="minbid">' + icon('up', 12, 2.2) + 'Minimum bid — $' + m.min.toFixed(2) + '</div></div>' +
+              '<div class="minbid">' + icon('up', 12, 2.2) + 'Minimum bid — $' + m.min.toFixed(2) + ' ' + m.unit + '</div></div>' +
             '<div style="border-top:1px solid #23272F;padding-top:18px">' +
               '<div class="chart-h"><div>' +
                 '<div style="font-size:13px;font-weight:600">Available volume at your bid</div>' +
@@ -294,7 +295,10 @@
         Store.set(function (s) {
           s.draft.model = v;
           var m = DATA.PAY_MODELS.find(function (x) { return x.key === v; });
-          s.draft.rates.forEach(function (r) { r.bid = m.price; });
+          /* Ставку задаёт рекламодатель: поднимаем только то, что ниже нового минимума. */
+          s.draft.rates.forEach(function (r) {
+            if (UI.num(r.bid) < m.min) r.bid = m.suggested;
+          });
         });
       },
       platform: function (v) {
@@ -318,7 +322,8 @@
           });
           if (!next) return;
           added = next.name;
-          s.draft.rates.push({ code: next.code, name: next.name, bid: model().price, goal: '' });
+          var like = s.draft.rates.length ? s.draft.rates[s.draft.rates.length - 1].bid : model().suggested;
+          s.draft.rates.push({ code: next.code, name: next.name, bid: like, goal: '' });
         });
         if (added) App.toast(added + ' added');
       },
@@ -353,6 +358,11 @@
         if (!d.rates.length) { App.toast('Add at least one country'); return; }
 
         var m = model(), newId;
+        var low = d.rates.filter(function (r) { return UI.num(r.bid) < m.min; });
+        if (low.length) {
+          App.toast(low[0].name + ': bid is below the $' + m.min.toFixed(2) + ' minimum for ' + m.name);
+          return;
+        }
         Store.set(function (s) {
           newId = String(4850 + s.campaigns.length);
           s.campaigns.unshift({

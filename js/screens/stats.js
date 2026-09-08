@@ -58,16 +58,26 @@
     return out;
   }
 
+  function scopedCampaign() {
+    var s = Store.get();
+    if (!s.ui.statsCampaign) return null;
+    return s.campaigns.find(function (c) { return c.id === s.ui.statsCampaign; }) || null;
+  }
+
   function model() {
     var s = Store.get(), n = s.ui.statsRange, k = n / DATA.BASE_DAYS;
-    var base = UI.sum(s.campaigns);
+    var scoped = scopedCampaign();
+    var base = UI.sum(scoped ? [scoped] : s.campaigns);
+    var accountCost = UI.sum(s.campaigns).cost;
+    /* Разрезы по площадкам и гео сужаются пропорционально доле кампании в расходе. */
+    var share = scoped ? (accountCost ? base.cost / accountCost : 0) : 1;
     var tot = {
       impr: base.impr * k, clicks: base.clicks * k, conv: base.conv * k,
       cost: base.cost * k, revenue: base.revenue * k,
       winRate: base.cost ? base.wSum / base.cost : 0
     };
     return {
-      n: n, k: k, tot: tot,
+      n: n, k: k, tot: tot, scoped: scoped, share: share,
       cost: UI.daily(n, 20260907, Math.round(tot.cost)),
       conv: UI.daily(n, 815, Math.round(tot.conv)),
       revenue: UI.daily(n, 4471, Math.round(tot.revenue)),
@@ -167,7 +177,7 @@
     var s = Store.get(), k = d.k, tab = s.ui.statsTab;
 
     if (tab === 'zones') {
-      var zr = DATA.ZONES.map(function (z) { return scale(z, k); });
+      var zr = DATA.ZONES.map(function (z) { return scale(z, k * d.share); });
       return {
         cols: '104px 96px 110px ' + M_COLS, minw: 'min-width:1420px',
         heads: ['Zone ID', 'Category', 'Vertical'].concat(M_HEADS),
@@ -184,23 +194,24 @@
     }
 
     if (tab === 'campaigns') {
-      var cr = s.campaigns.map(function (c) { return scale(c, k); });
+      var list = d.scoped ? [d.scoped] : s.campaigns;
+      var cr = list.map(function (c) { return scale(c, k); });
       return {
         cols: 'minmax(200px,1fr) 92px ' + M_COLS, minw: 'min-width:1450px',
         heads: ['Campaign', 'Model'].concat(M_HEADS),
         align: ['', ''].concat(M_HEADS.map(function () { return 'r'; })),
-        rows: s.campaigns.map(function (c, i) {
+        rows: list.map(function (c, i) {
           return '<div class="cell w">' + esc(c.name) + '</div>' +
             '<div><span class="model">' + esc(c.model) + '</span></div>' + metricCells(cr[i]);
         }),
-        totals: cr, totalLabel: s.campaigns.length + ' campaigns',
+        totals: cr, totalLabel: list.length + ' ' + UI.plural(list.length, 'campaign', 'campaigns'),
         note: 'All sources rolled into a single report.',
-        foot: ['Showing all ' + s.campaigns.length + ' campaigns', 'Updated an hour ago']
+        foot: ['Showing ' + list.length + ' of ' + s.campaigns.length + ' campaigns', 'Updated an hour ago']
       };
     }
 
     if (tab === 'geo') {
-      var gr = DATA.GEO.map(function (g) { return scale(g, k); });
+      var gr = DATA.GEO.map(function (g) { return scale(g, k * d.share); });
       return {
         cols: 'minmax(160px,1fr) 70px ' + M_COLS, minw: 'min-width:1380px',
         heads: ['Country', 'Code'].concat(M_HEADS),
@@ -268,7 +279,11 @@
       return '<div class="page">' +
         '<div class="head">' +
           '<div><h1 class="h1">Statistics</h1>' +
-          '<p class="sub">Every source rolled into one report. Placements appear under our own numbering.</p></div>' +
+          '<p class="sub">' + (d.scoped
+            ? 'Scoped to one campaign — placements and countries are shown for its share of the account.'
+            : 'Every source rolled into one report. Placements appear under our own numbering.') + '</p></div>' +
+          (d.scoped ? '<div class="scope" style="margin-left:4px">' + esc(d.scoped.name) +
+            '<span class="x" data-act="clearScope" title="Show the whole account">' + icon('close', 12, 2.4) + '</span></div>' : '') +
           '<div style="margin-left:auto;display:flex;align-items:center;gap:10px">' +
             '<div class="segs">' + ranges + '</div>' +
             '<button class="btn" data-act="csv">' + icon('download', 14, 1.9) + 'Export CSV</button>' +
@@ -343,7 +358,8 @@
     actions: {
       range: function (v) { Store.ui('statsRange', Number(v)); },
       tab: function (v) { Store.ui('statsTab', v); },
-      csv: function () { App.toast('Export is not generated in this prototype'); }
+      csv: function () { App.toast('Export is not generated in this prototype'); },
+      clearScope: function () { Store.ui('statsCampaign', ''); }
     }
   };
 
