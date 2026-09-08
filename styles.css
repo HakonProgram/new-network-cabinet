@@ -22,7 +22,7 @@
   --bg:#111110; --surface:#191918; --surface-2:#2a2a28; --surface-3:#31312e;
   --border:#42413e; --border-strong:#7c7b74;
   --text:#eeeeec; --text-2:#b5b3ad; --text-3:#b5b3ad;
-  --accent:#FFA36A; --accent-hover:#FFB98C; --accent-soft:#3A1E0D; --accent-line:#8A4B25;
+  --accent:#FFA36A; --accent-hover:#FFB98C; --accent-soft:#2B211A; --accent-tint:#6B3A18; --accent-line:#8A4B25;
   --accent-solid:#EE6A1C; --on-accent:#160D06;
   /* Кнопка должна быть видна на тёмном: заливка на две ступени светлее
      поверхности, линия — ещё на две. Никаких градиентов и фасок. */
@@ -37,7 +37,7 @@
   --bg:#f9f9f8; --surface:#ffffff; --surface-2:#f1f0ef; --surface-3:#e9e8e6;
   --border:#dad9d6; --border-strong:#bcbbb5;
   --text:#21201c; --text-2:#63635e; --text-3:#63635e;
-  --accent:#BE4708; --accent-hover:#8A3405; --accent-soft:#FFEEDD; --accent-line:#F0A472;
+  --accent:#BE4708; --accent-hover:#8A3405; --accent-soft:#FFEEDD; --accent-tint:#FBD3B2; --accent-line:#F0A472;
   --accent-solid:#C24A08; --on-accent:#FFFFFF;
   --btn-face:#FFFFFF; --btn-face-2:#F1EFEC; --btn-line:#B8B5AE;
   --pos:#2a7e3b; --neg:#ce2c31; --warn:#ab6400; --info:#0d74ce;
@@ -322,8 +322,10 @@ textarea.inp { height:auto; padding:10px var(--s3); resize:vertical; }
 .grid-r { display:grid; grid-template-columns:36px repeat(24, minmax(0,1fr)); gap:3px; margin-bottom:3px; align-items:center; }
 .hh { font-size:10px; color:var(--text-3); text-align:center; font-variant-numeric:tabular-nums; }
 .dd { font-size:var(--fs-1); color:var(--text-3); }
-.cellh { height:20px; border-radius:3px; cursor:pointer; background:var(--surface-3); }
-.cellh.on { background:var(--accent-soft); }
+/* Включённый час должен быть светлее выключенного, а не наоборот:
+   у сетки расписания заливка своя, заметная сама по себе. */
+.cellh { height:20px; border-radius:3px; cursor:pointer; background:var(--surface-2); }
+.cellh.on { background:var(--accent-tint); }
 .cellh.on.peak { background:var(--accent); }
 .cellh:hover { outline:2px solid var(--accent); }
 .tok { display:inline-flex; align-items:center; gap:var(--s2); height:32px; padding:0 var(--s3);
@@ -397,7 +399,10 @@ textarea.inp { height:auto; padding:10px var(--s3); resize:vertical; }
 .item { display:flex; gap:var(--s3); padding:var(--s4); border-bottom:1px solid var(--border); cursor:pointer; }
 .item:last-of-type { border-bottom:none; }
 .item:hover { background:var(--surface-2); }
-.item.new { background:var(--accent-soft); }
+.item { position:relative; }
+.item.new { background:var(--surface-2); }
+.item.new::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--accent); }
 .it-ic { width:30px; height:30px; flex:0 0 30px; border-radius:var(--r-sm); display:flex; align-items:center;
   justify-content:center; border:1px solid var(--border); }
 .it-t { font-size:var(--fs-3); font-weight:500; }
