@@ -338,7 +338,7 @@
           '<span class="sub" style="margin:0 0 0 4px">' + t.note + '</span>' +
         '</div>' +
 
-        '<div class="table"><div class="table-scroll">' +
+        '<div class="table pin' + (t.tail === 2 ? ' pin-end' : '') + '"><div class="table-scroll">' +
           '<div class="tr thead" style="grid-template-columns:' + t.cols + ';' + t.minw + '">' +
             t.heads.map(function (h, i) { return '<div class="th ' + t.align[i] + '">' + h + '</div>'; }).join('') +
           '</div>' +

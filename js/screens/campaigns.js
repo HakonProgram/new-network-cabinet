@@ -157,7 +157,7 @@
         '</div>' +
 
         bulk +
-        '<div class="table">' +
+        '<div class="table pin-end">' +
           '<div class="table-scroll">' +
             '<div class="tr thead" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
               heads.map(function (h, i) {

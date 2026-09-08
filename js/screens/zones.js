@@ -3,12 +3,12 @@
   'use strict';
   var icon = UI.icon, esc = UI.esc;
 
-  var COLS = '24px 108px 92px 104px 74px 74px 56px 62px 56px 80px 84px 74px 66px 64px 68px 112px 96px';
+  var COLS = '24px 104px 96px 76px 68px 54px 62px 54px 82px 86px 72px 66px 66px 72px 108px 92px';
   var MINW = '';
   function minw() { if (!MINW) MINW = UI.gridMin(COLS); return MINW; }
-  var HEADS = ['', 'Zone ID', 'Category', 'Vertical', 'Impr.', 'Clicks', 'CTR', 'Conv.', 'CR',
+  var HEADS = ['', 'Zone ID', 'Category', 'Impr.', 'Clicks', 'CTR', 'Conv.', 'CR',
                'Cost', 'Revenue', 'ROI', 'CPA', 'CPM', 'Win rate', 'Status', ''];
-  var ALIGN = ['', '', '', '', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', '', ''];
+  var ALIGN = ['', '', '', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', '', ''];
   var STATE_META = {
     live:     { label: 'Live',      pill: 'pill pill-ok' },
     robot:    { label: 'Robot off', pill: 'pill pill-wait' },
@@ -31,7 +31,6 @@
     var u = Store.get().ui;
     var rows = DATA.ZONES.filter(function (z) {
       if (u.zonesCat !== 'all' && z.cat !== u.zonesCat) return false;
-      if (u.zonesVertical !== 'all' && z.vertical !== u.zonesVertical) return false;
       if (u.zonesTab === 'live' || u.zonesTab === 'robot' || u.zonesTab === 'blocked') {
         if (stateOf(z) !== u.zonesTab) return false;
       }
@@ -54,12 +53,12 @@
 
     return '<div class="tr row' + (st === 'live' ? '' : ' off') + (blocked ? ' blocked' : '') +
       '" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
-      '<div class="box' + (picked ? ' on' : '') + '" data-act="pick" data-arg="' + z.id + '"></div>' +
-      '<div style="min-width:0"><div class="cell mono w">' + z.id + '</div>' +
+      '<div class="stick stick-l1"><div class="box' + (picked ? ' on' : '') +
+        '" data-act="pick" data-arg="' + z.id + '"></div></div>' +
+      '<div class="stick stick-l2" style="min-width:0"><div class="cell mono w">' + z.id + '</div>' +
         (inPresets.length ? '<div class="cid" style="margin-top:2px">in ' + inPresets.length + ' ' +
           UI.plural(inPresets.length, 'preset', 'presets') + '</div>' : '') + '</div>' +
       '<div class="cell"><span class="dot" style="background:' + (z.cat === 'Adult' ? '' + UI.color('--warn') + '' : '' + UI.color('--info') + '') + '"></span>' + z.cat + '</div>' +
-      '<div class="cell muted">' + z.vertical + '</div>' +
       '<div class="cell muted r">' + m.impr + '</div>' +
       '<div class="cell muted r">' + m.clicks + '</div>' +
       '<div class="cell muted r">' + m.ctr + '</div>' +
@@ -72,7 +71,7 @@
       '<div class="cell muted r">' + m.cpm + '</div>' +
       '<div class="cell muted r">' + m.win + '</div>' +
       '<div><span class="' + STATE_META[st].pill + '">' + STATE_META[st].label + '</span></div>' +
-      '<div class="acts"><button class="btn btn-xs ' + (on ? 'btn-danger' : 'btn-up') +
+      '<div class="acts stick stick-r"><button class="btn btn-xs ' + (on ? 'btn-danger' : 'btn-up') +
         '" data-act="block" data-arg="' + z.id + '">' + (on ? 'Turn off' : 'Turn on') + '</button></div>' +
     '</div>';
   }
@@ -186,22 +185,26 @@
           '<div class="tr thead" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
             HEADS.map(function (h, i) {
               if (i === 0) {
-                return '<div class="box' + (sel.length && sel.length === rows.length ? ' on' : '') + '" data-act="pickAll"></div>';
+                return '<div class="stick stick-l1"><div class="box' +
+                  (sel.length && sel.length === rows.length ? ' on' : '') + '" data-act="pickAll"></div></div>';
               }
-              return '<div class="th ' + ALIGN[i] + '">' + h + '</div>';
+              var pin = i === 1 ? ' stick stick-l2' : (i === HEADS.length - 1 ? ' stick stick-r' : '');
+              return '<div class="th ' + ALIGN[i] + pin + '">' + h + '</div>';
             }).join('') +
           '</div>' +
           (rows.length
             ? '<div class="tr totals" style="grid-template-columns:' + COLS + ';' + minw() + '">' +
-                '<div></div><div class="tot-lab">Total</div>' +
-                '<div class="cell muted">' + rows.length + ' shown</div><div></div>' +
+                '<div class="stick stick-l1"></div>' +
+                '<div class="tot-lab stick stick-l2">Total</div>' +
+                '<div class="cell muted">' + rows.length + ' shown</div>' +
                 '<div class="cell r">' + tm.impr + '</div><div class="cell r">' + tm.clicks + '</div>' +
                 '<div class="cell r">' + tm.ctr + '</div><div class="cell r">' + tm.conv + '</div>' +
                 '<div class="cell r">' + tm.cr + '</div><div class="cell r">' + tm.cost + '</div>' +
                 '<div class="cell r">' + tm.revenue + '</div>' +
                 '<div class="cell r" style="color:' + tm.roiColor + '">' + tm.roi + '</div>' +
                 '<div class="cell r">' + tm.cpa + '</div><div class="cell r">' + tm.cpm + '</div>' +
-                '<div class="cell r">' + tm.win + '</div><div></div><div></div>' +
+                '<div class="cell r">' + tm.win + '</div><div></div>' +
+                '<div class="stick stick-r"></div>' +
               '</div>' + rows.map(rowHtml).join('')
             : '<div class="empty">No placements match these filters</div>') +
           '</div>' +
@@ -226,10 +229,6 @@
         '</div>';
       }
 
-      var verticals = ['all'].concat(DATA.VERTICALS).map(function (v) {
-        return '<div class="chip' + (u.zonesVertical === v ? ' on' : '') + '" data-act="vertical" data-arg="' + esc(v) + '">' +
-          (v === 'all' ? 'All verticals' : v) + '</div>';
-      }).join('');
       var cats = ['all', 'Mainstream', 'Adult'].map(function (c) {
         return '<div class="opt' + (u.zonesCat === c ? ' on' : '') + '" data-act="cat" data-arg="' + esc(c) + '">' +
           (c === 'all' ? 'All categories' : c) + '</div>';
@@ -259,7 +258,6 @@
             '<div class="opts" style="margin-left:auto">' + cats + '</div>' +
             '<span class="hint">Sort by</span><div class="segs">' + sorts + '</div>') +
         '</div>' +
-        (isPresets ? '' : '<div class="chips">' + verticals + '</div>') +
         bulk + body +
       '</div>';
     },
@@ -267,7 +265,6 @@
     actions: {
       tab: function (v) { Store.ui('zonesTab', v); },
       cat: function (v) { Store.ui('zonesCat', v); },
-      vertical: function (v) { Store.ui('zonesVertical', v); },
       sort: function (v) { Store.ui('zonesSort', v); },
 
       pick: function (id) {

@@ -250,7 +250,7 @@ textarea.inp { height:auto; padding:10px var(--s3); resize:vertical; }
 .row:hover { background:var(--surface-2); }
 .row.clickable { cursor:pointer; }
 .row.off .cell, .row.off .cname { color:var(--text-3); }
-.row.blocked { background:var(--neg-soft); }
+.row.blocked { background:linear-gradient(var(--neg-soft),var(--neg-soft)) var(--surface); }
 .tr.totals { min-height:44px; border-bottom:1px solid var(--border); background:var(--surface-2); }
 .tr.totals .cell { color:var(--text); font-weight:600; }
 .tot-lab { font-size:var(--fs-2); color:var(--text-2); font-weight:500; }
@@ -463,8 +463,8 @@ textarea.inp { height:auto; padding:10px var(--s3); resize:vertical; }
 .url-field .inp { height:44px; font-size:var(--fs-3); background:var(--surface); }
 
 /* выделенная строка */
-.row.picked { background:var(--accent-soft); }
-.row.picked:hover { background:var(--accent-soft); }
+.row.picked { background:linear-gradient(var(--accent-soft),var(--accent-soft)) var(--surface); }
+.row.picked:hover { background:linear-gradient(var(--accent-soft),var(--accent-soft)) var(--surface); }
 .btn[disabled] { opacity:0.4; pointer-events:none; }
 
 /* настоящий выпадающий список */
@@ -488,3 +488,33 @@ select.sel-inp option { background:var(--surface); color:var(--text); }
   .osv-r { grid-template-columns:1fr auto 1fr; grid-template-areas:'n n n' 'f t o' 's s s'; }
   .osv-n { grid-area:n; } .osv-to { grid-area:t; } .osv-s { grid-area:s; }
 }
+
+/* ── закреплённые края широкой таблицы: ID слева, управление справа ── */
+.row { background:var(--surface); }
+.tr .stick { position:sticky; z-index:2; background:inherit; align-self:stretch;
+  display:flex; flex-direction:column; justify-content:center; }
+/* Поля и зазоры закрашиваем сами, иначе прокручиваемые ячейки видны в щели. */
+.tr .stick-l1 { left:0; align-items:flex-start;
+  padding:0 var(--s3) 0 var(--s4); margin:0 calc(-1 * var(--s3)) 0 calc(-1 * var(--s4)); }
+.tr .stick-l2 { left:52px; }
+.tr .stick-r { right:0; flex-direction:row; align-items:center; justify-content:flex-end;
+  padding:0 var(--s4) 0 var(--s3); margin:0 calc(-1 * var(--s4)) 0 calc(-1 * var(--s3)); }
+.tr .stick-l2::after, .tr .stick-r::before { content:''; position:absolute; top:0; bottom:0;
+  width:1px; background:var(--border); }
+.tr .stick-l2::after { right:-6px; }
+.tr .stick-r::before { left:6px; }
+.thead .stick, .tr.totals .stick { background:var(--surface-2); }
+
+/* То же для отчётов: колонку-измерение и колонку управления закрепляем без правки разметки. */
+.table.pin .tr > :first-child, .table.pin-end .tr > :last-child {
+  position:sticky; z-index:2; background:inherit; align-self:stretch;
+  display:flex; flex-direction:column; justify-content:center; }
+.table.pin .tr > :first-child { left:0;
+  padding:0 var(--s3) 0 var(--s4); margin:0 calc(-1 * var(--s3)) 0 calc(-1 * var(--s4)); }
+.table.pin-end .tr > :last-child { right:0;
+  flex-direction:row; align-items:center; justify-content:flex-end;
+  padding:0 var(--s4) 0 var(--s3); margin:0 calc(-1 * var(--s4)) 0 calc(-1 * var(--s3)); }
+.table.pin .tr > :first-child::after, .table.pin-end .tr > :last-child::before {
+  content:''; position:absolute; top:0; bottom:0; width:1px; background:var(--border); }
+.table.pin .tr > :first-child::after { right:-6px; }
+.table.pin-end .tr > :last-child::before { left:6px; }
