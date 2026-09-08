@@ -1,0 +1,135 @@
+/* Палитры для выбора. Сгенерировано из Radix Colors (MIT).
+   Каждая задаёт нейтральную шкалу и акцент для обеих тем;
+   ступень заливки кнопки подобрана под контраст текста 4.5:1. */
+
+:root[data-palette="ember"], :root[data-palette="ember"][data-theme="dark"] {
+  --bg:#111110; --surface:#191918; --surface-2:#2a2a28; --surface-3:#31312e;
+  --border:#3b3a37; --border-strong:#7c7b74;
+  --text:#eeeeec; --text-2:#b5b3ad; --text-3:#b5b3ad;
+  --accent:#ffa057; --accent-hover:#ffe0c2; --accent-soft:#331e0b;
+  --accent-tint:#562800; --accent-line:#7e451d; --accent-solid:#f76b15; --on-accent:#15130f;
+  --btn-face:#31312e; --btn-face-2:#3b3a37; --btn-line:#62605b;
+  --pos:#71d083; --neg:#ff9592; --warn:#ffca16; --info:#70b8ff;
+  --pos-soft:#1b2a1e; --neg-soft:#3b1219; --warn-soft:#302008;
+}
+
+:root[data-palette="ember"][data-theme="light"] {
+  --bg:#f9f9f8; --surface:#ffffff; --surface-2:#f1f0ef; --surface-3:#e9e8e6;
+  --border:#dad9d6; --border-strong:#bcbbb5;
+  --text:#21201c; --text-2:#63635e; --text-3:#63635e;
+  --accent:#cc4e00; --accent-hover:#582d1d; --accent-soft:#ffefd6;
+  --accent-tint:#ffd19a; --accent-line:#f5ae73; --accent-solid:#f76b15; --on-accent:#15130f;
+  --btn-face:#ffffff; --btn-face-2:#f1f0ef; --btn-line:#bcbbb5;
+  --pos:#2a7e3b; --neg:#ce2c31; --warn:#ab6400; --info:#0d74ce;
+  --pos-soft:#e9f6e9; --neg-soft:#feebec; --warn-soft:#fff7c2;
+}
+
+:root[data-palette="lime"], :root[data-palette="lime"][data-theme="dark"] {
+  --bg:#111111; --surface:#191919; --surface-2:#2a2a2a; --surface-3:#313131;
+  --border:#3a3a3a; --border-strong:#7b7b7b;
+  --text:#eeeeee; --text-2:#b4b4b4; --text-3:#b4b4b4;
+  --accent:#bde56c; --accent-hover:#e3f7ba; --accent-soft:#1f2917;
+  --accent-tint:#334423; --accent-line:#496231; --accent-solid:#bdee63; --on-accent:#15130f;
+  --btn-face:#313131; --btn-face-2:#3a3a3a; --btn-line:#606060;
+  --pos:#71d083; --neg:#ff9592; --warn:#ffca16; --info:#70b8ff;
+  --pos-soft:#1b2a1e; --neg-soft:#3b1219; --warn-soft:#302008;
+}
+
+:root[data-palette="lime"][data-theme="light"] {
+  --bg:#f9f9f9; --surface:#ffffff; --surface-2:#f0f0f0; --surface-3:#e8e8e8;
+  --border:#d9d9d9; --border-strong:#bbbbbb;
+  --text:#202020; --text-2:#646464; --text-3:#646464;
+  --accent:#5c7c2f; --accent-hover:#37401c; --accent-soft:#eef6d6;
+  --accent-tint:#d3e7a6; --accent-line:#abc978; --accent-solid:#bdee63; --on-accent:#15130f;
+  --btn-face:#ffffff; --btn-face-2:#f0f0f0; --btn-line:#bbbbbb;
+  --pos:#2a7e3b; --neg:#ce2c31; --warn:#ab6400; --info:#0d74ce;
+  --pos-soft:#e9f6e9; --neg-soft:#feebec; --warn-soft:#fff7c2;
+}
+
+:root[data-palette="indigo"], :root[data-palette="indigo"][data-theme="dark"] {
+  --bg:#111113; --surface:#18191b; --surface-2:#272a2d; --surface-3:#2e3135;
+  --border:#363a3f; --border-strong:#777b84;
+  --text:#edeef0; --text-2:#b0b4ba; --text-3:#b0b4ba;
+  --accent:#9eb1ff; --accent-hover:#d6e1ff; --accent-soft:#182449;
+  --accent-tint:#253974; --accent-line:#3a4f97; --accent-solid:#3e63dd; --on-accent:#ffffff;
+  --btn-face:#2e3135; --btn-face-2:#363a3f; --btn-line:#5a6169;
+  --pos:#71d083; --neg:#ff9592; --warn:#ffca16; --info:#70b8ff;
+  --pos-soft:#1b2a1e; --neg-soft:#3b1219; --warn-soft:#302008;
+}
+
+:root[data-palette="indigo"][data-theme="light"] {
+  --bg:#f9f9fb; --surface:#ffffff; --surface-2:#f0f0f3; --surface-3:#e8e8ec;
+  --border:#d9d9e0; --border-strong:#b9bbc6;
+  --text:#1c2024; --text-2:#60646c; --text-3:#60646c;
+  --accent:#3a5bc7; --accent-hover:#1f2d5c; --accent-soft:#edf2fe;
+  --accent-tint:#d2deff; --accent-line:#abbdf9; --accent-solid:#3e63dd; --on-accent:#ffffff;
+  --btn-face:#ffffff; --btn-face-2:#f0f0f3; --btn-line:#b9bbc6;
+  --pos:#2a7e3b; --neg:#ce2c31; --warn:#ab6400; --info:#0d74ce;
+  --pos-soft:#e9f6e9; --neg-soft:#feebec; --warn-soft:#fff7c2;
+}
+
+:root[data-palette="jade"], :root[data-palette="jade"][data-theme="dark"] {
+  --bg:#101211; --surface:#171918; --surface-2:#272a29; --surface-3:#2e3130;
+  --border:#373b39; --border-strong:#717d79;
+  --text:#eceeed; --text-2:#adb5b2; --text-3:#adb5b2;
+  --accent:#1fd8a4; --accent-hover:#adf0d4; --accent-soft:#0f2e22;
+  --accent-tint:#114837; --accent-line:#246854; --accent-solid:#29a383; --on-accent:#15130f;
+  --btn-face:#2e3130; --btn-face-2:#373b39; --btn-line:#5b625f;
+  --pos:#71d083; --neg:#ff9592; --warn:#ffca16; --info:#70b8ff;
+  --pos-soft:#1b2a1e; --neg-soft:#3b1219; --warn-soft:#302008;
+}
+
+:root[data-palette="jade"][data-theme="light"] {
+  --bg:#f7f9f8; --surface:#ffffff; --surface-2:#eef1f0; --surface-3:#e6e9e8;
+  --border:#d7dad9; --border-strong:#b8bcba;
+  --text:#1a211e; --text-2:#5f6563; --text-3:#5f6563;
+  --accent:#208368; --accent-hover:#1d3b31; --accent-soft:#e6f7ed;
+  --accent-tint:#c3e9d7; --accent-line:#8bceb6; --accent-solid:#29a383; --on-accent:#15130f;
+  --btn-face:#ffffff; --btn-face-2:#eef1f0; --btn-line:#b8bcba;
+  --pos:#2a7e3b; --neg:#ce2c31; --warn:#ab6400; --info:#0d74ce;
+  --pos-soft:#e9f6e9; --neg-soft:#feebec; --warn-soft:#fff7c2;
+}
+
+:root[data-palette="ruby"], :root[data-palette="ruby"][data-theme="dark"] {
+  --bg:#121113; --surface:#1a191b; --surface-2:#2b292d; --surface-3:#323035;
+  --border:#3c393f; --border-strong:#7c7a85;
+  --text:#eeeef0; --text-2:#b5b2bc; --text-3:#b5b2bc;
+  --accent:#ff949d; --accent-hover:#fed2e1; --accent-soft:#3a141e;
+  --accent-tint:#5e1a2e; --accent-line:#883447; --accent-solid:#e54666; --on-accent:#15130f;
+  --btn-face:#323035; --btn-face-2:#3c393f; --btn-line:#625f69;
+  --pos:#71d083; --neg:#ff9592; --warn:#ffca16; --info:#70b8ff;
+  --pos-soft:#1b2a1e; --neg-soft:#3b1219; --warn-soft:#302008;
+}
+
+:root[data-palette="ruby"][data-theme="light"] {
+  --bg:#faf9fb; --surface:#ffffff; --surface-2:#f2eff3; --surface-3:#eae7ec;
+  --border:#dbd8e0; --border-strong:#bcbac7;
+  --text:#211f26; --text-2:#65636d; --text-3:#65636d;
+  --accent:#ca244d; --accent-hover:#64172b; --accent-soft:#feeaed;
+  --accent-tint:#ffced6; --accent-line:#efacb8; --accent-solid:#e54666; --on-accent:#15130f;
+  --btn-face:#ffffff; --btn-face-2:#f2eff3; --btn-line:#bcbac7;
+  --pos:#2a7e3b; --neg:#ce2c31; --warn:#ab6400; --info:#0d74ce;
+  --pos-soft:#e9f6e9; --neg-soft:#feebec; --warn-soft:#fff7c2;
+}
+
+:root[data-palette="cyan"], :root[data-palette="cyan"][data-theme="dark"] {
+  --bg:#111113; --surface:#18191b; --surface-2:#272a2d; --surface-3:#2e3135;
+  --border:#363a3f; --border-strong:#777b84;
+  --text:#edeef0; --text-2:#b0b4ba; --text-3:#b0b4ba;
+  --accent:#4ccce6; --accent-hover:#b6ecf7; --accent-soft:#082c36;
+  --accent-tint:#004558; --accent-line:#12677e; --accent-solid:#00a2c7; --on-accent:#15130f;
+  --btn-face:#2e3135; --btn-face-2:#363a3f; --btn-line:#5a6169;
+  --pos:#71d083; --neg:#ff9592; --warn:#ffca16; --info:#70b8ff;
+  --pos-soft:#1b2a1e; --neg-soft:#3b1219; --warn-soft:#302008;
+}
+
+:root[data-palette="cyan"][data-theme="light"] {
+  --bg:#f9f9fb; --surface:#ffffff; --surface-2:#f0f0f3; --surface-3:#e8e8ec;
+  --border:#d9d9e0; --border-strong:#b9bbc6;
+  --text:#1c2024; --text-2:#60646c; --text-3:#60646c;
+  --accent:#107d98; --accent-hover:#0d3c48; --accent-soft:#def7f9;
+  --accent-tint:#b5e9f0; --accent-line:#7dcedc; --accent-solid:#00a2c7; --on-accent:#15130f;
+  --btn-face:#ffffff; --btn-face-2:#f0f0f3; --btn-line:#b9bbc6;
+  --pos:#2a7e3b; --neg:#ce2c31; --warn:#ab6400; --info:#0d74ce;
+  --pos-soft:#e9f6e9; --neg-soft:#feebec; --warn-soft:#fff7c2;
+}
