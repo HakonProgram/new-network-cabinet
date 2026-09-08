@@ -164,23 +164,12 @@
   function scheduleAutoChecks() {
     Store.get().campaigns.forEach(function (c) {
       if (c.status !== 'review' || pendingChecks[c.id]) return;
+      /* В настоящем кабинете это придёт push'ем или опросом — здесь имитируем таймером. */
       pendingChecks[c.id] = setTimeout(function () {
         delete pendingChecks[c.id];
-        var name = '';
-        Store.set(function (s) {
-          var x = s.campaigns.find(function (y) { return y.id === c.id; });
-          if (!x || x.status !== 'review') return;
-          x.status = 'active';
-          name = x.name;
-          s.notifications.unshift({
-            id: Date.now(), kind: 'ok', cat: 'camp', unread: true,
-            title: 'Auto-check passed — campaign started',
-            text: 'NN-C-' + x.id + ' \u201c' + x.name + '\u201d · vertical detected, link responds, ' +
-                  'settings package assembled. No manager involved.',
-            time: 'Just now'
-          });
+        Api.campaigns.passAutoCheck(c.id).then(function (r) {
+          if (r && r.campaign) toast('\u201c' + r.campaign.name + '\u201d passed the auto-check and started');
         });
-        if (name) toast('\u201c' + name + '\u201d passed the auto-check and started');
       }, AUTO_CHECK_MS);
     });
   }

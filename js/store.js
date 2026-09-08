@@ -168,8 +168,17 @@
     setZone(zoneId, campaignId, !zoneIsOn(zone, campaignId));
   }
 
+  /* Серверная часть состояния. Пишет в неё только Api — экраны читают. */
+  function db() { return get(); }
+  /* Изменение из Api: мутируем, сохраняем, перерисовываем и возвращаем результат. */
+  function commit(fn) {
+    var out;
+    set(function (s) { out = fn(s); });
+    return out;
+  }
+
   w.Store = {
-    get: get, set: set, patch: patch, ui: ui, reset: reset,
+    get: get, db: db, commit: commit, set: set, patch: patch, ui: ui, reset: reset,
     subscribe: subscribe, seedDraft: seedDraft, seedSchedule: seedSchedule,
     zoneState: zoneState, zoneIsOn: zoneIsOn, setZone: setZone, toggleZone: toggleZone
   };

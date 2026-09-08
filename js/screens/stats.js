@@ -378,12 +378,11 @@
       clearScope: function () { Store.ui('statsCampaign', ''); },
       toggleZone: function (id) {
         var cid = Store.get().ui.statsCampaign || null;
-        Store.toggleZone(id, cid);
-        var z = DATA.ZONES.find(function (x) { return x.id === id; });
-        var on = Store.zoneIsOn(z, cid);
-        var camp = cid ? scopedCampaign() : null;
-        App.toast(id + (on ? ' turned on' : ' turned off') +
-          (camp ? ' for “' + camp.name + '”' : ' across all campaigns'));
+        Api.placements.toggle(id, { campaignId: cid }).then(function (r) {
+          var camp = cid ? scopedCampaign() : null;
+          App.toast(id + (r.on ? ' turned on' : ' turned off') +
+            (camp ? ' for \u201c' + camp.name + '\u201d' : ' across all campaigns'));
+        });
       }
     }
   };

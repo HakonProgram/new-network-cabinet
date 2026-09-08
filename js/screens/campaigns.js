@@ -204,85 +204,54 @@
       },
       clearSel: function () { Store.set(function (s) { s.ui.campSelection = []; }); },
 
+      /* Все изменения кампаний идут через Api: экран только просит и показывает итог. */
       startSel: function () {
-        var n = 0;
-        Store.set(function (s) {
-          s.ui.campSelection.forEach(function (id) {
-            var c = s.campaigns.find(function (x) { return x.id === id; });
-            if (c && c.status === 'paused') { c.status = c.wasTest ? 'test' : 'active'; n++; }
-          });
+        var ids = selected();
+        Api.campaigns.bulk({ action: 'start', ids: ids }).then(function (r) {
+          App.toast(r.affected
+            ? r.affected + ' ' + UI.plural(r.affected, 'campaign', 'campaigns') + ' started'
+            : 'Nothing to start');
         });
-        App.toast(n ? n + ' ' + UI.plural(n, 'campaign', 'campaigns') + ' started' : 'Nothing to start');
       },
       stopSel: function () {
-        var n = 0;
-        Store.set(function (s) {
-          s.ui.campSelection.forEach(function (id) {
-            var c = s.campaigns.find(function (x) { return x.id === id; });
-            if (c && (c.status === 'active' || c.status === 'test')) {
-              c.wasTest = c.status === 'test'; c.status = 'paused'; n++;
-            }
-          });
+        var ids = selected();
+        Api.campaigns.bulk({ action: 'stop', ids: ids }).then(function (r) {
+          App.toast(r.affected
+            ? r.affected + ' ' + UI.plural(r.affected, 'campaign', 'campaigns') + ' stopped'
+            : 'Nothing to stop');
         });
-        App.toast(n ? n + ' ' + UI.plural(n, 'campaign', 'campaigns') + ' stopped' : 'Nothing to stop');
       },
       dupSel: function () {
-        var n = 0;
-        Store.set(function (s) {
-          s.ui.campSelection.forEach(function (id) {
-            var c = s.campaigns.find(function (x) { return x.id === id; });
-            if (!c) return;
-            n++;
-            s.campaigns.unshift(Object.assign({}, c, {
-              id: String(4900 + s.campaigns.length), name: c.name + ' — copy', status: 'paused',
-              impr: 0, clicks: 0, conv: 0, cost: 0, revenue: 0, winRate: 0
-            }));
-          });
-          s.ui.campSelection = [];
+        var ids = selected();
+        Api.campaigns.bulk({ action: 'duplicate', ids: ids }).then(function (r) {
+          Store.ui('campSelection', []);
+          App.toast(r.affected + ' ' + UI.plural(r.affected, 'copy', 'copies') + ' created — stopped');
         });
-        App.toast(n + ' ' + UI.plural(n, 'copy', 'copies') + ' created — stopped');
       },
       archiveSel: function () {
-        var n = 0;
-        Store.set(function (s) {
-          s.ui.campSelection.forEach(function (id) {
-            var c = s.campaigns.find(function (x) { return x.id === id; });
-            if (!c || c.status === 'archived') return;
-            c.beforeArchive = c.status; c.status = 'archived'; n++;
-          });
-          s.ui.campSelection = [];
+        var ids = selected();
+        Api.campaigns.bulk({ action: 'archive', ids: ids }).then(function (r) {
+          Store.ui('campSelection', []);
+          App.toast(r.affected + ' ' + UI.plural(r.affected, 'campaign', 'campaigns') + ' archived');
         });
-        App.toast(n + ' ' + UI.plural(n, 'campaign', 'campaigns') + ' archived');
       },
       reportSel: function () {
         var id = selected()[0];
-        Store.set(function (s) { s.ui.campSelection = []; });
+        Store.ui('campSelection', []);
         openReport(id);
       },
 
       toggle: function (id) {
-        Store.set(function (s) {
-          var c = s.campaigns.find(function (x) { return x.id === id; });
-          if (!c || c.status === 'review' || c.status === 'done') return;
-          if (c.status === 'paused') { c.status = c.wasTest ? 'test' : 'active'; }
-          else { c.wasTest = c.status === 'test'; c.status = 'paused'; }
+        Api.campaigns.bulk({ action: 'toggle', ids: [id] }).then(function (r) {
+          if (!r.campaign) return;
+          App.toast(r.campaign.status === 'paused' ? 'Campaign stopped' : 'Campaign started');
         });
-        var c = Store.get().campaigns.find(function (x) { return x.id === id; });
-        App.toast(c.status === 'paused' ? 'Campaign stopped' : 'Campaign started');
       },
 
       dup: function (id) {
-        var newId;
-        Store.set(function (s) {
-          var c = s.campaigns.find(function (x) { return x.id === id; });
-          if (!c) return;
-          newId = String(4900 + s.campaigns.length);
-          s.campaigns.unshift(Object.assign({}, c, {
-            id: newId, name: c.name + ' — copy', status: 'paused',
-            impr: 0, clicks: 0, conv: 0, cost: 0, revenue: 0, winRate: 0
-          }));
+        Api.campaigns.bulk({ action: 'duplicate', ids: [id] }).then(function (r) {
+          if (r.campaign) App.toast('Copy NN-C-' + r.campaign.id + ' created — it is stopped');
         });
-        App.toast('Copy NN-C-' + newId + ' created — it is stopped');
       },
 
       edit: function (id) {
@@ -304,27 +273,14 @@
       stats: function (id) { openReport(id); },
 
       archive: function (id) {
-        var name;
-        Store.set(function (s) {
-          var c = s.campaigns.find(function (x) { return x.id === id; });
-          if (!c) return;
-          name = c.name;
-          c.beforeArchive = c.status;
-          c.status = 'archived';
+        Api.campaigns.bulk({ action: 'archive', ids: [id] }).then(function (r) {
+          if (r.campaign) App.toast('\u201c' + r.campaign.name + '\u201d archived — it no longer spends');
         });
-        App.toast('\u201c' + name + '\u201d archived — it no longer spends');
       },
       restore: function (id) {
-        var name;
-        Store.set(function (s) {
-          var c = s.campaigns.find(function (x) { return x.id === id; });
-          if (!c) return;
-          name = c.name;
-          c.status = c.beforeArchive === 'archived' ? 'paused' : (c.beforeArchive || 'paused');
-          if (c.status === 'review') c.status = 'paused';
-          delete c.beforeArchive;
+        Api.campaigns.bulk({ action: 'restore', ids: [id] }).then(function (r) {
+          if (r.campaign) App.toast('\u201c' + r.campaign.name + '\u201d restored — stopped, start it when ready');
         });
-        App.toast('\u201c' + name + '\u201d restored — stopped, start it when ready');
       }
     }
   };

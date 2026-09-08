@@ -629,20 +629,30 @@
           return;
         }
 
-        var newId;
-        Store.set(function (s) {
-          newId = String(4850 + s.campaigns.length);
-          s.campaigns.unshift({
-            id: newId, name: d.name, format: d.format, vertical: d.vertical,
-            adult: d.age === 'Adult', model: m.name, status: 'review',
-            impr: 0, clicks: 0, conv: 0, cost: 0, revenue: 0, winRate: 0, bid: d.rates[0].bid
+        /* Отправляем на сервер весь черновик — он же будет телом POST /campaigns. */
+        Api.campaigns.create({
+          name: d.name, url: d.url, format: d.format, vertical: d.vertical,
+          adult: d.age === 'Adult', model: m.name, bid: d.rates[0].bid,
+          targeting: {
+            countries: d.rates.map(function (g) { return { codes: g.codes.slice(), bid: g.bid, goal: g.goal }; }),
+            platforms: d.platforms.slice(), oses: d.oses.slice(), osVersions: Object.assign({}, d.osVer),
+            sources: d.sources.slice(), quality: d.quality.slice(),
+            capping: d.capping, browsers: d.browsers, language: d.language,
+            connection: d.conn, vpn: d.vpn, schedule: d.schedule,
+            preset: d.preset, subzones: d.subzones, subzoneMode: d.subzoneMode
+          },
+          budget: { daily: d.daily, total: d.total }
+        }).then(function (c) {
+          Store.set(function (s) {
+            s.draft = Store.seedDraft();
+            s.ui.geoPickerOpen = false;
+            s.ui.advancedOpen = false;
           });
-          s.draft = Store.seedDraft();
-          s.ui.geoPickerOpen = false;
-          s.ui.advancedOpen = false;
+          App.go('campaigns');
+          App.toast('Campaign NN-C-' + c.id + ' created — pending the auto-check');
+        }).catch(function (e) {
+          App.toast('Could not create the campaign: ' + e.message);
         });
-        App.go('campaigns');
-        App.toast('Campaign NN-C-' + newId + ' created — pending the auto-check');
       }
     },
 

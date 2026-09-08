@@ -154,21 +154,9 @@
         if (amt < m.min) { App.toast('Minimum deposit for this method is ' + UI.money(m.min)); return; }
         var fee = amt * m.feePct / 100;
         var credited = amt - fee;
-        Store.set(function (st) {
-          st.balance += credited;
-          st.payments.unshift({
-            date: UI.dateShort(new Date()), meth: m.name, sum: amt, fee: fee,
-            ok: 'ok', st: 'Credited', doc: 'Receipt'
-          });
-          st.notifications.unshift({
-            id: Date.now(), kind: 'money', cat: 'money', unread: true,
-            title: 'Payment credited',
-            text: UI.money(amt) + ' · ' + m.name.toLowerCase() + ' · fee ' + UI.money2(fee) +
-                  ' · ' + UI.money2(credited) + ' credited.',
-            time: 'Just now'
-          });
-        });
-        App.toast('Balance topped up by ' + UI.money2(credited));
+        Api.billing.topUp({ amount: amt, method: m.name, feePct: m.feePct }).then(function (r) {
+          App.toast('Balance topped up by ' + UI.money2(r.credited));
+        }).catch(function (e) { App.toast('Top-up failed: ' + e.message); });
       }
     },
 

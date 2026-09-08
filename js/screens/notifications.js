@@ -84,20 +84,16 @@
 
     actions: {
       tab: function (v) { Store.ui('notifTab', v); },
-      read: function (id) {
-        Store.set(function (s) {
-          var n = s.notifications.find(function (x) { return String(x.id) === String(id); });
-          if (n) n.unread = false;
-        });
-      },
+      read: function (id) { Api.notifications.markRead({ id: id }); },
       readAll: function () {
-        Store.set(function (s) { s.notifications.forEach(function (n) { n.unread = false; }); });
-        App.toast('All notifications marked as read');
+        Api.notifications.markRead({}).then(function () { App.toast('All notifications marked as read'); });
       },
       channel: function (k) {
-        Store.set(function (s) { s.channels[k] = !s.channels[k]; });
+        var ch = {};
+        ch[k] = !Store.get().channels[k];
+        Api.account.update({ channels: ch });
       },
-      threshold: function (v) { Store.set(function (s) { s.threshold = v; }); }
+      threshold: function (v) { Api.account.update({ threshold: v }); }
     }
   };
 })(window);

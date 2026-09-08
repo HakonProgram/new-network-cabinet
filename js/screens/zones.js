@@ -281,84 +281,60 @@
       clearSel: function () { Store.set(function (s) { s.selection = []; }); },
 
       block: function (id) {
-        Store.toggleZone(id, null);
-        var z = DATA.ZONES.find(function (x) { return x.id === id; });
-        App.toast(Store.zoneIsOn(z, null)
-          ? id + ' turned on across all campaigns'
-          : id + ' turned off across all campaigns');
+        Api.placements.toggle(id, {}).then(function (r) {
+          App.toast(r.on ? id + ' turned on across all campaigns'
+                         : id + ' turned off across all campaigns');
+        });
       },
       blockSel: function () {
         var ids = selected().slice();
-        ids.forEach(function (id) { Store.setZone(id, null, false); });
-        Store.set(function (s) { s.selection = []; });
-        App.toast(ids.length + ' ' + UI.plural(ids.length, 'placement', 'placements') + ' turned off');
+        Api.placements.setStateMany({ ids: ids, on: false }).then(function () {
+          Store.set(function (s) { s.selection = []; });
+          App.toast(ids.length + ' ' + UI.plural(ids.length, 'placement', 'placements') + ' turned off');
+        });
       },
       unblockSel: function () {
         var ids = selected().slice();
-        ids.forEach(function (id) { Store.setZone(id, null, true); });
-        Store.set(function (s) { s.selection = []; });
-        App.toast(ids.length + ' ' + UI.plural(ids.length, 'placement', 'placements') + ' turned on');
+        Api.placements.setStateMany({ ids: ids, on: true }).then(function () {
+          Store.set(function (s) { s.selection = []; });
+          App.toast(ids.length + ' ' + UI.plural(ids.length, 'placement', 'placements') + ' turned on');
+        });
       },
 
       newPreset: function () {
-        var name;
-        Store.set(function (s) {
-          name = 'Preset ' + (s.presets.length + 1);
-          s.presets.push({
-            id: 'p' + Date.now(), name: name, kind: 'whitelist',
-            zones: s.selection.slice(), appliedTo: []
+        var sel = selected().slice();
+        Api.presets.create({ name: 'Preset ' + (Store.get().presets.length + 1),
+                             kind: 'whitelist', zones: sel }).then(function (p) {
+          Store.set(function (s) {
+            s.ui.openPreset = p.id;
+            s.ui.zonesTab = 'presets';
+            s.selection = [];
           });
-          s.ui.openPreset = s.presets[s.presets.length - 1].id;
-          s.ui.zonesTab = 'presets';
-          s.selection = [];
+          App.toast('\u201c' + p.name + '\u201d created');
         });
-        App.toast('“' + name + '” created');
       },
       addSel: function (pid) {
-        var added = 0;
-        Store.set(function (s) {
-          var p = s.presets.find(function (x) { return x.id === pid; });
-          if (!p) return;
-          s.selection.forEach(function (id) {
-            if (p.zones.indexOf(id) < 0) { p.zones.push(id); added++; }
-          });
-          s.selection = [];
+        var sel = selected().slice();
+        Api.presets.addZones(pid, { zones: sel }).then(function (r) {
+          Store.set(function (s) { s.selection = []; });
+          App.toast(r.added
+            ? r.added + ' ' + UI.plural(r.added, 'placement', 'placements') + ' added to the preset'
+            : 'Nothing to add — select placements first');
         });
-        App.toast(added ? added + ' ' + UI.plural(added, 'placement', 'placements') + ' added to the preset'
-                        : 'Nothing to add — select placements first');
       },
       dropZone: function (arg) {
         var parts = arg.split('|');
-        Store.set(function (s) {
-          var p = s.presets.find(function (x) { return x.id === parts[0]; });
-          if (!p) return;
-          var i = p.zones.indexOf(parts[1]);
-          if (i >= 0) p.zones.splice(i, 1);
-        });
+        Api.presets.removeZone(parts[0], parts[1]);
       },
       applyTo: function (arg) {
         var parts = arg.split('|');
-        Store.set(function (s) {
-          var p = s.presets.find(function (x) { return x.id === parts[0]; });
-          if (!p) return;
-          var i = p.appliedTo.indexOf(parts[1]);
-          if (i >= 0) p.appliedTo.splice(i, 1); else p.appliedTo.push(parts[1]);
-        });
+        Api.presets.toggleCampaign(parts[0], { campaignId: parts[1] });
       },
-      flip: function (pid) {
-        Store.set(function (s) {
-          var p = s.presets.find(function (x) { return x.id === pid; });
-          if (p) p.kind = p.kind === 'whitelist' ? 'blacklist' : 'whitelist';
-        });
-      },
+      flip: function (pid) { Api.presets.flip(pid); },
       delPreset: function (pid) {
-        var name;
-        Store.set(function (s) {
-          var p = s.presets.find(function (x) { return x.id === pid; });
-          name = p ? p.name : '';
-          s.presets = s.presets.filter(function (x) { return x.id !== pid; });
+        Api.presets.remove(pid).then(function (r) {
+          App.toast('\u201c' + r.name + '\u201d deleted');
         });
-        App.toast('“' + name + '” deleted');
       },
       openPreset: function (pid) {
         Store.set(function (s) { s.ui.openPreset = s.ui.openPreset === pid ? '' : pid; });
