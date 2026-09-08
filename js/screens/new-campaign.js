@@ -130,14 +130,21 @@
         return '<div class="tok" data-act="copyToken" data-arg="' + esc(t) + '">' + icon('copy', 11, 1.9) + esc(t) + '</div>';
       }).join('');
 
+      /* Проверки ещё не прошли — они запустятся при старте. Показываем готовность. */
+      var hasUrl = !!d.url.trim(), hasName = !!d.name.trim(), hasGeo = d.rates.length > 0;
       var checks = [
-        ['Detecting the vertical', esc(d.vertical) + ' · ' + (d.age === 'Adult' ? 'adult' : 'mainstream')],
-        ['Checking for restricted content', 'No violations'],
-        ['Checking that the link responds', d.url ? '200 OK · 340 ms' : 'link required'],
-        ['Assembling the final settings package', 'Ready']
+        { t: 'Detect the vertical', ok: true,
+          r: esc(d.vertical) + ' · ' + (d.age === 'Adult' ? 'adult' : 'mainstream') },
+        { t: 'Screen for restricted content', ok: hasUrl,
+          r: hasUrl ? 'ready to scan' : 'needs a link' },
+        { t: 'Verify the link responds', ok: hasUrl,
+          r: hasUrl ? 'ready to ping' : 'needs a link' },
+        { t: 'Assemble the settings package', ok: hasUrl && hasName && hasGeo,
+          r: hasUrl && hasName && hasGeo ? 'ready' : 'fill the blocks above' }
       ].map(function (c) {
-        return '<div class="check"><div class="check-ic">' + icon('check', 13, 3) + '</div>' +
-          '<div class="check-t">' + c[0] + '</div><div class="check-r mono">' + c[1] + '</div></div>';
+        return '<div class="check"><div class="check-ic' + (c.ok ? '' : ' pending') + '">' +
+          (c.ok ? icon('check', 13, 3) : icon('clock', 13, 2)) + '</div>' +
+          '<div class="check-t">' + c.t + '</div><div class="check-r mono">' + c.r + '</div></div>';
       });
 
       return '<div class="page">' +
@@ -260,13 +267,14 @@
 
         '<div class="card"><div class="card-h"><div class="card-n">07</div>' +
           '<div class="card-t">Auto-check and launch</div>' +
-          '<div class="card-s">A robot runs the check — no manager involved</div></div>' +
+          '<div class="card-s">Runs the moment you hit launch — no manager involved</div></div>' +
           '<div class="card-b">' +
             '<div class="g2">' +
               '<div style="display:flex;flex-direction:column;gap:8px">' + checks.slice(0, 2).join('') + '</div>' +
               '<div style="display:flex;flex-direction:column;gap:8px">' + checks.slice(2).join('') + '</div></div>' +
             '<div class="note">' + icon('info', 15, 2) +
-              '<p><b>One request, the whole network.</b> After launch the campaign goes out to verified placements, ' +
+              '<p><b>One request, the whole network.</b> The checks below run on launch; the campaign starts by itself ' +
+              'as soon as they pass. After that it goes out to verified placements, ' +
               'and the robot reconciles statistics every hour: it stops unprofitable placements and adjusts caps and bids. ' +
               'No per-source setup needed.</p></div></div>' +
           '<div class="bar-row">' +

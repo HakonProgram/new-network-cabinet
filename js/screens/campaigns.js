@@ -4,21 +4,30 @@
   var icon = UI.icon, esc = UI.esc;
 
   var TABS = [
-    { key: 'all',    label: 'All' },
-    { key: 'active', label: 'Active' },
-    { key: 'test',   label: 'Test' },
-    { key: 'review', label: 'Auto-check' },
-    { key: 'paused', label: 'Stopped' }
+    { key: 'all',      label: 'All' },
+    { key: 'active',   label: 'Active' },
+    { key: 'test',     label: 'Test' },
+    { key: 'review',   label: 'Auto-check' },
+    { key: 'paused',   label: 'Stopped' },
+    { key: 'archived', label: 'Archived' }
   ];
   var MODELS = ['all', 'CPA', 'Pure CPA', 'CPM', 'Smart CPM', 'CPC'];
-  var COLS = '34px 72px minmax(180px,1fr) 84px 100px 74px 66px 80px 70px 64px 92px';
-  var MINW = 'min-width:1036px';
+  var COLS = '34px 72px minmax(170px,1fr) 84px 108px 74px 66px 80px 70px 64px 122px';
+  var MINW = 'min-width:1076px';
 
+  /* Архив живёт на своей вкладке и не мешается в общем списке. */
   function visible() {
     var s = Store.get(), st = s.ui.campStatus, md = s.ui.campModel;
     return s.campaigns.filter(function (c) {
-      return (st === 'all' || c.status === st) && (md === 'all' || c.model === md);
+      var byStatus = st === 'all' ? c.status !== 'archived' : c.status === st;
+      return byStatus && (md === 'all' || c.model === md);
     });
+  }
+
+  function tabCount(key) {
+    var all = Store.get().campaigns;
+    if (key === 'all') return all.filter(function (c) { return c.status !== 'archived'; }).length;
+    return all.filter(function (c) { return c.status === key; }).length;
   }
 
   function rowHtml(c) {
@@ -28,8 +37,11 @@
     var m = UI.metrics(c);
     var noData = !c.impr;
     var dash = function (v) { return noData ? '—' : v; };
+    var archived = c.status === 'archived';
     var runCls = !controllable ? 'act act-off' : (running ? 'act act-stop' : 'act act-run');
-    var runTitle = !controllable ? 'Controls unavailable' : (running ? 'Stop campaign' : 'Start campaign');
+    var runTitle = !controllable
+      ? (c.status === 'review' ? 'Starts by itself once the auto-check passes' : 'Controls unavailable')
+      : (running ? 'Stop campaign' : 'Start campaign');
 
     return '<div class="tr row clickable' + (running ? '' : ' off') + '" data-act="open" data-arg="' + c.id +
       '" title="Open the report for this campaign" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
@@ -41,8 +53,10 @@
         '<div class="cmeta"><span class="cid">' + esc(c.format) + '</span>' +
         '<span class="tag' + (c.adult ? ' tag-18' : '') + '">' + esc(c.vertical) + '</span></div></div>' +
       '<div><span class="model">' + esc(c.model) + '</span></div>' +
-      '<div class="status"><span class="dot" style="background:' + meta.color + '"></span>' +
-        '<span style="color:' + meta.ink + '">' + meta.label + '</span></div>' +
+      '<div class="status"><span class="dot' + (c.status === 'review' ? ' pulse' : '') +
+        '" style="background:' + meta.color + '"></span>' +
+        '<span style="color:' + meta.ink + '">' + meta.label + '</span>' +
+        (c.status === 'review' ? '<span class="cid">starting</span>' : '') + '</div>' +
       '<div class="cell muted r">' + dash(m.impr) + '</div>' +
       '<div class="cell w r">' + dash(m.conv) + '</div>' +
       '<div class="cell w r">' + dash(m.cost) + '</div>' +
@@ -52,6 +66,9 @@
         '<div class="act" data-act="dup" data-arg="' + c.id + '" title="Duplicate">' + icon('copy', 13, 1.9) + '</div>' +
         '<div class="act" data-act="edit" data-arg="' + c.id + '" title="Edit">' + icon('edit', 13, 1.9) + '</div>' +
         '<div class="act act-chart" data-act="stats" data-arg="' + c.id + '" title="Statistics">' + icon('chart', 13, 1.9) + '</div>' +
+        '<div class="act" data-act="' + (archived ? 'restore' : 'archive') + '" data-arg="' + c.id +
+          '" title="' + (archived ? 'Restore from archive' : 'Archive') + '">' +
+          icon(archived ? 'unarchive' : 'archive', 13, 1.9) + '</div>' +
       '</div>' +
     '</div>';
   }
@@ -76,8 +93,7 @@
                             revenue: vt.revenue, winRate: vt.cost ? vt.wSum / vt.cost : 0 });
 
       var tabs = TABS.map(function (x) {
-        var n = x.key === 'all' ? s.campaigns.length
-          : s.campaigns.filter(function (c) { return c.status === x.key; }).length;
+        var n = tabCount(x.key);
         return '<div class="seg' + (s.ui.campStatus === x.key ? ' on' : '') + '" data-act="tab" data-arg="' + x.key + '">' +
           '<span>' + x.label + '</span><span class="seg-n">' + n + '</span></div>';
       }).join('');
@@ -100,7 +116,7 @@
         '<div class="head">' +
           '<div><h1 class="h1">Campaigns</h1>' +
           '<p class="sub">One campaign, one request — the system distributes it on its own. Last 7 days · ' +
-          'click a row for the full report.</p></div>' +
+          'click a row for the full report. New campaigns start by themselves once the auto-check passes.</p></div>' +
           '<button class="btn btn-pri" style="margin-left:auto;height:36px" data-go="campaigns/new">' +
             icon('plus', 14, 2.4) + 'Create campaign</button>' +
         '</div>' +
@@ -188,7 +204,31 @@
       },
 
       open: function (id) { openReport(id); },
-      stats: function (id) { openReport(id); }
+      stats: function (id) { openReport(id); },
+
+      archive: function (id) {
+        var name;
+        Store.set(function (s) {
+          var c = s.campaigns.find(function (x) { return x.id === id; });
+          if (!c) return;
+          name = c.name;
+          c.beforeArchive = c.status;
+          c.status = 'archived';
+        });
+        App.toast('\u201c' + name + '\u201d archived — it no longer spends');
+      },
+      restore: function (id) {
+        var name;
+        Store.set(function (s) {
+          var c = s.campaigns.find(function (x) { return x.id === id; });
+          if (!c) return;
+          name = c.name;
+          c.status = c.beforeArchive === 'archived' ? 'paused' : (c.beforeArchive || 'paused');
+          if (c.status === 'review') c.status = 'paused';
+          delete c.beforeArchive;
+        });
+        App.toast('\u201c' + name + '\u201d restored — stopped, start it when ready');
+      }
     }
   };
 })(window);

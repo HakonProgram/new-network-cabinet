@@ -25,7 +25,8 @@
     test:   { label: 'Test',          color: '#8368F7', ink: '#EEF2FA' },
     review: { label: 'Auto-check',    color: '#fab219', ink: '#EEF2FA' },
     paused: { label: 'Stopped',       color: '#6A7180', ink: '#9AA1AE' },
-    done:   { label: 'Finished',      color: '#2E323B', ink: '#6A7180' }
+    done:     { label: 'Finished', color: '#2E323B', ink: '#6A7180' },
+    archived: { label: 'Archived', color: '#2E323B', ink: '#6A7180' }
   };
 
   /* Campaign figures — last 7 days. Everything else scales from this base. */
