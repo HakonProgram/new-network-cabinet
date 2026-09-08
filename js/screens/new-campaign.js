@@ -167,8 +167,7 @@
           '<div class="radio"><i></i></div>' +
           '<div style="min-width:0"><div style="display:flex;align-items:center;gap:9px">' +
             '<span class="mname">' + x.name + '</span><span class="mtag">' + x.tag + '</span></div>' +
-            '<div class="mdesc">' + x.desc + '</div></div>' +
-          '<div class="mprice"><b>from $' + x.min.toFixed(2) + '</b><span>' + x.unit + '</span></div></div>';
+            '<div class="mdesc">' + x.desc + '</div></div></div>';
       }).join('');
 
       var sourceCards = DATA.SOURCES.map(function (x) {
@@ -246,8 +245,7 @@
                 '<div class="opts">' + opts(['Mainstream', 'Adult'], d.age, 'age') + '</div></div></div>' +
             '<div class="field"><label class="lab">Pricing model</label>' +
               '<div style="display:flex;flex-direction:column;gap:8px">' + modelRows + '</div>' +
-              '<div class="hint">You set the rate yourself — per country, in block 03. ' +
-                'The network only defines the floor.</div></div>' +
+              '<div class="hint">You set the rate per country in block 03.</div></div>' +
           '</div></div>' +
 
         /* 02 */
