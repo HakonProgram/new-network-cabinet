@@ -51,6 +51,10 @@
     d.documentElement.setAttribute('data-nav', open ? 'open' : '');
   }
 
+  function userMenu(open) {
+    d.documentElement.setAttribute('data-user', open ? 'open' : '');
+  }
+
   function route() {
     var h = (location.hash || '').replace(/^#\/?/, '');
     return ROUTES[h] ? h : 'campaigns';
@@ -86,6 +90,33 @@
     }).join('');
   }
 
+  /* Профиль в правом углу: аватар открывает меню с настройками и выходом. */
+  function userHtml() {
+    var ses = Store.get().session || {};
+    var name = ses.user || 'Advertiser';
+    var person = [ses.firstName, ses.lastName].filter(Boolean).join(' ');
+    var initials = (person || name).split(/\s+/).slice(0, 2)
+      .map(function (x) { return x[0]; }).join('').toUpperCase();
+
+    return '<div class="user-wrap">' +
+      '<div class="user" data-act="userMenu">' +
+        '<div class="avatar">' + esc(initials) + '</div>' +
+        '<div class="user-n">' + esc(person || name) + '</div>' +
+        icon('down', 13) +
+      '</div>' +
+      '<div class="umenu">' +
+        '<div class="umenu-h"><div class="avatar avatar-lg">' + esc(initials) + '</div>' +
+          '<div style="min-width:0"><div class="umenu-n">' + esc(person || name) + '</div>' +
+          '<div class="umenu-s">' + esc(ses.email || name) + '</div></div></div>' +
+        '<div class="umenu-i" data-go="profile">' + icon('user', 16) + 'Profile settings</div>' +
+        '<div class="umenu-i" data-go="payments">' + icon('pay', 16) + 'Billing</div>' +
+        '<div class="umenu-i" data-go="postback">' + icon('post', 16) + 'Postback</div>' +
+        '<div class="umenu-sep"></div>' +
+        '<div class="umenu-i danger" data-act="signOut">' + icon('right', 16) + 'Sign out</div>' +
+      '</div>' +
+    '</div>';
+  }
+
   function crumbsHtml() {
     var r = ROUTES[current];
     if (!r.parent) return '<b>' + r.title + '</b>';
@@ -102,17 +133,6 @@
             '<div><div class="brand-name">AdAnvil</div><div class="brand-sub">Advertiser</div></div>' +
           '</div>' +
           '<nav class="nav" id="nav">' + navHtml() + '</nav>' +
-          (function () {
-            var ses = Store.get().session || {};
-            var name = ses.user || 'Advertiser';
-            var initials = name.split(/\s+/).slice(0, 2).map(function (x) { return x[0]; }).join('').toUpperCase();
-            return '<div class="acct">' +
-              '<div class="avatar" data-go="profile">' + esc(initials) + '</div>' +
-              '<div style="min-width:0" data-go="profile"><div class="acct-n">' + esc(name) + '</div>' +
-              '<div class="cid mono">' + (ses.mode === 'demo' ? 'adv-4821' : 'adv-new') + '</div></div>' +
-              '<div class="icon-btn acct-out" data-act="signOut" title="Sign out">' + icon('right', 15) + '</div>' +
-            '</div>';
-          })() +
         '</div>' +
       '</aside>' +
       '<div class="scrim" data-act="closeNav"></div>' +
@@ -122,11 +142,13 @@
           '<div class="crumbs" id="crumbs">' + crumbsHtml() + '</div>' +
           '<div class="balance">' +
             '<div><div class="bal-lab">Balance</div><div class="bal-val num" id="balance">' + UI.money2(s.balance) + '</div></div>' +
-            '<button class="btn btn-pri btn-sm" data-go="payments">' + icon('plus', 13, 2.4) + 'Add funds</button>' +
+            '<button class="btn btn-pri btn-sm" data-go="payments">' + icon('plus', 13) +
+              '<span>Add funds</span></button>' +
           '</div>' +
           '<div class="icon-btn" data-act="theme" title="Switch theme">' + icon(theme() === 'light' ? 'moon' : 'sun', 16) + '</div>' +
           '<div class="icon-btn" data-go="notifications" title="Notifications">' + icon('bell', 16) +
             (badges().unread !== '0' ? '<span class="bell-dot"></span>' : '') + '</div>' +
+          userHtml() +
         '</div>' +
         '<div id="view"></div>' +
       '</div>';
@@ -267,6 +289,7 @@
       if (goEl) {
         ev.preventDefault();
         nav(false);
+        userMenu(false);
         go(goEl.dataset.go);
         return;
       }
@@ -274,8 +297,14 @@
       if (!actEl) return;
       if (actEl.dataset.act === 'theme') { ev.preventDefault(); toggleTheme(); return; }
       if (actEl.dataset.act === 'openNav') { ev.preventDefault(); nav(true); return; }
+      if (actEl.dataset.act === 'userMenu') {
+        ev.preventDefault();
+        userMenu(d.documentElement.getAttribute('data-user') !== 'open');
+        return;
+      }
       if (actEl.dataset.act === 'signOut') {
         ev.preventDefault();
+        userMenu(false);
         Store.signOut();
         toast('Signed out');
         return;
@@ -300,11 +329,17 @@
     app.addEventListener('change', onField);
 
     d.addEventListener('keydown', function (ev) {
-      if (ev.key === 'Escape') nav(false);
+      if (ev.key === 'Escape') { nav(false); userMenu(false); }
     });
+
+    /* Клик мимо меню закрывает его — как у любого выпадающего списка. */
+    d.addEventListener('click', function (ev) {
+      if (!ev.target.closest('.user-wrap')) userMenu(false);
+    }, true);
 
     w.addEventListener('hashchange', function () {
       nav(false);
+      userMenu(false);
       current = route();
       w.scrollTo(0, 0);
       render();
