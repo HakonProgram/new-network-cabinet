@@ -36,6 +36,9 @@
       balance: 12480.50,
       campaigns: DATA.CAMPAIGNS.map(function (c) { return Object.assign({}, c); }),
       blockedZones: { 'NN-37540': true },
+      forcedZones: {},
+      campaignBlocks: {},
+      campaignForced: {},
       selection: [],
       presets: DATA.PRESETS.map(function (p) {
         return Object.assign({}, p, { zones: p.zones.slice(), appliedTo: p.appliedTo.slice() });
@@ -109,8 +112,63 @@
 
   function subscribe(fn) { listeners.push(fn); }
 
+  /* Состояние площадки: глобальное или в рамках одной кампании.
+     live — крутится, robot — отключена роботом, blocked — выключена вами,
+     campaign — выключена вами только в этой кампании. */
+  function zoneState(zone, campaignId) {
+    var s = get();
+    if (campaignId) {
+      var off = s.campaignBlocks[campaignId] || {};
+      if (off[zone.id]) return 'campaign';
+      var on = s.campaignForced[campaignId] || {};
+      if (on[zone.id]) return 'live';
+    }
+    if (s.blockedZones[zone.id]) return 'blocked';
+    if (s.forcedZones[zone.id]) return 'live';
+    return zone.robot ? 'robot' : 'live';
+  }
+
+  function zoneIsOn(zone, campaignId) {
+    return zoneState(zone, campaignId) === 'live';
+  }
+
+  /* Включить или выключить площадку. Без campaignId — на весь аккаунт. */
+  function setZone(zoneId, campaignId, on) {
+    var zone = DATA.ZONES.find(function (z) { return z.id === zoneId; });
+    if (!zone) return;
+    set(function (s) {
+      if (campaignId) {
+        if (!s.campaignBlocks[campaignId]) s.campaignBlocks[campaignId] = {};
+        if (!s.campaignForced[campaignId]) s.campaignForced[campaignId] = {};
+        delete s.campaignBlocks[campaignId][zoneId];
+        delete s.campaignForced[campaignId][zoneId];
+        if (on) {
+          /* Включаем поверх глобальной блокировки или решения робота. */
+          if (s.blockedZones[zoneId] || zone.robot) s.campaignForced[campaignId][zoneId] = true;
+        } else {
+          s.campaignBlocks[campaignId][zoneId] = true;
+        }
+        return;
+      }
+      delete s.blockedZones[zoneId];
+      delete s.forcedZones[zoneId];
+      if (on) {
+        if (zone.robot) s.forcedZones[zoneId] = true;
+      } else {
+        s.blockedZones[zoneId] = true;
+      }
+    });
+  }
+
+  function toggleZone(zoneId, campaignId) {
+    var zone = DATA.ZONES.find(function (z) { return z.id === zoneId; });
+    if (!zone) return;
+    setZone(zoneId, campaignId, !zoneIsOn(zone, campaignId));
+  }
+
   w.Store = {
     get: get, set: set, patch: patch, ui: ui, reset: reset,
-    subscribe: subscribe, seedDraft: seedDraft, seedSchedule: seedSchedule
+    subscribe: subscribe, seedDraft: seedDraft, seedSchedule: seedSchedule,
+    zoneState: zoneState, zoneIsOn: zoneIsOn, setZone: setZone, toggleZone: toggleZone
   };
 })(window);

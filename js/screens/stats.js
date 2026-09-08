@@ -23,6 +23,19 @@
     return out;
   }
 
+  function tailCells(count) {
+    var out = '';
+    for (var i = 0; i < count; i++) out += '<div></div>';
+    return out;
+  }
+
+  var ZSTATE = {
+    live:     { label: 'Live',      pill: 'pill pill-ok' },
+    robot:    { label: 'Robot off', pill: 'pill pill-wait' },
+    blocked:  { label: 'Turned off', pill: 'pill pill-bad' },
+    campaign: { label: 'Off here',  pill: 'pill pill-bad' }
+  };
+
   function metricCells(row) {
     var m = UI.metrics(row);
     return '<div class="cell muted r">' + m.impr + '</div>' +
@@ -178,17 +191,25 @@
 
     if (tab === 'zones') {
       var zr = DATA.ZONES.map(function (z) { return scale(z, k * d.share); });
+      var cid = d.scoped ? d.scoped.id : null;
       return {
-        cols: '104px 96px 110px ' + M_COLS, minw: 'min-width:1420px',
-        heads: ['Zone ID', 'Category', 'Vertical'].concat(M_HEADS),
-        align: ['', '', ''].concat(M_HEADS.map(function () { return 'r'; })),
+        cols: '104px 96px 110px ' + M_COLS + ' 128px 96px', minw: 'min-width:1660px',
+        heads: ['Zone ID', 'Category', 'Vertical'].concat(M_HEADS).concat(['Status', '']),
+        align: ['', '', ''].concat(M_HEADS.map(function () { return 'r'; })).concat(['', '']),
+        tail: 2,
         rows: DATA.ZONES.map(function (z, i) {
+          var st = Store.zoneState(z, cid), on = st === 'live';
           return '<div class="cell mono w">' + z.id + '</div>' +
             '<div class="cell"><span class="dot" style="background:' + (z.cat === 'Adult' ? '#DA69B9' : '#009FAE') + '"></span>' + z.cat + '</div>' +
-            '<div class="cell muted">' + z.vertical + '</div>' + metricCells(zr[i]);
+            '<div class="cell muted">' + z.vertical + '</div>' + metricCells(zr[i]) +
+            '<div><span class="' + ZSTATE[st].pill + '">' + ZSTATE[st].label + '</span></div>' +
+            '<div class="acts"><button class="btn btn-xs ' + (on ? 'btn-danger' : 'btn-up') +
+              '" data-act="toggleZone" data-arg="' + z.id + '">' + (on ? 'Turn off' : 'Turn on') + '</button></div>';
         }),
         totals: zr, totalLabel: DATA.ZONES.length + ' placements shown',
-        note: 'Placement IDs are ours — the same numbers drive blocking and presets.',
+        note: d.scoped
+          ? 'Turn a placement off right here — inside a campaign report it affects this campaign only.'
+          : 'Placement IDs are ours. Turning one off here applies to every campaign.',
         foot: ['Showing ' + DATA.ZONES.length + ' of 1,482 placements', 'Robot switched off 214 placements this period']
       };
     }
@@ -328,7 +349,7 @@
             t.heads.map(function (h, i) { return '<div class="th ' + t.align[i] + '">' + h + '</div>'; }).join('') +
           '</div>' +
           '<div class="tr totals" style="grid-template-columns:' + t.cols + ';' + t.minw + '">' +
-            dimCells(t.heads.length - M_HEADS.length, t.totalLabel) +
+            dimCells(t.heads.length - M_HEADS.length - (t.tail || 0), t.totalLabel) +
             '<div class="cell r">' + sm.impr + '</div><div class="cell r">' + sm.clicks + '</div>' +
             '<div class="cell r">' + sm.ctr + '</div><div class="cell r">' + sm.conv + '</div>' +
             '<div class="cell r">' + sm.cr + '</div><div class="cell r">' + sm.cost + '</div>' +
@@ -337,6 +358,7 @@
             '<div class="cell r" style="color:' + sm.roiColor + '">' + sm.roi + '</div>' +
             '<div class="cell r">' + sm.cpa + '</div><div class="cell r">' + sm.cpm + '</div>' +
             '<div class="cell r">' + sm.cpc + '</div><div class="cell r">' + sm.win + '</div>' +
+            tailCells(t.tail || 0) +
           '</div>' +
           t.rows.map(function (r) { return '<div class="tr row" style="grid-template-columns:' + t.cols + ';' + t.minw + '">' + r + '</div>'; }).join('') +
         '</div>' +
@@ -359,7 +381,16 @@
       range: function (v) { Store.ui('statsRange', Number(v)); },
       tab: function (v) { Store.ui('statsTab', v); },
       csv: function () { App.toast('Export is not generated in this prototype'); },
-      clearScope: function () { Store.ui('statsCampaign', ''); }
+      clearScope: function () { Store.ui('statsCampaign', ''); },
+      toggleZone: function (id) {
+        var cid = Store.get().ui.statsCampaign || null;
+        Store.toggleZone(id, cid);
+        var z = DATA.ZONES.find(function (x) { return x.id === id; });
+        var on = Store.zoneIsOn(z, cid);
+        var camp = cid ? scopedCampaign() : null;
+        App.toast(id + (on ? ' turned on' : ' turned off') +
+          (camp ? ' for “' + camp.name + '”' : ' across all campaigns'));
+      }
     }
   };
 

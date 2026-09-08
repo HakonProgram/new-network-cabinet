@@ -9,9 +9,10 @@
                'Cost', 'Revenue', 'ROI', 'CPA', 'CPM', 'Win rate', 'Status', ''];
   var ALIGN = ['', '', '', '', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', '', ''];
   var STATE_META = {
-    live:    { label: 'Live',      pill: 'pill pill-ok' },
-    robot:   { label: 'Robot off', pill: 'pill pill-wait' },
-    blocked: { label: 'Blocked',   pill: 'pill pill-bad' }
+    live:     { label: 'Live',      pill: 'pill pill-ok' },
+    robot:    { label: 'Robot off', pill: 'pill pill-wait' },
+    blocked:  { label: 'Turned off', pill: 'pill pill-bad' },
+    campaign: { label: 'Off in a campaign', pill: 'pill pill-bad' }
   };
   var SORTS = [
     { k: 'cost', label: 'Cost' },
@@ -19,10 +20,7 @@
     { k: 'conv', label: 'Conversions' }
   ];
 
-  function stateOf(z) {
-    if (Store.get().blockedZones[z.id]) return 'blocked';
-    return z.robot ? 'robot' : 'live';
-  }
+  function stateOf(z) { return Store.zoneState(z, null); }
   function presetsOf(id) {
     return Store.get().presets.filter(function (p) { return p.zones.indexOf(id) >= 0; });
   }
@@ -48,13 +46,14 @@
 
   function rowHtml(z) {
     var st = stateOf(z), m = UI.metrics(z);
-    var on = selected().indexOf(z.id) >= 0;
+    var picked = selected().indexOf(z.id) >= 0;
     var inPresets = presetsOf(z.id);
-    var blocked = st === 'blocked';
+    var blocked = st !== 'live';
+    var on = st === 'live';
 
     return '<div class="tr row' + (st === 'live' ? '' : ' off') + (blocked ? ' blocked' : '') +
       '" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
-      '<div class="box' + (on ? ' on' : '') + '" data-act="pick" data-arg="' + z.id + '"></div>' +
+      '<div class="box' + (picked ? ' on' : '') + '" data-act="pick" data-arg="' + z.id + '"></div>' +
       '<div style="min-width:0"><div class="cell mono w">' + z.id + '</div>' +
         (inPresets.length ? '<div class="cid" style="margin-top:2px">in ' + inPresets.length + ' ' +
           UI.plural(inPresets.length, 'preset', 'presets') + '</div>' : '') + '</div>' +
@@ -72,8 +71,8 @@
       '<div class="cell muted r">' + m.cpm + '</div>' +
       '<div class="cell muted r">' + m.win + '</div>' +
       '<div><span class="' + STATE_META[st].pill + '">' + STATE_META[st].label + '</span></div>' +
-      '<div class="acts"><button class="btn btn-xs btn-danger" data-act="block" data-arg="' + z.id + '">' +
-        (blocked ? 'Unblock' : 'Block') + '</button></div>' +
+      '<div class="acts"><button class="btn btn-xs ' + (on ? 'btn-danger' : 'btn-up') +
+        '" data-act="block" data-arg="' + z.id + '">' + (on ? 'Turn off' : 'Turn on') + '</button></div>' +
     '</div>';
   }
 
@@ -133,18 +132,18 @@
       var isPresets = u.zonesTab === 'presets';
       var rows = isPresets ? [] : filtered();
       var sel = selected();
-      var blockedCount = Object.keys(s.blockedZones).length;
+      var blockedCount = DATA.ZONES.filter(function (z) { return stateOf(z) === 'blocked'; }).length;
 
       var counts = {
         all: DATA.ZONES.length,
         live: DATA.ZONES.filter(function (z) { return stateOf(z) === 'live'; }).length,
         robot: DATA.ZONES.filter(function (z) { return stateOf(z) === 'robot'; }).length,
-        blocked: DATA.ZONES.filter(function (z) { return stateOf(z) === 'blocked'; }).length,
+        blocked: blockedCount,
         presets: s.presets.length
       };
       var tabs = [
         { k: 'all', label: 'All placements' }, { k: 'live', label: 'Live' },
-        { k: 'robot', label: 'Robot off' }, { k: 'blocked', label: 'Blocked' },
+        { k: 'robot', label: 'Robot off' }, { k: 'blocked', label: 'Turned off' },
         { k: 'presets', label: 'Presets' }
       ].map(function (t) {
         return '<div class="seg' + (u.zonesTab === t.k ? ' on' : '') + '" data-act="tab" data-arg="' + t.k + '">' +
@@ -206,7 +205,8 @@
             : '<div class="empty">No placements match these filters</div>') +
           '</div>' +
           '<div class="foot"><span>Showing ' + rows.length + ' of 1,482 placements · last 7 days</span>' +
-          '<span style="margin-left:auto">Blocking applies to every campaign in the account</span></div>' +
+          '<span style="margin-left:auto">Turning a placement off here applies to every campaign · ' +
+          'inside a campaign report it affects that campaign only</span></div>' +
         '</div>';
       }
 
@@ -217,8 +217,8 @@
         }).join('');
         bulk = '<div class="bulk">' +
           '<span class="bulk-n">' + sel.length + ' selected</span>' +
-          '<button class="btn btn-xs btn-danger" data-act="blockSel">Block</button>' +
-          '<button class="btn btn-xs" data-act="unblockSel">Unblock</button>' +
+          '<button class="btn btn-xs btn-danger" data-act="blockSel">Turn off</button>' +
+          '<button class="btn btn-xs btn-up" data-act="unblockSel">Turn on</button>' +
           '<span class="hint" style="margin-left:8px">Add to preset:</span>' + presetBtns +
           '<button class="btn btn-xs btn-up" data-act="newPreset">' + icon('plus', 11, 2.4) + 'New preset</button>' +
           '<button class="btn btn-xs btn-ghost" style="margin-left:auto" data-act="clearSel">Clear selection</button>' +
@@ -248,7 +248,7 @@
           kpi('Cost', am.cost, 'last 7 days') +
           kpi('Revenue', am.revenue, 'across shown placements') +
           kpi('ROI', am.roi, 'blended', am.roiColor) +
-          kpi('Blocked by you', String(blockedCount), 'applies to all campaigns') +
+          kpi('Turned off by you', String(blockedCount), 'applies to all campaigns') +
           kpi('Presets', String(s.presets.length), 'reusable placement groups') +
         '</div>' +
 
@@ -283,28 +283,23 @@
       clearSel: function () { Store.set(function (s) { s.selection = []; }); },
 
       block: function (id) {
-        var nowBlocked;
-        Store.set(function (s) {
-          if (s.blockedZones[id]) { delete s.blockedZones[id]; nowBlocked = false; }
-          else { s.blockedZones[id] = true; nowBlocked = true; }
-        });
-        App.toast(nowBlocked ? id + ' blocked across all campaigns' : id + ' unblocked');
+        Store.toggleZone(id, null);
+        var z = DATA.ZONES.find(function (x) { return x.id === id; });
+        App.toast(Store.zoneIsOn(z, null)
+          ? id + ' turned on across all campaigns'
+          : id + ' turned off across all campaigns');
       },
       blockSel: function () {
-        var n = selected().length;
-        Store.set(function (s) {
-          s.selection.forEach(function (id) { s.blockedZones[id] = true; });
-          s.selection = [];
-        });
-        App.toast(n + ' ' + UI.plural(n, 'placement', 'placements') + ' blocked');
+        var ids = selected().slice();
+        ids.forEach(function (id) { Store.setZone(id, null, false); });
+        Store.set(function (s) { s.selection = []; });
+        App.toast(ids.length + ' ' + UI.plural(ids.length, 'placement', 'placements') + ' turned off');
       },
       unblockSel: function () {
-        var n = selected().length;
-        Store.set(function (s) {
-          s.selection.forEach(function (id) { delete s.blockedZones[id]; });
-          s.selection = [];
-        });
-        App.toast(n + ' ' + UI.plural(n, 'placement', 'placements') + ' unblocked');
+        var ids = selected().slice();
+        ids.forEach(function (id) { Store.setZone(id, null, true); });
+        Store.set(function (s) { s.selection = []; });
+        App.toast(ids.length + ' ' + UI.plural(ids.length, 'placement', 'placements') + ' turned on');
       },
 
       newPreset: function () {
