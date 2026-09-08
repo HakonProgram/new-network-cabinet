@@ -348,56 +348,9 @@
     Store.subscribe(render);
   }
 
-  /* ── временный переключатель палитр ──
-     Нужен только чтобы выбрать направление вживую. После выбора
-     убирается вместе с palettes.css. */
-  var PALETTES = [
-    { k: '',       n: 'Ember',  c: '#EE6A1C', d: 'песок и раскалённый оранжевый' },
-    { k: 'lime',   n: 'Acid',   c: '#BDEE63', d: 'чистый серый и кислотный лайм' },
-    { k: 'indigo', n: 'Indigo', c: '#3E63DD', d: 'холодный сланец и индиго' },
-    { k: 'jade',   n: 'Jade',   c: '#29A383', d: 'зеленоватый нейтральный и нефрит' },
-    { k: 'ruby',   n: 'Ruby',   c: '#E54666', d: 'тёплый серый и рубин' },
-    { k: 'cyan',   n: 'Cyan',   c: '#00A2C7', d: 'сланец и электрический циан' }
-  ];
-
-  function paletteBar() {
-    var box = d.getElementById('palette-bar');
-    if (!box) return;
-    var cur = d.documentElement.getAttribute('data-palette') || '';
-    box.innerHTML =
-      '<button class="pal-tab" data-pal-toggle>Palette</button>' +
-      '<div class="pal-list">' +
-        '<div class="pal-h">Выберите направление</div>' +
-        PALETTES.map(function (p) {
-          return '<button class="pal-i' + (p.k === cur ? ' on' : '') + '" data-pal="' + p.k + '">' +
-            '<span class="pal-dot" style="background:' + p.c + '"></span>' +
-            '<span><b>' + p.n + '</b><i>' + p.d + '</i></span></button>';
-        }).join('') +
-      '</div>';
-  }
-
-  function bindPaletteBar() {
-    var box = d.getElementById('palette-bar');
-    if (!box) return;
-    box.addEventListener('click', function (ev) {
-      if (ev.target.closest('[data-pal-toggle]')) { box.classList.toggle('open'); return; }
-      var item = ev.target.closest('[data-pal]');
-      if (!item) return;
-      var k = item.getAttribute('data-pal');
-      if (k) d.documentElement.setAttribute('data-palette', k);
-      else d.documentElement.removeAttribute('data-palette');
-      try { localStorage.setItem('nn-palette', k); } catch (e) {}
-      paletteBar();
-      box.classList.add('open');
-      render();
-    });
-  }
-
   function start() {
     current = route();
     bind();
-    paletteBar();
-    bindPaletteBar();
     render();
   }
 

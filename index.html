@@ -15,8 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="styles.css?v=68">
-  <link rel="stylesheet" href="palettes.css?v=68">
+  <link rel="stylesheet" href="styles.css?v=69">
 <script>
     /* Тема до первой отрисовки, чтобы не мигало. */
     (function () {
@@ -24,32 +23,28 @@
       try { t = localStorage.getItem('nn-theme'); } catch (e) {}
       if (!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', t);
-      var p = null;
-      try { p = localStorage.getItem('nn-palette'); } catch (e) {}
-      if (p) document.documentElement.setAttribute('data-palette', p);
     })();
   </script>
 </head>
 <body>
   <div id="app" class="app"></div>
   <div class="toasts" id="toasts"></div>
-  <div id="palette-bar"></div>
 
-  <script src="js/ui.js?v=68"></script>
-  <script src="js/data.js?v=68"></script>
-  <script src="js/store.js?v=68"></script>
-  <script src="js/api.js?v=68"></script>
-  <script src="js/screens/auth.js?v=68"></script>
-  <script src="js/screens/welcome.js?v=68"></script>
-  <script src="js/screens/campaigns.js?v=68"></script>
-  <script src="js/screens/new-campaign.js?v=68"></script>
-  <script src="js/screens/stats.js?v=68"></script>
-  <script src="js/screens/zones.js?v=68"></script>
-  <script src="js/screens/volumes.js?v=68"></script>
-  <script src="js/screens/payments.js?v=68"></script>
-  <script src="js/screens/profile.js?v=68"></script>
-  <script src="js/screens/postback.js?v=68"></script>
-  <script src="js/screens/notifications.js?v=68"></script>
-  <script src="js/app.js?v=68"></script>
+  <script src="js/ui.js?v=69"></script>
+  <script src="js/data.js?v=69"></script>
+  <script src="js/store.js?v=69"></script>
+  <script src="js/api.js?v=69"></script>
+  <script src="js/screens/auth.js?v=69"></script>
+  <script src="js/screens/welcome.js?v=69"></script>
+  <script src="js/screens/campaigns.js?v=69"></script>
+  <script src="js/screens/new-campaign.js?v=69"></script>
+  <script src="js/screens/stats.js?v=69"></script>
+  <script src="js/screens/zones.js?v=69"></script>
+  <script src="js/screens/volumes.js?v=69"></script>
+  <script src="js/screens/payments.js?v=69"></script>
+  <script src="js/screens/profile.js?v=69"></script>
+  <script src="js/screens/postback.js?v=69"></script>
+  <script src="js/screens/notifications.js?v=69"></script>
+  <script src="js/app.js?v=69"></script>
 </body>
 </html>

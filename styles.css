@@ -22,13 +22,15 @@
   --bg:#111110; --surface:#191918; --surface-2:#2a2a28; --surface-3:#31312e;
   --border:#42413e; --border-strong:#7c7b74;
   --text:#eeeeec; --text-2:#b5b3ad; --text-3:#b5b3ad;
-  --accent:#FFA36A; --accent-hover:#FFB98C; --accent-soft:#2B211A; --accent-tint:#6B3A18; --accent-line:#8A4B25;
+  --accent:#FFA36A; --accent-hover:#FFB98C; --accent-soft:#2B211A; --accent-tint:#6B3A18; --accent-line:#8A4B25; --item-new:#3A1E0D;
   --accent-solid:#EE6A1C; --on-accent:#160D06;
   /* Кнопка должна быть видна на тёмном: заливка на две ступени светлее
      поверхности, линия — ещё на две. Никаких градиентов и фасок. */
   --btn-face:#31312e; --btn-face-2:#3d3c39; --btn-line:#62605b;
-  --pos:#71d083; --neg:#ff9592; --warn:#ffca16; --info:#70b8ff;
-  --pos-soft:#1b2a1e; --neg-soft:#3b1219; --warn-soft:#302008;
+  /* Статусы намеренно уведены от акцента: нефрит, чистый красный,
+     жёлтый и циан — их не спутать с оранжевым ни в таблице, ни на графике. */
+  --pos:#1fd8a4; --neg:#ec5d5e; --warn:#f5e147; --info:#4ccce6;
+  --pos-soft:#0f2e22; --neg-soft:#3b1219; --warn-soft:#2d2305;
   --shadow:0 10px 30px rgba(0,0,0,0.45);
   color-scheme: dark;
 }
@@ -37,11 +39,11 @@
   --bg:#f9f9f8; --surface:#ffffff; --surface-2:#f1f0ef; --surface-3:#e9e8e6;
   --border:#dad9d6; --border-strong:#bcbbb5;
   --text:#21201c; --text-2:#63635e; --text-3:#63635e;
-  --accent:#BE4708; --accent-hover:#8A3405; --accent-soft:#FFEEDD; --accent-tint:#FBD3B2; --accent-line:#F0A472;
+  --accent:#BE4708; --accent-hover:#8A3405; --accent-soft:#FFEEDD; --accent-tint:#FBD3B2; --accent-line:#F0A472; --item-new:#FFEEDD;
   --accent-solid:#C24A08; --on-accent:#FFFFFF;
   --btn-face:#FFFFFF; --btn-face-2:#F1EFEC; --btn-line:#B8B5AE;
-  --pos:#2a7e3b; --neg:#ce2c31; --warn:#ab6400; --info:#0d74ce;
-  --pos-soft:#e9f6e9; --neg-soft:#feebec; --warn-soft:#fff7c2;
+  --pos:#208368; --neg:#ce2c31; --warn:#9e6c00; --info:#107d98;
+  --pos-soft:#e6f7ed; --neg-soft:#feebec; --warn-soft:#fffab8;
   --shadow:0 10px 30px rgba(60,56,48,0.10);
   color-scheme: light;
 }
@@ -399,10 +401,7 @@ textarea.inp { height:auto; padding:10px var(--s3); resize:vertical; }
 .item { display:flex; gap:var(--s3); padding:var(--s4); border-bottom:1px solid var(--border); cursor:pointer; }
 .item:last-of-type { border-bottom:none; }
 .item:hover { background:var(--surface-2); }
-.item { position:relative; }
-.item.new { background:var(--surface-2); }
-.item.new::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
-  background:var(--accent); }
+.item.new { background:var(--item-new); }
 .it-ic { width:30px; height:30px; flex:0 0 30px; border-radius:var(--r-sm); display:flex; align-items:center;
   justify-content:center; border:1px solid var(--border); }
 .it-t { font-size:var(--fs-3); font-weight:500; }
@@ -793,21 +792,3 @@ select.sel-inp option { background:var(--surface); color:var(--text); }
   .umenu { max-width:calc(100vw - 24px); }
 }
 
-/* ── временный переключатель палитр (удаляется после выбора) ── */
-#palette-bar { position:fixed; right:18px; bottom:18px; z-index:200; display:flex;
-  flex-direction:column; align-items:flex-end; gap:8px; }
-.pal-tab { height:38px; padding:0 16px; border-radius:99px; cursor:pointer;
-  border:1px solid var(--btn-line); background:var(--btn-face); color:var(--text);
-  font-family:var(--sans); font-size:var(--fs-2); font-weight:500; box-shadow:var(--shadow); }
-.pal-list { display:none; width:270px; padding:8px; border-radius:var(--r);
-  background:var(--surface); border:1px solid var(--border); box-shadow:var(--shadow); }
-#palette-bar.open .pal-list { display:block; }
-.pal-h { font-size:var(--fs-1); color:var(--text-3); padding:6px 8px 8px; }
-.pal-i { display:flex; align-items:center; gap:10px; width:100%; text-align:left; cursor:pointer;
-  padding:8px; border-radius:var(--r-sm); border:1px solid transparent; background:none;
-  color:var(--text); font-family:var(--sans); }
-.pal-i:hover { background:var(--surface-2); }
-.pal-i.on { border-color:var(--accent-line); background:var(--accent-soft); }
-.pal-dot { width:20px; height:20px; border-radius:6px; flex:0 0 20px; }
-.pal-i b { display:block; font-size:var(--fs-2); font-weight:500; }
-.pal-i i { display:block; font-size:var(--fs-1); color:var(--text-3); font-style:normal; margin-top:1px; }
