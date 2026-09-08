@@ -8,7 +8,6 @@
     { cap: 'Workspace' },
     { key: 'stats',         icon: 'stats',  label: 'Statistics' },
     { key: 'campaigns',     icon: 'camp',   label: 'Campaigns',      badge: 'campaigns' },
-    { key: 'zones',         icon: 'zones',  label: 'Placements' },
     { key: 'volumes',       icon: 'volume', label: 'Traffic volumes' },
     { cap: 'Integrations' },
     { key: 'postback',      icon: 'post',   label: 'Postback' },
