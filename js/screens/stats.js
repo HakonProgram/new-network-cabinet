@@ -487,50 +487,80 @@
       };
       var dimOpts = DIMS.map(function (x) { return { id: x.k, label: x.label }; });
 
+      /* Фильтры, вынесенные в чипы: только то, что реально выбрано. */
+      var CHIP_LABEL = {
+        campaign: 'Campaign', country: 'Country', city: 'City', platform: 'Platform', os: 'OS',
+        format: 'Format', model: 'Model', browser: 'Browser', connection: 'Connection',
+        zone: 'Placement', isp: 'ISP', cpaTest: 'CPA test'
+      };
+      var OPTS = {
+        campaign: campaignOpts, country: countryOpts, zone: zoneOpts,
+        city: shareOpts('city', ''), platform: shareOpts('platform', ''), os: shareOpts('os', ''),
+        browser: shareOpts('browser', ''), connection: shareOpts('connection', ''),
+        isp: shareOpts('isp', ''), cpaTest: shareOpts('cpaTest', ''),
+        format: anyOpts(DATA.FORMATS.map(function (x) { return { id: x, label: x }; }), ''),
+        model: anyOpts(DATA.PAY_MODELS.map(function (m) { return { id: m.name, label: m.name }; }), '')
+      };
+      var activeKeys = Object.keys(CHIP_LABEL).filter(function (k) { return form[k]; });
+      var chips = activeKeys.map(function (k) {
+        var opt = (OPTS[k] || []).find(function (o) { return String(o.id) === String(form[k]); });
+        return '<span class="fchip">' + CHIP_LABEL[k] + ': <b>' + esc(opt ? opt.label : form[k]) + '</b>' +
+          '<span class="x" data-act="dropFilter" data-arg="' + k + '">' + icon('close', 11, 2.4) + '</span></span>';
+      }).join('');
+
+      var more = s.ui.statsMore;
       var filters =
-        '<div class="card filters"><div class="card-b">' +
-          '<div class="filt-row">' +
-            '<div class="filt wide"><label class="lab">Period</label>' +
-              '<div class="segs wrap">' + presets + '</div></div>' +
+        '<div class="card repbar"><div class="repbar-main">' +
+          '<div class="segs">' + presets + '</div>' +
+          '<div class="rb-dates">' +
+            '<input class="inp" type="date" value="' + esc(form.from || d.period.from) + '" data-inp="from" title="From">' +
+            '<span class="rb-dash">—</span>' +
+            '<input class="inp" type="date" value="' + esc(form.to || d.period.to) + '" data-inp="to" title="To">' +
           '</div>' +
-          '<div class="filt-row">' +
-            '<div class="filt"><label class="lab">From</label>' +
-              '<input class="inp" type="date" value="' + esc(form.from || d.period.from) + '" data-inp="from"></div>' +
-            '<div class="filt"><label class="lab">To</label>' +
-              '<input class="inp" type="date" value="' + esc(form.to || d.period.to) + '" data-inp="to"></div>' +
-            '<div class="filt"><label class="lab">Delta</label>' +
-              '<input class="inp" type="text" placeholder="days back" value="' + esc(form.delta) + '" data-inp="delta">' +
-              '<span class="hint">Compare with the same span N days earlier</span></div>' +
-            field('Group by', 'groupBy', dimOpts) +
-            field('Then by', 'groupBy2', anyOpts(dimOpts, 'Nothing')) +
+          '<div class="rb-group">' +
+            '<span class="rb-lab">Group by</span>' +
+            UI.selectKV('groupBy', dimOpts, form.groupBy) +
+            '<span class="rb-lab">then</span>' +
+            UI.selectKV('groupBy2', anyOpts(dimOpts, 'nothing'), form.groupBy2) +
           '</div>' +
-          '<div class="filt-row">' +
-            field('Campaigns', 'campaign', campaignOpts, true) +
-            field('Countries', 'country', countryOpts) +
-            field('Cities', 'city', shareOpts('city', 'All cities')) +
-            field('Platform', 'platform', shareOpts('platform', 'All platforms')) +
-          '</div>' +
-          '<div class="filt-row">' +
-            field('OSs', 'os', shareOpts('os', 'All systems')) +
-            field('Formats', 'format', anyOpts(DATA.FORMATS.map(function (x) { return { id: x, label: x }; }), 'All formats')) +
-            field('Business model', 'model', anyOpts(DATA.PAY_MODELS.map(function (m) { return { id: m.name, label: m.name }; }), 'All models')) +
-            field('Browsers', 'browser', shareOpts('browser', 'All browsers')) +
-          '</div>' +
-          '<div class="filt-row">' +
-            field('Connection', 'connection', shareOpts('connection', 'Any connection')) +
-            field('Zones', 'zone', zoneOpts) +
-            field('ISP', 'isp', shareOpts('isp', 'All networks')) +
-            field('CPA tests', 'cpaTest', shareOpts('cpaTest', 'All campaigns')) +
-          '</div>' +
-          '<div class="filt-foot">' +
-            '<span class="hint">System timezone is UTC · ' + esc(d.period.from) + ' — ' + esc(d.period.to) +
-              ' (' + d.n + ' ' + UI.plural(d.n, 'day', 'days') + ')</span>' +
-            '<button class="btn" data-act="resetFilters">Reset</button>' +
+          '<div class="rb-acts">' +
+            '<button class="btn' + (more ? ' on' : '') + '" data-act="toggleMore">' +
+              icon('gear', 14, 1.9) + 'Filters' + (activeKeys.length ? ' · ' + activeKeys.length : '') + '</button>' +
             '<button class="btn" data-act="csv">' + icon('download', 14, 1.9) + 'CSV</button>' +
             '<button class="btn btn-pri" data-act="applyFilters">' +
               (dirty ? 'Get statistics' : 'Refresh') + '</button>' +
           '</div>' +
-        '</div></div>';
+        '</div>' +
+        (chips || form.delta
+          ? '<div class="repbar-chips">' + chips +
+            (form.delta ? '<span class="fchip">Delta: <b>' + esc(form.delta) + 'd</b>' +
+              '<span class="x" data-act="dropFilter" data-arg="delta">' + icon('close', 11, 2.4) + '</span></span>' : '') +
+            '<button class="btn btn-xs" data-act="resetFilters">Clear all</button></div>'
+          : '') +
+        (more
+          ? '<div class="repbar-more">' +
+              '<div class="filt-grid">' +
+                field('Campaigns', 'campaign', campaignOpts) +
+                field('Countries', 'country', countryOpts) +
+                field('Cities', 'city', shareOpts('city', 'All cities')) +
+                field('Placements', 'zone', zoneOpts) +
+                field('Platform', 'platform', shareOpts('platform', 'All platforms')) +
+                field('OS', 'os', shareOpts('os', 'All systems')) +
+                field('Browser', 'browser', shareOpts('browser', 'All browsers')) +
+                field('Connection', 'connection', shareOpts('connection', 'Any connection')) +
+                field('Format', 'format', anyOpts(DATA.FORMATS.map(function (x) { return { id: x, label: x }; }), 'All formats')) +
+                field('Business model', 'model', anyOpts(DATA.PAY_MODELS.map(function (m) { return { id: m.name, label: m.name }; }), 'All models')) +
+                field('ISP', 'isp', shareOpts('isp', 'All networks')) +
+                field('CPA test', 'cpaTest', shareOpts('cpaTest', 'All campaigns')) +
+                '<div class="filt"><label class="lab">Delta</label>' +
+                  '<input class="inp" type="text" placeholder="days back" value="' + esc(form.delta) + '" data-inp="delta"></div>' +
+              '</div>' +
+              '<div class="hint">Timezone UTC · ' + esc(d.period.from) + ' — ' + esc(d.period.to) +
+                ' (' + d.n + ' ' + UI.plural(d.n, 'day', 'days') + ')' +
+                ' · Delta compares the same span that many days earlier.</div>' +
+            '</div>'
+          : '') +
+        '</div>';
 
       /* Приписка «+12.4% vs 7d earlier» — только когда задан Delta. */
       function chg(cur, was, invert) {
@@ -561,8 +591,6 @@
           '<p class="sub">' + (d.scoped
             ? 'Scoped to one campaign — placements and countries are shown for its share of the account.'
             : 'Every source rolled into one report. Placements appear under our own numbering.') + '</p></div>' +
-          (d.scoped ? '<div class="scope" style="margin-left:4px">' + esc(d.scoped.name) +
-            '<span class="x" data-act="clearScope" title="Show the whole account">' + icon('close', 12, 2.4) + '</span></div>' : '') +
         '</div>' +
 
         filters +
@@ -644,6 +672,13 @@
                             country: f.country, city: f.city, platform: f.platform, os: f.os,
                             format: f.format, model: f.model, browser: f.browser,
                             connection: f.connection, zone: f.zone, isp: f.isp, cpaTest: f.cpaTest });
+      },
+      toggleMore: function () { Store.ui('statsMore', !Store.get().ui.statsMore); },
+      dropFilter: function (name) {
+        Store.set(function (s) {
+          s.ui.statsForm[name] = '';
+          s.ui.statsApplied[name] = '';
+        });
       },
       resetFilters: function () {
         Store.set(function (s) {

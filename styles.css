@@ -167,6 +167,7 @@ textarea.inp { height:auto; padding:10px var(--s3); resize:vertical; }
 /* ── переключатели ── */
 .segs { display:inline-flex; padding:3px; background:var(--surface-2); border-radius:var(--r-sm); }
 .seg { display:flex; align-items:center; gap:var(--s2); height:30px; padding:0 var(--s3); border-radius:5px;
+  white-space:nowrap; flex:0 0 auto;
   color:var(--text-3); font-size:var(--fs-2); cursor:pointer; }
 .seg:hover { color:var(--text); }
 .seg.on { color:var(--text); background:var(--surface); font-weight:500; box-shadow:0 1px 2px rgba(0,0,0,0.12); }
@@ -578,18 +579,53 @@ select.sel-inp option { background:var(--surface); color:var(--text); }
   .side { transition:none; }
 }
 
-/* ── панель фильтров отчёта ── */
-.filters .card-b { gap:var(--s4); }
-.filt-row { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--s4); align-items:end; }
-.filt { display:flex; flex-direction:column; gap:var(--s2); min-width:0; }
-.filt.wide { grid-column:span 2; }
+/* ── панель отчёта ──
+   Верхняя строка всегда на виду: период, группировка, кнопки.
+   Остальные двенадцать фильтров прячутся за кнопкой Filters,
+   а выбранное показывается чипами — форма не заслоняет отчёт. */
+.repbar { padding:var(--s4) var(--s5); display:flex; flex-direction:column; gap:var(--s3); }
+.repbar-main { display:flex; align-items:center; gap:var(--s4); flex-wrap:wrap; }
+.rb-dates { display:flex; align-items:center; gap:var(--s2); }
+.rb-dates .inp { width:150px; height:var(--ctrl); }
+.rb-dash { color:var(--text-3); }
+.rb-group { display:flex; align-items:center; gap:var(--s2); }
+.rb-group .inp { height:var(--ctrl); width:150px; }
+.rb-lab { font-size:var(--fs-2); color:var(--text-2); white-space:nowrap; }
+.rb-acts { margin-left:auto; display:flex; align-items:center; gap:var(--s2); }
+.btn.on { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+
+.repbar-chips { display:flex; align-items:center; gap:var(--s2); flex-wrap:wrap;
+  padding-top:var(--s3); border-top:1px solid var(--border); }
+.fchip { display:inline-flex; align-items:center; gap:6px; font-size:var(--fs-2); color:var(--text-2);
+  background:var(--surface-2); border:1px solid var(--border); border-radius:99px; padding:4px 6px 4px 11px; }
+.fchip b { color:var(--text); font-weight:500; }
+.fchip .x { display:inline-flex; cursor:pointer; color:var(--text-3); padding:2px; border-radius:50%; }
+.fchip .x:hover { color:var(--neg); background:var(--neg-soft); }
+
+.repbar-more { padding-top:var(--s4); border-top:1px solid var(--border);
+  display:flex; flex-direction:column; gap:var(--s3); }
+.filt-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--s4); }
+.filt { display:flex; flex-direction:column; gap:6px; min-width:0; }
 .filt .lab { font-size:var(--fs-2); color:var(--text-2); }
-.filt .hint { margin:0; }
-.segs.wrap { display:flex; flex-wrap:wrap; }
-.filt-foot { display:flex; align-items:center; gap:var(--s3); flex-wrap:wrap;
-  padding-top:var(--s4); border-top:1px solid var(--border); }
-.filt-foot .hint { margin-right:auto; }
-@media (max-width:1240px) { .filt-row { grid-template-columns:repeat(3,minmax(0,1fr)); } }
-@media (max-width:900px)  { .filt-row { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-@media (max-width:700px)  { .filt-row { grid-template-columns:minmax(0,1fr); }
-  .filt.wide { grid-column:span 1; } .filt-foot .hint { width:100%; margin:0 0 var(--s2); } }
+@media (max-width:1240px) { .filt-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media (max-width:900px) {
+  .filt-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .rb-acts { margin-left:0; width:100%; }
+  .rb-dates .inp, .rb-group .inp { width:auto; flex:1; min-width:0; }
+  .rb-dates, .rb-group { width:100%; }
+}
+@media (max-width:700px) { .filt-grid { grid-template-columns:minmax(0,1fr); } }
+
+/* Крупные плитки и графики на узких экранах перестраиваются в колонки. */
+@media (max-width:1040px) {
+  .stats.s6 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+@media (max-width:900px) {
+  .charts { grid-template-columns:minmax(0,1fr); }
+  .stats.s4 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:700px) {
+  .stats.s6, .stats.s4 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .repbar { padding:var(--s4); }
+  .rb-acts { flex-wrap:wrap; }
+}

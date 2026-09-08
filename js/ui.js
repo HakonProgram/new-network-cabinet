@@ -71,9 +71,11 @@
     var sign = n < 0 ? '-' : '';
     return sign + '$' + Math.abs(Math.round(n)).toLocaleString('en-US');
   }
+  /* Копейки с разделителем тысяч: $12,480.50, а не $12480.50. */
   function money2(n) {
     var sign = n < 0 ? '-' : '';
-    return sign + '$' + (Math.round(Math.abs(n) * 100) / 100).toFixed(2);
+    return sign + '$' + (Math.round(Math.abs(n) * 100) / 100)
+      .toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
   function int(n) { return Math.round(n).toLocaleString('en-US'); }
   function compact(n) {

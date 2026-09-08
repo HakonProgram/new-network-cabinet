@@ -63,7 +63,7 @@
         campStatus: 'all', campModel: 'all', campSelection: [],
         geoPickerOpen: false, geoSearch: '', geoPick: [], geoTarget: 'new', geoBid: '', advancedOpen: false,
         /* Черновик фильтров отчёта и то, что реально применено кнопкой. */
-        statsForm: seedStatsFilters(), statsApplied: seedStatsFilters(),
+        statsForm: seedStatsFilters(), statsApplied: seedStatsFilters(), statsMore: false,
         zonesTab: 'all', zonesCat: 'all', zonesVertical: 'all', zonesSort: 'cost',
         openPreset: '',
         payMethod: 'card', payAmount: '5000', payTab: 'pay', payRange: '30',
