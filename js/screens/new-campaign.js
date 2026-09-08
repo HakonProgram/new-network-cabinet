@@ -12,6 +12,36 @@
   }
   function draft() { return Store.get().draft; }
 
+  /* Рекомендация по ступени качества: базовый бид модели, помноженный на её коэффициент. */
+  function recBid(q) {
+    var m = model();
+    return Math.max(m.min, UI.num(m.suggested) * q.bidx).toFixed(2);
+  }
+  /* По умолчанию в новой группе — рекомендация самой дорогой из выбранных ступеней. */
+  function recBidForDraft() {
+    var chosen = DATA.QUALITY.filter(function (q) { return draft().quality.indexOf(q.key) >= 0; });
+    if (!chosen.length) return model().suggested;
+    return chosen.map(recBid).reduce(function (a, b) { return UI.num(a) > UI.num(b) ? a : b; });
+  }
+
+  /* Список ОС собирается из выбранных платформ: на десктопе iOS не предлагаем. */
+  function availableOses(d) {
+    var set = {};
+    d.platforms.forEach(function (p) {
+      (DATA.PLATFORM_OS[p] || []).forEach(function (os) { set[os] = true; });
+    });
+    return DATA.OS_ORDER.filter(function (os) { return set[os]; });
+  }
+  function verRange(d, os) { return (d.osVer && d.osVer[os]) || { from: '', to: '' }; }
+  /* Понятная подпись под диапазоном: «Android 9 – 13», «iOS 16 and newer», … */
+  function verLabel(os, r) {
+    if (!r.from && !r.to) return 'All versions';
+    if (r.from && !r.to) return os + ' ' + r.from + ' and newer';
+    if (!r.from && r.to) return os + ' ' + r.to + ' and older';
+    if (r.from === r.to) return os + ' ' + r.from + ' only';
+    return os + ' ' + r.from + ' – ' + r.to;
+  }
+
   function opts(items, selected, act) {
     return items.map(function (x) {
       return '<div class="opt' + (selected === x ? ' on' : '') + '" data-act="' + act + '" data-arg="' + esc(x) + '">' + esc(x) + '</div>';
@@ -128,7 +158,7 @@
         (u.geoTarget === 'new'
           ? '<span class="hint" style="margin-left:auto">Bid</span>' +
             '<input class="inp num" style="width:96px;height:32px" type="text" value="' +
-              esc(u.geoBid || model().suggested) + '" data-inp="geoBid">'
+              esc(u.geoBid || recBidForDraft()) + '" data-inp="geoBid">'
           : '<span class="hint" style="margin-left:auto">Adding to the $' +
             esc(draft().rates[u.geoTarget] ? draft().rates[u.geoTarget].bid : '') + ' bid</span>') +
         '<button class="btn btn-sm btn-pri" data-act="addGeo">' +
@@ -202,7 +232,29 @@
         return '<div class="tile' + (on ? ' on' : '') + '" data-act="quality" data-arg="' + x.key + '">' +
           '<div class="tile-h"><div class="box' + (on ? ' on' : '') + '"></div>' +
             '<span class="tile-n">' + x.name + '</span></div>' +
-          '<div class="tile-d">' + x.desc + '</div></div>';
+          '<div class="tile-d">' + x.desc + '</div>' +
+          '<div class="tile-f"><span class="tile-v">$' + recBid(x) + '</span>' +
+            '<span class="tile-m">recommended bid</span></div></div>';
+      }).join('');
+
+      var osList = availableOses(d);
+      var verRows = d.oses.filter(function (os) {
+        return osList.indexOf(os) >= 0 && (DATA.OS_VERSIONS[os] || []).length;
+      }).map(function (os) {
+        var all = DATA.OS_VERSIONS[os], r = verRange(d, os);
+        /* «To» не может быть ниже «From» — обрезаем сам список, а не ругаемся потом. */
+        var fromOpts = ['Any'].concat(r.to ? all.slice(0, all.indexOf(r.to) + 1) : all);
+        var toOpts = ['Any'].concat(r.from ? all.slice(all.indexOf(r.from)) : all);
+        return '<div class="osv-r">' +
+          '<div class="osv-n">' + esc(os) + '</div>' +
+          UI.select('osFrom', fromOpts, r.from || 'Any', os) +
+          '<span class="osv-to">to</span>' +
+          UI.select('osTo', toOpts, r.to || 'Any', os) +
+          '<div class="osv-s">' + esc(verLabel(os, r)) + '</div>' +
+          (r.from || r.to
+            ? '<button class="btn btn-xs" data-act="osVerAll" data-arg="' + esc(os) + '">Reset</button>'
+            : '') +
+        '</div>';
       }).join('');
 
       var tokens = DATA.TOKENS.map(function (t) {
@@ -281,12 +333,18 @@
               '<div class="hint">Pick both to start on clean inventory and scale into partner supply later.</div></div>' +
             '<div class="field"><label class="lab">Traffic quality</label>' +
               '<div class="tiles">' + qualityRows + '</div>' +
-              '<div class="hint">Fresher audiences cost more. Remnant is the cheapest leftover volume.</div></div>' +
+              '<div class="hint">Recommendations are for ' + esc(model().name) + '. Set your own bid per country below — '
+                + 'the auction still decides what you actually pay.</div></div>' +
             '<div class="g2">' +
               '<div class="field"><label class="lab">Platform</label>' +
                 '<div class="opts">' + multi(['Desktop', 'Mobile', 'Tablet'], d.platforms, 'platform') + '</div></div>' +
               '<div class="field"><label class="lab">Operating systems</label>' +
-                '<div class="opts">' + multi(['Android', 'iOS', 'Windows', 'macOS'], d.oses, 'os') + '</div></div></div>' +
+                (osList.length
+                  ? '<div class="opts">' + multi(osList, d.oses, 'os') + '</div>'
+                  : '<div class="hint">Pick a platform first</div>') + '</div></div>' +
+            (verRows ? '<div class="field"><label class="lab">OS versions</label>' +
+              '<div class="osv">' + verRows + '</div>' +
+              '<div class="hint">Leave a range open to take everything on that side.</div></div>' : '') +
           '</div></div>' +
 
         /* 03 */
@@ -438,14 +496,30 @@
       platform: function (v) {
         Store.set(function (s) {
           var i = s.draft.platforms.indexOf(v);
-          if (i >= 0) s.draft.platforms.splice(i, 1); else s.draft.platforms.push(v);
+          if (i >= 0) s.draft.platforms.splice(i, 1);
+          else {
+            s.draft.platforms.push(v);
+            /* Включили платформу — её системы сразу в наборе, снимать лишние проще, чем искать. */
+            (DATA.PLATFORM_OS[v] || []).forEach(function (os) {
+              if (s.draft.oses.indexOf(os) < 0) s.draft.oses.push(os);
+            });
+          }
+          var ok = availableOses(s.draft);
+          s.draft.oses = ok.filter(function (os) { return s.draft.oses.indexOf(os) >= 0; });
+          Object.keys(s.draft.osVer).forEach(function (os) {
+            if (s.draft.oses.indexOf(os) < 0) delete s.draft.osVer[os];
+          });
         });
       },
       os: function (v) {
         Store.set(function (s) {
           var i = s.draft.oses.indexOf(v);
-          if (i >= 0) s.draft.oses.splice(i, 1); else s.draft.oses.push(v);
+          if (i >= 0) { s.draft.oses.splice(i, 1); delete s.draft.osVer[v]; }
+          else s.draft.oses.push(v);
         });
+      },
+      osVerAll: function (os) {
+        Store.set(function (s) { delete s.draft.osVer[os]; });
       },
 
       /* ── страны ── */
@@ -479,7 +553,7 @@
         var n = u.geoPick.length;
         if (!n) { App.toast('Pick at least one country'); return; }
         var m = model();
-        var bid = u.geoTarget === 'new' ? String(u.geoBid || m.suggested).trim() : null;
+        var bid = u.geoTarget === 'new' ? String(u.geoBid || recBidForDraft()).trim() : null;
         if (bid !== null && UI.num(bid) < m.min) {
           App.toast('Bid is below the $' + m.min.toFixed(2) + ' minimum for ' + m.name);
           return;
@@ -586,6 +660,22 @@
       geoSearch: function (v) { Store.set(function (s) { s.ui.geoSearch = v; s.ui.geoPick = []; }); },
       /* Пока печатаешь — ничего не перерисовываем, иначе поле дёргается.
          Ставка уходит в расчёт, когда уводишь фокус. */
+      osFrom: function (v, os) {
+        Store.set(function (s) {
+          var r = s.draft.osVer[os] || { from: '', to: '' };
+          r.from = v === 'Any' ? '' : v;
+          s.draft.osVer[os] = r;
+          if (!r.from && !r.to) delete s.draft.osVer[os];
+        });
+      },
+      osTo: function (v, os) {
+        Store.set(function (s) {
+          var r = s.draft.osVer[os] || { from: '', to: '' };
+          r.to = v === 'Any' ? '' : v;
+          s.draft.osVer[os] = r;
+          if (!r.from && !r.to) delete s.draft.osVer[os];
+        });
+      },
       geoBid: function (v) { Store.patch(function (s) { s.ui.geoBid = v; }); },
       /* Пока печатаешь — не перерисовываем. По уходу фокуса строки с одинаковым бидом сливаем. */
       bid: function (v, i, type) {

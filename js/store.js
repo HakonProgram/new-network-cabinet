@@ -21,6 +21,8 @@
       capping: '1 impression / 24 hours', browsers: 'All browsers', language: 'Any language',
       sources: ['direct'], quality: ['fresh', 'regular'],
       platforms: ['Mobile'], oses: ['Android', 'iOS'],
+      /* osVer[os] = { from, to }; пусто — все версии. */
+      osVer: {},
       conn: 'All', vpn: 'No VPN',
       preset: '', subzones: '', subzoneMode: 'Exclude',
       daily: '400', total: '4000',

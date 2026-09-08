@@ -203,12 +203,31 @@
   ];
 
   /* Качество аудитории: чем свежее пользователь, тем он дороже. */
+  /* bidx — во сколько раз ступень дороже базовой рекомендации модели. */
   var QUALITY = [
-    { key: 'fresh',   name: 'Fresh users',     desc: 'Have seen the fewest ads' },
-    { key: 'regular', name: 'Regular users',   desc: 'Average activity' },
-    { key: 'aged',    name: 'Aged users',      desc: 'Have seen a lot already' },
-    { key: 'remnant', name: 'Remnant traffic', desc: 'Leftover inventory at the lowest price' }
+    { key: 'fresh',   name: 'Fresh users',     desc: 'Have seen the fewest ads',                bidx: 1.25 },
+    { key: 'regular', name: 'Regular users',   desc: 'Average activity',                        bidx: 1.00 },
+    { key: 'aged',    name: 'Aged users',      desc: 'Have seen a lot already',                 bidx: 0.80 },
+    { key: 'remnant', name: 'Remnant traffic', desc: 'Leftover inventory at the lowest price',  bidx: 0.60 }
   ];
+
+  /* На десктопе не бывает iOS — список ОС собирается из выбранных платформ. */
+  var PLATFORM_OS = {
+    Desktop: ['Windows', 'macOS', 'Linux', 'Chrome OS'],
+    Mobile:  ['Android', 'iOS'],
+    Tablet:  ['Android', 'iPadOS']
+  };
+  var OS_ORDER = ['Windows', 'macOS', 'Linux', 'Chrome OS', 'Android', 'iOS', 'iPadOS'];
+  /* Версии от старой к новой. Пустой список — версия не таргетируется. */
+  var OS_VERSIONS = {
+    Windows:     ['7', '8.1', '10', '11'],
+    macOS:       ['11', '12', '13', '14', '15', '26'],
+    Linux:       [],
+    'Chrome OS': [],
+    Android:     ['6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'],
+    iOS:         ['12', '13', '14', '15', '16', '17', '18', '26'],
+    iPadOS:      ['13', '14', '15', '16', '17', '18', '26']
+  };
 
   var COUNTRIES = [
     { code: 'DE', name: 'Germany' },        { code: 'US', name: 'United States' },
@@ -233,6 +252,7 @@
 
   w.DATA = {
     PAY_MODELS: PAY_MODELS, STATUS: STATUS, CAMPAIGNS: CAMPAIGNS,
+    PLATFORM_OS: PLATFORM_OS, OS_ORDER: OS_ORDER, OS_VERSIONS: OS_VERSIONS,
     ZONES: buildZones(), GEO: GEO, GEO_POOL: GEO_POOL, PRESETS: PRESETS,
     PAY_METHODS: PAY_METHODS, PAYMENTS: PAYMENTS, INVOICES: INVOICES,
     NOTIFICATIONS: NOTIFICATIONS, DOCS: DOCS, FILES: FILES, PAYOUT: PAYOUT,

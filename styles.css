@@ -474,3 +474,17 @@ select.sel-inp { appearance:none; -webkit-appearance:none; cursor:pointer; paddi
   background-position:calc(100% - 18px) calc(50% + 1px), calc(100% - 13px) calc(50% + 1px);
   background-size:5px 5px, 5px 5px; background-repeat:no-repeat; color:var(--text); }
 select.sel-inp option { background:var(--surface); color:var(--text); }
+
+/* ── версии ОС: строка на систему, диапазон «от – до» ── */
+.osv { display:flex; flex-direction:column; gap:var(--s2); }
+.osv-r { display:grid; grid-template-columns:120px 108px auto 108px minmax(0,1fr) auto;
+  align-items:center; gap:var(--s3); padding:var(--s3) var(--s4);
+  border:1px solid var(--border); border-radius:var(--r-sm); background:var(--surface-2); }
+.osv-n { font-size:var(--fs-3); font-weight:500; }
+.osv-r .inp { height:36px; }
+.osv-to { font-size:var(--fs-2); color:var(--text-3); }
+.osv-s { font-size:var(--fs-2); color:var(--text-2); font-variant-numeric:tabular-nums; }
+@media (max-width:860px) {
+  .osv-r { grid-template-columns:1fr auto 1fr; grid-template-areas:'n n n' 'f t o' 's s s'; }
+  .osv-n { grid-area:n; } .osv-to { grid-area:t; } .osv-s { grid-area:s; }
+}
