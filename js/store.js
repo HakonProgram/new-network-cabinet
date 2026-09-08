@@ -89,6 +89,19 @@
   var state = null;
   var listeners = [];
 
+  /* Сохранённое состояние сливаем на два уровня: иначе объект, лежащий
+     внутри ui (форма входа, фильтры отчёта), приходит из старого
+     хранилища целиком и затирает поля, добавленные позже. */
+  function mergeState(base, saved) {
+    var out = Object.assign({}, base, saved || {});
+    Object.keys(base).forEach(function (k) {
+      var b = base[k], v = (saved || {})[k];
+      var plain = function (x) { return x && typeof x === 'object' && !Array.isArray(x); };
+      if (plain(b) && plain(v)) out[k] = Object.assign({}, b, v);
+    });
+    return out;
+  }
+
   function load() {
     try {
       var raw = localStorage.getItem(KEY);
@@ -96,8 +109,8 @@
         var parsed = JSON.parse(raw);
         var base = seed(parsed.session ? parsed.session.mode : 'demo');
         state = Object.assign({}, base, parsed);
-        state.ui = Object.assign({}, base.ui, parsed.ui || {});
-        state.draft = Object.assign({}, base.draft, parsed.draft || {});
+        state.ui = mergeState(base.ui, parsed.ui);
+        state.draft = mergeState(base.draft, parsed.draft);
         return;
       }
     } catch (e) { /* повреждённое хранилище — начинаем заново */ }
