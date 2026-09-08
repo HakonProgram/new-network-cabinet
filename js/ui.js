@@ -13,6 +13,7 @@
     bell:    '<path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"/><path d="M10.5 19a1.8 1.8 0 0 0 3 0"/>',
     help:    '<circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.3 2.4c-.6.2-.9.7-.9 1.3v.5"/><path d="M12 17h.01"/>',
     plus:    '<path d="M12 5v14M5 12h14"/>',
+    menu:    '<path d="M4 7h16M4 12h16M4 17h16"/>',
     search:  '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
     right:   '<path d="m9 6 6 6-6 6"/>',
     left:    '<path d="m15 6-6 6 6 6"/>',

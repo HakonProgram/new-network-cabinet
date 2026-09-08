@@ -45,6 +45,12 @@
     render();
   }
 
+  /* Боковое меню на узких экранах — выдвижная панель. Состояние держим
+     на корневом элементе: оно эфемерное и переживать перезагрузку не должно. */
+  function nav(open) {
+    d.documentElement.setAttribute('data-nav', open ? 'open' : '');
+  }
+
   function route() {
     var h = (location.hash || '').replace(/^#\/?/, '');
     return ROUTES[h] ? h : 'campaigns';
@@ -111,8 +117,10 @@
           '</div>' +
         '</div>' +
       '</aside>' +
+      '<div class="scrim" data-act="closeNav"></div>' +
       '<div class="main">' +
         '<div class="topbar">' +
+          '<div class="icon-btn nav-toggle" data-act="openNav" title="Menu">' + icon('menu', 18) + '</div>' +
           '<div class="crumbs" id="crumbs">' + crumbsHtml() + '</div>' +
           '<div class="balance">' +
             '<div><div class="bal-lab">Balance</div><div class="bal-val num" id="balance">' + UI.money2(s.balance) + '</div></div>' +
@@ -249,12 +257,15 @@
       var goEl = ev.target.closest('[data-go]');
       if (goEl) {
         ev.preventDefault();
+        nav(false);
         go(goEl.dataset.go);
         return;
       }
       var actEl = ev.target.closest('[data-act]');
       if (!actEl) return;
       if (actEl.dataset.act === 'theme') { ev.preventDefault(); toggleTheme(); return; }
+      if (actEl.dataset.act === 'openNav') { ev.preventDefault(); nav(true); return; }
+      if (actEl.dataset.act === 'closeNav') { ev.preventDefault(); nav(false); return; }
       var sc = screen();
       var fn = sc.actions && sc.actions[actEl.dataset.act];
       if (fn) {
@@ -273,7 +284,12 @@
     app.addEventListener('input', onField);
     app.addEventListener('change', onField);
 
+    d.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape') nav(false);
+    });
+
     w.addEventListener('hashchange', function () {
+      nav(false);
       current = route();
       w.scrollTo(0, 0);
       render();

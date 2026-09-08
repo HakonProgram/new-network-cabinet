@@ -203,8 +203,8 @@
           '<div class="geo-cell">' + chips +
             '<button class="btn btn-xs" data-act="openGeo" data-arg="' + i + '">' +
               icon('plus', 11, 2.4) + 'Add</button></div>' +
-          '<input class="inp num" type="text" value="' + esc(g.bid) + '" data-inp="bid" data-arg="' + i + '">' +
-          '<input class="inp num" type="text" value="' + esc(g.goal) + '" placeholder="optional" data-inp="goal" data-arg="' + i + '">' +
+          '<input class="inp num" type="text" value="' + esc(g.bid) + '" placeholder="bid" data-inp="bid" data-arg="' + i + '">' +
+          '<input class="inp num" type="text" value="' + esc(g.goal) + '" placeholder="CPA goal" data-inp="goal" data-arg="' + i + '">' +
           '<div class="del" data-act="delGroup" data-arg="' + i + '" title="Remove this bid">' +
             icon('trash', 14, 1.9) + '</div>' +
         '</div>';

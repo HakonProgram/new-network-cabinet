@@ -1,6 +1,12 @@
 /* Billing: top-ups and transaction history. */
 (function (w) {
   'use strict';
+
+  var MINW = {};
+  function minw(cols) {
+    if (!MINW[cols]) MINW[cols] = UI.gridMin(cols);
+    return MINW[cols];
+  }
   var icon = UI.icon, esc = UI.esc;
 
   function method() {
@@ -129,11 +135,13 @@
               '<div class="segs" style="margin-left:auto">' + ranges + '</div>' +
               '<button class="btn btn-sm" data-act="csv">' + icon('download', 13, 1.9) + 'CSV</button>' +
             '</div>' +
-            '<div class="table" style="border-radius:10px">' +
-              '<div class="tr thead" style="grid-template-columns:' + cols + '">' +
+            '<div class="table" style="border-radius:10px"><div class="table-scroll">' +
+              '<div class="tr thead" style="grid-template-columns:' + cols + ';' + minw(cols) + '">' +
                 heads.map(function (h, i) { return '<div class="th ' + align[i] + '">' + h + '</div>'; }).join('') +
               '</div>' +
-              rows.map(function (r) { return '<div class="tr row" style="grid-template-columns:' + cols + '">' + r + '</div>'; }).join('') +
+              rows.map(function (r) {
+                return '<div class="tr row" style="grid-template-columns:' + cols + ';' + minw(cols) + '">' + r + '</div>';
+              }).join('') + '</div>' +
               '<div class="foot"><span>' + footLeft + '</span>' +
               '<span style="margin-left:auto">Updated an hour ago</span></div>' +
             '</div>' +

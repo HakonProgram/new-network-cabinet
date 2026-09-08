@@ -62,7 +62,7 @@ button, input, textarea { font-family:inherit; font-size:inherit; }
 ::selection { background:var(--accent-soft); }
 
 /* ── каркас ── */
-.app { display:flex; min-height:100vh; min-width:1240px; }
+.app { display:flex; min-height:100vh; }
 .side { width:224px; flex:0 0 224px; background:var(--surface); border-right:1px solid var(--border);
   padding:var(--s5) 0; }
 .side-inner { position:sticky; top:var(--s5); display:flex; flex-direction:column; gap:var(--s6); }
@@ -376,7 +376,7 @@ textarea.inp { height:auto; padding:10px var(--s3); resize:vertical; }
 .pb { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:var(--s7); align-items:start; }
 .step { display:flex; gap:var(--s3); }
 .step-n { width:22px; flex:0 0 22px; font-size:var(--fs-2); color:var(--text-3); font-variant-numeric:tabular-nums; }
-.step-t { font-size:var(--fs-2); color:var(--text-2); line-height:1.6; }
+.step-t { font-size:var(--fs-2); color:var(--text-2); line-height:1.6; min-width:0; }
 .step-t b { color:var(--text); font-weight:500; }
 .code { display:block; padding:10px var(--s3); border-radius:var(--r-sm); background:var(--bg);
   border:1px solid var(--border); font-family:var(--mono); font-size:var(--fs-1); color:var(--text-2);
@@ -518,3 +518,62 @@ select.sel-inp option { background:var(--surface); color:var(--text); }
   content:''; position:absolute; top:0; bottom:0; width:1px; background:var(--border); }
 .table.pin .tr > :first-child::after { right:-6px; }
 .table.pin-end .tr > :last-child::before { left:6px; }
+
+
+/* ═══════════════════════════════════════════════════════════
+   Адаптив. Ступени: 1240 — тесный десктоп, 1040 — ноутбук,
+   900 — меню уезжает в панель, 700 — одна колонка.
+   Таблицы никогда не ломаются: они прокручиваются вбок,
+   а колонка управления остаётся закреплённой.
+   ═══════════════════════════════════════════════════════════ */
+.nav-toggle { display:none; }
+.scrim { display:none; }
+.crumbs { min-width:0; }
+.crumbs b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+@media (max-width:1240px) {
+  .page { padding:var(--s5) var(--s5) var(--s7); }
+  .kpis.k6 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .tiles { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+@media (max-width:1040px) {
+  .g3 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .kpis, .kpis.k5 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+
+@media (max-width:900px) {
+  /* Панель сдвигаем координатой, а не transform: так она ведёт себя
+     одинаково во всех окружениях, включая встроенные предпросмотры. */
+  .side { position:fixed; top:0; bottom:0; left:-280px; z-index:60; width:268px; flex-basis:0;
+    overflow-y:auto; transition:left .22s ease; box-shadow:var(--shadow); }
+  :root[data-nav="open"] .side { left:0; }
+  .side-inner { position:static; }
+  :root[data-nav="open"] .scrim { display:block; position:fixed; inset:0; z-index:50;
+    background:rgba(0,0,0,0.45); }
+  .nav-toggle { display:flex; }
+  .topbar { padding:0 var(--s4); gap:var(--s3); }
+  .balance { gap:var(--s3); }
+  .bal-lab { display:none; }
+  .g2, .g3, .two, .pb { grid-template-columns:minmax(0,1fr); }
+  .segs { max-width:100%; overflow-x:auto; }
+}
+
+@media (max-width:700px) {
+  /* Строка «страны — бид — цель» складывается: страны сверху, поля под ними. */
+  .rate-h { display:none; }
+  .rate-r { grid-template-columns:minmax(0,1fr) minmax(0,1fr) 36px; row-gap:var(--s2); }
+  .rate-r > :first-child { grid-column:1 / -1; }
+  .page { padding:var(--s4) var(--s4) var(--s7); gap:var(--s5); }
+  .h1 { font-size:var(--fs-5); }
+  .head { align-items:flex-start; }
+  .kpis, .kpis.k5, .kpis.k6 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .tiles, .tiles.t2 { grid-template-columns:minmax(0,1fr); }
+  .card-b, .card-h { padding-left:var(--s4); padding-right:var(--s4); }
+  .balance .btn span { display:none; }
+  .balance .btn { padding:0 var(--s3); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .side { transition:none; }
+}
