@@ -84,11 +84,11 @@
           '<div class="brand" data-go="campaigns">' +
             '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">' +
               '<rect x="0.5" y="0.5" width="25" height="25" rx="7" fill="#12100E" stroke="#312F2C"/>' +
-              '<circle cx="8" cy="8" r="1.6" fill="#6C6760"/><circle cx="13" cy="7" r="1.6" fill="#6C6760"/>' +
-              '<circle cx="18" cy="8" r="1.6" fill="#6C6760"/><circle cx="19" cy="13" r="1.6" fill="#6C6760"/>' +
-              '<circle cx="18" cy="18" r="1.6" fill="#6C6760"/><circle cx="13" cy="19" r="1.6" fill="#6C6760"/>' +
-              '<circle cx="8" cy="18" r="1.6" fill="#6C6760"/><circle cx="7" cy="13" r="1.6" fill="#6C6760"/>' +
-              '<circle cx="13" cy="13" r="3.2" fill="#F0B13F"/>' +
+              '<circle cx="8" cy="8" r="1.6" fill="#625E59"/><circle cx="13" cy="7" r="1.6" fill="#625E59"/>' +
+              '<circle cx="18" cy="8" r="1.6" fill="#625E59"/><circle cx="19" cy="13" r="1.6" fill="#625E59"/>' +
+              '<circle cx="18" cy="18" r="1.6" fill="#625E59"/><circle cx="13" cy="19" r="1.6" fill="#625E59"/>' +
+              '<circle cx="8" cy="18" r="1.6" fill="#625E59"/><circle cx="7" cy="13" r="1.6" fill="#625E59"/>' +
+              '<circle cx="13" cy="13" r="3.2" fill="#C4995B"/>' +
             '</svg>' +
             '<div><div class="brand-name">New Network</div><div class="brand-sub">Advertiser</div></div>' +
           '</div>' +

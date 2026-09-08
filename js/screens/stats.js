@@ -103,7 +103,7 @@
     return t.values.map(function (v) {
       var y = G.B - (v / t.top) * (G.B - G.T);
       return '<line x1="' + G.L + '" y1="' + y.toFixed(1) + '" x2="' + G.R + '" y2="' + y.toFixed(1) + '" stroke="#252220" stroke-width="1"/>' +
-        '<text x="' + (G.L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="#6C6760" font-size="10" text-anchor="end">' + fmt(v) + '</text>';
+        '<text x="' + (G.L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="#625E59" font-size="10" text-anchor="end">' + fmt(v) + '</text>';
     }).join('');
   }
 
@@ -112,7 +112,7 @@
     for (i = 0; i < n; i += step) idx.push(i);
     if (idx[idx.length - 1] !== n - 1) idx.push(n - 1);
     return idx.map(function (j) {
-      return '<text x="' + fx(j).toFixed(1) + '" y="170" fill="#6C6760" font-size="10" text-anchor="middle">' +
+      return '<text x="' + fx(j).toFixed(1) + '" y="170" fill="#625E59" font-size="10" text-anchor="middle">' +
         UI.dayLabel(n - 1 - j) + '</text>';
     }).join('');
   }
@@ -162,7 +162,7 @@
       var y = zero - q * half;
       return '<line x1="' + G.L + '" y1="' + y.toFixed(1) + '" x2="' + G.R + '" y2="' + y.toFixed(1) +
         '" stroke="' + (q === 0 ? '#312F2C' : '#252220') + '" stroke-width="1"/>' +
-        '<text x="' + (G.L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="#6C6760" font-size="10" text-anchor="end">' +
+        '<text x="' + (G.L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="#625E59" font-size="10" text-anchor="end">' +
         (q === 0 ? '0' : (q > 0 ? '' : '-') + '$' + UI.compact(t.top * Math.abs(q))) + '</text>';
     }).join('');
 
@@ -170,7 +170,7 @@
       var h = Math.max(2, Math.abs(v) / t.top * half);
       var y = v >= 0 ? zero - h : zero;
       return '<rect data-i="' + i + '" x="' + (G.L + i * band + (band - bw) / 2).toFixed(1) + '" y="' + y.toFixed(1) +
-        '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3" fill="' + (v >= 0 ? '#3FA96B' : '#E0655C') + '"/>';
+        '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3" fill="' + (v >= 0 ? '#63A471' : '#C56B65') + '"/>';
     }).join('');
 
     return svgOpen(id, label) + grid + bars +
@@ -200,7 +200,7 @@
         rows: DATA.ZONES.map(function (z, i) {
           var st = Store.zoneState(z, cid), on = st === 'live';
           return '<div class="cell mono w">' + z.id + '</div>' +
-            '<div class="cell"><span class="dot" style="background:' + (z.cat === 'Adult' ? '#D98BB0' : '#43B2AC') + '"></span>' + z.cat + '</div>' +
+            '<div class="cell"><span class="dot" style="background:' + (z.cat === 'Adult' ? '#B9829C' : '#56A19E') + '"></span>' + z.cat + '</div>' +
             '<div class="cell muted">' + z.vertical + '</div>' + metricCells(zr[i]) +
             '<div><span class="' + ZSTATE[st].pill + '">' + ZSTATE[st].label + '</span></div>' +
             '<div class="acts"><button class="btn btn-xs ' + (on ? 'btn-danger' : 'btn-up') +
@@ -331,13 +331,13 @@
 
         '<div class="charts">' +
           chartCard('Cost by day', period + ', dollars', tm.cost, 'A',
-            lineChart(d.cost, 'svgA', 'Cost by day', '#F0B13F', function (v) { return v === 0 ? '0' : '$' + UI.compact(v); })) +
+            lineChart(d.cost, 'svgA', 'Cost by day', '#C4995B', function (v) { return v === 0 ? '0' : '$' + UI.compact(v); })) +
           chartCard('Conversions by day', period + ', confirmed actions', tm.conv, 'B',
-            barChart(d.conv, 'svgB', 'Conversions by day', '#43B2AC', function (v) { return UI.int(v); })) +
+            barChart(d.conv, 'svgB', 'Conversions by day', '#56A19E', function (v) { return UI.int(v); })) +
           chartCard('Profit by day', period + ', revenue minus cost', tm.profit, 'C',
             divChart(profitSeries, 'svgC', 'Profit by day')) +
           chartCard('Win rate by day', period + ', share of auctions won', tm.win, 'D',
-            lineChart(d.win, 'svgD', 'Win rate by day', '#43B2AC', function (v) { return v.toFixed(0) + '%'; })) +
+            lineChart(d.win, 'svgD', 'Win rate by day', '#56A19E', function (v) { return v.toFixed(0) + '%'; })) +
         '</div>' +
 
         '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
@@ -444,7 +444,7 @@
       var x = (ev.clientX - rect.left) / rect.width * G.W;
       var i = Math.max(0, Math.min(n - 1, Math.floor((x - G.L) / band)));
       bars.forEach(function (b, j) {
-        b.setAttribute('fill', j === i ? (diverging ? (series[j] >= 0 ? '#55C98D' : '#F08A82') : '#5FD0C9') : base[j]);
+        b.setAttribute('fill', j === i ? (diverging ? (series[j] >= 0 ? '#74B382' : '#CE7A74') : '#6DB6B3') : base[j]);
       });
       var b = bars[i];
       var cy = diverging

@@ -11,10 +11,10 @@
     { k: 'sys',   label: 'System' }
   ];
   var STYLE = {
-    ok:    { bg: 'rgba(63,169,107,0.14)',   fg: '#4FBF83', ic: 'check' },
-    warn:  { bg: 'rgba(232,163,60,0.14)',  fg: '#E8A33C', ic: 'alert' },
-    bot:   { bg: 'rgba(240,177,63,0.16)', fg: '#FECB74', ic: 'bot' },
-    money: { bg: 'rgba(67,178,172,0.14)',   fg: '#5FD0C9', ic: 'pay' }
+    ok:    { bg: 'rgba(99,164,113,0.13)',   fg: '#63A471', ic: 'check' },
+    warn:  { bg: 'rgba(198,158,88,0.13)',  fg: '#C69E58', ic: 'alert' },
+    bot:   { bg: 'rgba(196,153,91,0.14)', fg: '#D7B174', ic: 'bot' },
+    money: { bg: 'rgba(86,161,158,0.13)',   fg: '#6DB6B3', ic: 'pay' }
   };
 
   w.Screens = w.Screens || {};

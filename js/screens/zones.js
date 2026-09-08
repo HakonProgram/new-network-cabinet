@@ -57,7 +57,7 @@
       '<div style="min-width:0"><div class="cell mono w">' + z.id + '</div>' +
         (inPresets.length ? '<div class="cid" style="margin-top:2px">in ' + inPresets.length + ' ' +
           UI.plural(inPresets.length, 'preset', 'presets') + '</div>' : '') + '</div>' +
-      '<div class="cell"><span class="dot" style="background:' + (z.cat === 'Adult' ? '#D98BB0' : '#43B2AC') + '"></span>' + z.cat + '</div>' +
+      '<div class="cell"><span class="dot" style="background:' + (z.cat === 'Adult' ? '#B9829C' : '#56A19E') + '"></span>' + z.cat + '</div>' +
       '<div class="cell muted">' + z.vertical + '</div>' +
       '<div class="cell muted r">' + m.impr + '</div>' +
       '<div class="cell muted r">' + m.clicks + '</div>' +

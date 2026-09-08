@@ -95,7 +95,7 @@
   }
 
   /* ── производные метрики ── */
-  var GOOD = '#4FBF83', BAD = '#EB7A71', MUTED = '#6C6760';
+  var GOOD = '#63A471', BAD = '#C56B65', MUTED = '#625E59';
 
   function cpm(cost, impr) { return impr > 0 ? '$' + (cost / impr * 1000).toFixed(2) : '—'; }
   function cpc(cost, clicks) { return clicks > 0 ? '$' + (cost / clicks).toFixed(3) : '—'; }
