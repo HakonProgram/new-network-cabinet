@@ -12,8 +12,9 @@
     { key: 'archived', label: 'Archived' }
   ];
   var MODELS = ['all', 'CPA', 'Pure CPA', 'CPM', 'Smart CPM', 'CPC'];
-  var COLS = '34px 68px minmax(190px,1fr) 92px 118px 78px 70px 88px 76px 70px 126px';
-  var MINW = 'min-width:1130px'; /* влезает целиком на 1440 — кнопки всегда видны */
+  /* 4 кнопки по 30px + зазоры = 136px; минимум таблицы честно равен сумме колонок */
+  var COLS = '32px 64px minmax(180px,1fr) 88px 112px 76px 68px 86px 74px 68px 136px';
+  var MINW = 'min-width:1104px';
 
   /* Архив живёт на своей вкладке и не мешается в общем списке. */
   function visible() {
@@ -44,7 +45,7 @@
       : (running ? 'Stop campaign' : 'Start campaign');
 
     return '<div class="tr row clickable' + (running ? '' : ' off') + '" data-act="open" data-arg="' + c.id +
-      '" title="Open the report for this campaign" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
+      '" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
       '<div class="' + runCls + '" data-act="toggle" data-arg="' + c.id + '" title="' + runTitle + '">' +
         icon(running ? 'pause' : 'play', 12) + '</div>' +
       '<div class="cid mono">' + esc(c.id) + '</div>' +

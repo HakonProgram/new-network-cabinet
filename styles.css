@@ -122,16 +122,17 @@ button, input, textarea { font-family:inherit; font-size:inherit; }
 .btn-up:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
 .btn-up.on { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
 .act { width:30px; height:30px; flex:0 0 30px; border-radius:var(--r-sm); display:flex; align-items:center;
-  justify-content:center; cursor:pointer; color:var(--text-3); }
-.act:hover { color:var(--text); background:var(--surface-3); }
-.act-run { color:var(--pos); }
-.act-run:hover { color:var(--pos); background:var(--pos-soft); }
-.act-stop { color:var(--neg); }
-.act-stop:hover { color:var(--neg); background:var(--neg-soft); }
-.act-chart:hover { color:var(--accent); background:var(--accent-soft); }
-.act-off { opacity:0.3; cursor:default; }
-.act-off:hover { background:none; color:var(--text-3); }
-.acts { display:flex; gap:var(--s1); justify-content:flex-end; }
+  justify-content:center; cursor:pointer; color:var(--text-2); background:var(--surface-2);
+  border:1px solid var(--border); }
+.act:hover { color:var(--text); background:var(--surface-3); border-color:var(--border-strong); }
+.act-run { color:var(--pos); background:var(--pos-soft); border-color:var(--pos); }
+.act-run:hover { color:var(--pos); background:var(--pos-soft); border-color:var(--pos); filter:brightness(1.12); }
+.act-stop { color:var(--neg); background:var(--neg-soft); border-color:var(--neg); }
+.act-stop:hover { color:var(--neg); background:var(--neg-soft); border-color:var(--neg); filter:brightness(1.12); }
+.act-chart:hover { color:var(--accent); background:var(--accent-soft); border-color:var(--accent); }
+.act-off { opacity:0.4; cursor:default; }
+.act-off:hover { color:var(--text-2); background:var(--surface-2); border-color:var(--border); }
+.acts { display:flex; gap:var(--s1); justify-content:flex-end; flex:0 0 auto; }
 
 /* ── карточки и поля ── */
 .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); }
