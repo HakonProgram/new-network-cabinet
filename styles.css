@@ -95,6 +95,8 @@ button, input, textarea { font-family:inherit; }
 .act-stop { background:rgba(208,59,59,0.14); border-color:rgba(208,59,59,0.36); color:#f07575; }
 .act-stop:hover { background:rgba(208,59,59,0.22); color:#ff8a8a; }
 .act-chart:hover { color:#00C2D4; border-color:rgba(0,159,174,0.5); background:rgba(0,159,174,0.10); }
+.act-off { opacity:0.32; cursor:default; }
+.act-off:hover { color:var(--ink-2); border-color:var(--line-2); }
 .acts { display:flex; gap:6px; justify-content:flex-end; }
 
 /* ─────────── карточки и поля ─────────── */

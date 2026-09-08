@@ -11,8 +11,8 @@
     { key: 'paused', label: 'Stopped' }
   ];
   var MODELS = ['all', 'CPA', 'Pure CPA', 'CPM', 'Smart CPM', 'CPC'];
-  var COLS = '84px minmax(220px,1fr) 92px 108px 78px 62px 66px 84px 88px 78px 70px 68px 76px 118px';
-  var MINW = 'min-width:1460px';
+  var COLS = '34px 72px minmax(180px,1fr) 84px 100px 74px 66px 80px 70px 64px 92px';
+  var MINW = 'min-width:1036px';
 
   function visible() {
     var s = Store.get(), st = s.ui.campStatus, md = s.ui.campModel;
@@ -28,12 +28,14 @@
     var m = UI.metrics(c);
     var noData = !c.impr;
     var dash = function (v) { return noData ? '—' : v; };
-    var runCls = !controllable ? 'act' : (running ? 'act act-stop' : 'act act-run');
-    var runTitle = !controllable ? 'Controls unavailable' : (running ? 'Stop' : 'Start');
+    var runCls = !controllable ? 'act act-off' : (running ? 'act act-stop' : 'act act-run');
+    var runTitle = !controllable ? 'Controls unavailable' : (running ? 'Stop campaign' : 'Start campaign');
 
     return '<div class="tr row clickable' + (running ? '' : ' off') + '" data-act="open" data-arg="' + c.id +
       '" title="Open the report for this campaign" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
-      '<div class="cid mono">NN-C-' + esc(c.id) + '</div>' +
+      '<div class="' + runCls + '" data-act="toggle" data-arg="' + c.id + '" title="' + runTitle + '">' +
+        icon(running ? 'pause' : 'play', 12) + '</div>' +
+      '<div class="cid mono">' + esc(c.id) + '</div>' +
       '<div style="min-width:0">' +
         '<div class="cname">' + esc(c.name) + '</div>' +
         '<div class="cmeta"><span class="cid">' + esc(c.format) + '</span>' +
@@ -42,17 +44,11 @@
       '<div class="status"><span class="dot" style="background:' + meta.color + '"></span>' +
         '<span style="color:' + meta.ink + '">' + meta.label + '</span></div>' +
       '<div class="cell muted r">' + dash(m.impr) + '</div>' +
-      '<div class="cell muted r">' + dash(m.ctr) + '</div>' +
       '<div class="cell w r">' + dash(m.conv) + '</div>' +
       '<div class="cell w r">' + dash(m.cost) + '</div>' +
-      '<div class="cell r">' + dash(m.revenue) + '</div>' +
       '<div class="cell w r" style="color:' + m.roiColor + '">' + dash(m.roi) + '</div>' +
       '<div class="cell muted r">' + m.cpa + '</div>' +
-      '<div class="cell muted r">' + dash(m.cpm) + '</div>' +
-      '<div class="cell muted r">' + dash(m.win) + '</div>' +
       '<div class="acts">' +
-        '<div class="' + runCls + '" data-act="toggle" data-arg="' + c.id + '" title="' + runTitle + '">' +
-          icon(running ? 'pause' : 'play', 12) + '</div>' +
         '<div class="act" data-act="dup" data-arg="' + c.id + '" title="Duplicate">' + icon('copy', 13, 1.9) + '</div>' +
         '<div class="act" data-act="edit" data-arg="' + c.id + '" title="Edit">' + icon('edit', 13, 1.9) + '</div>' +
         '<div class="act act-chart" data-act="stats" data-arg="' + c.id + '" title="Statistics">' + icon('chart', 13, 1.9) + '</div>' +
@@ -60,6 +56,7 @@
     '</div>';
   }
 
+  /* Провалиться в кампанию: отчёт, сужённый до неё. */
   function openReport(id) {
     var c = Store.get().campaigns.find(function (x) { return x.id === id; });
     Store.set(function (s) { s.ui.statsCampaign = id; });
@@ -96,14 +93,14 @@
           '<div class="hint">' + sub + '</div></div>';
       };
 
-      var heads = ['Campaign ID', 'Campaign', 'Model', 'Status', 'Impr.', 'CTR', 'Conv.',
-                   'Cost', 'Revenue', 'ROI', 'CPA', 'CPM', 'Win rate', ''];
-      var align = ['', '', '', '', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', ''];
+      var heads = ['', 'ID', 'Campaign', 'Model', 'Status', 'Impr.', 'Conv.', 'Cost', 'ROI', 'CPA', ''];
+      var align = ['', '', '', '', '', 'r', 'r', 'r', 'r', 'r', ''];
 
       return '<div class="page">' +
         '<div class="head">' +
           '<div><h1 class="h1">Campaigns</h1>' +
-          '<p class="sub">One campaign, one request — the system distributes it on its own. Figures for the last 7 days.</p></div>' +
+          '<p class="sub">One campaign, one request — the system distributes it on its own. Last 7 days · ' +
+          'click a row for the full report.</p></div>' +
           '<button class="btn btn-pri" style="margin-left:auto;height:36px" data-go="campaigns/new">' +
             icon('plus', 14, 2.4) + 'Create campaign</button>' +
         '</div>' +
@@ -129,15 +126,14 @@
             '</div>' +
             (rows.length
               ? '<div class="tr totals" style="grid-template-columns:' + COLS + ';' + MINW + '">' +
-                  '<div class="tot-lab">Total</div>' +
+                  '<div></div><div class="tot-lab">Total</div>' +
                   '<div class="cell muted">' + rows.length + ' ' + UI.plural(rows.length, 'campaign', 'campaigns') + ' shown</div>' +
                   '<div></div><div></div>' +
-                  '<div class="cell r">' + vm.impr + '</div><div class="cell r">' + vm.ctr + '</div>' +
-                  '<div class="cell r">' + vm.conv + '</div><div class="cell r">' + vm.cost + '</div>' +
-                  '<div class="cell r">' + vm.revenue + '</div>' +
+                  '<div class="cell r">' + vm.impr + '</div>' +
+                  '<div class="cell r">' + vm.conv + '</div>' +
+                  '<div class="cell r">' + vm.cost + '</div>' +
                   '<div class="cell r" style="color:' + vm.roiColor + '">' + vm.roi + '</div>' +
-                  '<div class="cell r">' + vm.cpa + '</div><div class="cell r">' + vm.cpm + '</div>' +
-                  '<div class="cell r">' + vm.win + '</div><div></div>' +
+                  '<div class="cell r">' + vm.cpa + '</div><div></div>' +
                 '</div>' + rows.map(rowHtml).join('')
               : '<div class="empty">No campaigns match these filters</div>') +
           '</div>' +
