@@ -39,8 +39,8 @@
 
       var grid = [0, 0.25, 0.5, 0.75, 1].map(function (q) {
         var y = B - q * H;
-        return '<line x1="' + L + '" y1="' + y.toFixed(1) + '" x2="' + R + '" y2="' + y.toFixed(1) + '" stroke="#22262E" stroke-width="1"/>' +
-          '<text x="' + (L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="#6A7180" font-size="10" text-anchor="end">' +
+        return '<line x1="' + L + '" y1="' + y.toFixed(1) + '" x2="' + R + '" y2="' + y.toFixed(1) + '" stroke="#252220" stroke-width="1"/>' +
+          '<text x="' + (L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="#6C6760" font-size="10" text-anchor="end">' +
           (q === 0 ? '0' : UI.compact(maxVol * q)) + '</text>';
       }).join('');
       var line = pts.map(function (p) { return vx(p[0]).toFixed(1) + ',' + vy(p[1]).toFixed(1); }).join(' ');
@@ -48,7 +48,7 @@
       var xt = '';
       for (i = 0; i <= 6; i++) {
         var bb = (i / 6) * bMax;
-        xt += '<text x="' + vx(bb).toFixed(1) + '" y="186" fill="#6A7180" font-size="10" text-anchor="middle">$' + bb.toFixed(2) + '</text>';
+        xt += '<text x="' + vx(bb).toFixed(1) + '" y="186" fill="#6C6760" font-size="10" text-anchor="middle">$' + bb.toFixed(2) + '</text>';
       }
 
       var rows = DATA.GEO.map(function (g) {
@@ -108,11 +108,11 @@
                 kpiBig('Avg CPM in scope', '$' + (0.9 + bid * 0.34).toFixed(2)) +
                 kpiBig('Avg CR in vertical', '2.31%') +
               '</div></div>' +
-            '<div class="plot"><svg width="100%" height="200" viewBox="0 0 1104 200" fill="none" font-family="Archivo, sans-serif" aria-label="Available volume by bid">' +
-              grid + '<path d="' + area + '" fill="#8368F7" fill-opacity="0.10"/>' +
-              '<polyline points="' + line + '" fill="none" stroke="#8368F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
-              '<line x1="' + vx(bid).toFixed(1) + '" y1="16" x2="' + vx(bid).toFixed(1) + '" y2="164" stroke="#A48FFF" stroke-width="1" stroke-dasharray="3 3"/>' +
-              '<circle cx="' + vx(bid).toFixed(1) + '" cy="' + vy(vol(bid)).toFixed(1) + '" r="4.5" fill="#8368F7" stroke="#13161C" stroke-width="2"/>' +
+            '<div class="plot"><svg width="100%" height="200" viewBox="0 0 1104 200" fill="none" font-family="IBM Plex Mono, monospace" aria-label="Available volume by bid">' +
+              grid + '<path d="' + area + '" fill="#F0B13F" fill-opacity="0.10"/>' +
+              '<polyline points="' + line + '" fill="none" stroke="#F0B13F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+              '<line x1="' + vx(bid).toFixed(1) + '" y1="16" x2="' + vx(bid).toFixed(1) + '" y2="164" stroke="#FECB74" stroke-width="1" stroke-dasharray="3 3"/>' +
+              '<circle cx="' + vx(bid).toFixed(1) + '" cy="' + vy(vol(bid)).toFixed(1) + '" r="4.5" fill="#F0B13F" stroke="#12100E" stroke-width="2"/>' +
               xt + '</svg></div>' +
             '<div class="hint">Bid along the horizontal axis, impressions per day along the vertical. The dashed line marks your current bid.</div>' +
           '</div></div>' +

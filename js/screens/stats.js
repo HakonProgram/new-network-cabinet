@@ -102,8 +102,8 @@
   function axis(t, fmt) {
     return t.values.map(function (v) {
       var y = G.B - (v / t.top) * (G.B - G.T);
-      return '<line x1="' + G.L + '" y1="' + y.toFixed(1) + '" x2="' + G.R + '" y2="' + y.toFixed(1) + '" stroke="#22262E" stroke-width="1"/>' +
-        '<text x="' + (G.L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="#6A7180" font-size="10" text-anchor="end">' + fmt(v) + '</text>';
+      return '<line x1="' + G.L + '" y1="' + y.toFixed(1) + '" x2="' + G.R + '" y2="' + y.toFixed(1) + '" stroke="#252220" stroke-width="1"/>' +
+        '<text x="' + (G.L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="#6C6760" font-size="10" text-anchor="end">' + fmt(v) + '</text>';
     }).join('');
   }
 
@@ -112,14 +112,14 @@
     for (i = 0; i < n; i += step) idx.push(i);
     if (idx[idx.length - 1] !== n - 1) idx.push(n - 1);
     return idx.map(function (j) {
-      return '<text x="' + fx(j).toFixed(1) + '" y="170" fill="#6A7180" font-size="10" text-anchor="middle">' +
+      return '<text x="' + fx(j).toFixed(1) + '" y="170" fill="#6C6760" font-size="10" text-anchor="middle">' +
         UI.dayLabel(n - 1 - j) + '</text>';
     }).join('');
   }
 
   function svgOpen(id, label) {
     return '<svg id="' + id + '" width="100%" height="184" viewBox="0 0 532 184" fill="none" ' +
-      'font-family="Archivo, sans-serif" aria-label="' + label + '">';
+      'font-family="IBM Plex Mono, monospace" aria-label="' + label + '">';
   }
 
   function lineChart(series, id, label, color, fmt) {
@@ -133,8 +133,8 @@
     return svgOpen(id, label) + axis(t, fmt) +
       '<path d="' + area + '" fill="' + color + '" fill-opacity="0.10"/>' +
       '<polyline points="' + line + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '<line class="cross" x1="0" y1="14" x2="0" y2="150" stroke="#2E323B" stroke-width="1" opacity="0"/>' +
-      '<circle class="mark" cx="0" cy="0" r="4.5" fill="' + color + '" stroke="#13161C" stroke-width="2" opacity="0"/>' +
+      '<line class="cross" x1="0" y1="14" x2="0" y2="150" stroke="#312F2C" stroke-width="1" opacity="0"/>' +
+      '<circle class="mark" cx="0" cy="0" r="4.5" fill="' + color + '" stroke="#12100E" stroke-width="2" opacity="0"/>' +
       xTicks(n, px) + '</svg>';
   }
 
@@ -161,8 +161,8 @@
     var grid = [-1, -0.5, 0, 0.5, 1].map(function (q) {
       var y = zero - q * half;
       return '<line x1="' + G.L + '" y1="' + y.toFixed(1) + '" x2="' + G.R + '" y2="' + y.toFixed(1) +
-        '" stroke="' + (q === 0 ? '#2E323B' : '#22262E') + '" stroke-width="1"/>' +
-        '<text x="' + (G.L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="#6A7180" font-size="10" text-anchor="end">' +
+        '" stroke="' + (q === 0 ? '#312F2C' : '#252220') + '" stroke-width="1"/>' +
+        '<text x="' + (G.L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="#6C6760" font-size="10" text-anchor="end">' +
         (q === 0 ? '0' : (q > 0 ? '' : '-') + '$' + UI.compact(t.top * Math.abs(q))) + '</text>';
     }).join('');
 
@@ -170,7 +170,7 @@
       var h = Math.max(2, Math.abs(v) / t.top * half);
       var y = v >= 0 ? zero - h : zero;
       return '<rect data-i="' + i + '" x="' + (G.L + i * band + (band - bw) / 2).toFixed(1) + '" y="' + y.toFixed(1) +
-        '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3" fill="' + (v >= 0 ? '#0ca30c' : '#d03b3b') + '"/>';
+        '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3" fill="' + (v >= 0 ? '#3FA96B' : '#E0655C') + '"/>';
     }).join('');
 
     return svgOpen(id, label) + grid + bars +
@@ -200,7 +200,7 @@
         rows: DATA.ZONES.map(function (z, i) {
           var st = Store.zoneState(z, cid), on = st === 'live';
           return '<div class="cell mono w">' + z.id + '</div>' +
-            '<div class="cell"><span class="dot" style="background:' + (z.cat === 'Adult' ? '#DA69B9' : '#009FAE') + '"></span>' + z.cat + '</div>' +
+            '<div class="cell"><span class="dot" style="background:' + (z.cat === 'Adult' ? '#D98BB0' : '#43B2AC') + '"></span>' + z.cat + '</div>' +
             '<div class="cell muted">' + z.vertical + '</div>' + metricCells(zr[i]) +
             '<div><span class="' + ZSTATE[st].pill + '">' + ZSTATE[st].label + '</span></div>' +
             '<div class="acts"><button class="btn btn-xs ' + (on ? 'btn-danger' : 'btn-up') +
@@ -284,10 +284,9 @@
         return '<div class="seg' + (s.ui.statsTab === x.k ? ' on' : '') + '" data-act="tab" data-arg="' + x.k + '">' + x.label + '</div>';
       }).join('');
 
-      var kpi = function (lab, val, sub, color) {
-        return '<div class="kpi tight"><div class="kpi-lab">' + lab + '</div>' +
-          '<div class="kpi-val num"' + (color ? ' style="color:' + color + '"' : '') + '>' + val + '</div>' +
-          '<div class="hint">' + sub + '</div></div>';
+      var stat = function (k, v, sub) {
+        return '<div class="stat"><span class="k">' + k + '</span><span class="v">' + v + '</span>' +
+          (sub ? '<span class="d">' + sub + '</span>' : '') + '</div>';
       };
 
       var profitSeries = d.cost.map(function (c, i) { return d.revenue[i] - c; });
@@ -311,32 +310,34 @@
           '</div>' +
         '</div>' +
 
-        '<div class="kpis k6">' +
-          kpi('Cost', tm.cost, period) +
-          kpi('Revenue', tm.revenue, 'reported via postback') +
-          kpi('Profit', tm.profit, 'revenue minus cost', tm.profitColor) +
-          kpi('ROI', tm.roi, 'return on ad spend', tm.roiColor) +
-          kpi('Conversions', tm.conv, 'CR ' + tm.cr) +
-          kpi('Avg CPA', tm.cpa, 'target $11.50') +
+        '<div class="statbar">' +
+          '<div class="stat hero"><span class="k">ROI · ' + period + '</span>' +
+            '<span class="v" style="color:' + tm.roiColor + '">' + tm.roi + '</span>' +
+            '<span class="d">' + tm.profit + ' profit on ' + tm.cost + ' spend</span></div>' +
+          stat('Revenue', tm.revenue, 'reported via postback') +
+          stat('Conversions', tm.conv, 'CR ' + tm.cr) +
+          stat('Avg CPA', tm.cpa, 'target $11.50') +
+          stat('Impressions', tm.impr, 'CTR ' + tm.ctr) +
+          stat('Clicks', tm.clicks, 'avg CPC ' + tm.cpc) +
         '</div>' +
-        '<div class="kpis k6">' +
-          kpi('Impressions', tm.impr, period) +
-          kpi('Clicks', tm.clicks, 'CTR ' + tm.ctr) +
-          kpi('Avg CPM', tm.cpm, 'blended across sources') +
-          kpi('Avg CPC', tm.cpc, 'blended across sources') +
-          kpi('Win rate', tm.win, 'auctions won') +
-          kpi('Placements', '1,482', '214 switched off by the robot') +
+        '<div class="statbar">' +
+          stat('Avg CPM', tm.cpm, 'blended across sources') +
+          stat('Win rate', tm.win, 'auctions won') +
+          stat('Placements', '1,482', '214 switched off by the robot') +
+          stat('Countries', String(DATA.GEO.length), 'with spend this period') +
+          stat('Campaigns', String(s.campaigns.length), 'in the account') +
+          stat('Period', d.n + ' days', 'ending today') +
         '</div>' +
 
         '<div class="charts">' +
           chartCard('Cost by day', period + ', dollars', tm.cost, 'A',
-            lineChart(d.cost, 'svgA', 'Cost by day', '#8368F7', function (v) { return v === 0 ? '0' : '$' + UI.compact(v); })) +
+            lineChart(d.cost, 'svgA', 'Cost by day', '#F0B13F', function (v) { return v === 0 ? '0' : '$' + UI.compact(v); })) +
           chartCard('Conversions by day', period + ', confirmed actions', tm.conv, 'B',
-            barChart(d.conv, 'svgB', 'Conversions by day', '#009FAE', function (v) { return UI.int(v); })) +
+            barChart(d.conv, 'svgB', 'Conversions by day', '#43B2AC', function (v) { return UI.int(v); })) +
           chartCard('Profit by day', period + ', revenue minus cost', tm.profit, 'C',
             divChart(profitSeries, 'svgC', 'Profit by day')) +
           chartCard('Win rate by day', period + ', share of auctions won', tm.win, 'D',
-            lineChart(d.win, 'svgD', 'Win rate by day', '#A48FFF', function (v) { return v.toFixed(0) + '%'; })) +
+            lineChart(d.win, 'svgD', 'Win rate by day', '#43B2AC', function (v) { return v.toFixed(0) + '%'; })) +
         '</div>' +
 
         '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
@@ -443,7 +444,7 @@
       var x = (ev.clientX - rect.left) / rect.width * G.W;
       var i = Math.max(0, Math.min(n - 1, Math.floor((x - G.L) / band)));
       bars.forEach(function (b, j) {
-        b.setAttribute('fill', j === i ? (diverging ? (series[j] >= 0 ? '#2fe02f' : '#ff6b6b') : '#00C2D4') : base[j]);
+        b.setAttribute('fill', j === i ? (diverging ? (series[j] >= 0 ? '#55C98D' : '#F08A82') : '#5FD0C9') : base[j]);
       });
       var b = bars[i];
       var cy = diverging

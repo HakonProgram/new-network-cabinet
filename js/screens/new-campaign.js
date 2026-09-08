@@ -61,25 +61,25 @@
       pts.map(function (p) { return vx(p[0]).toFixed(1) + ' ' + vy(p[1]).toFixed(1); }).join(' L ') + ' L ' + R + ' ' + B + ' Z';
     var grid = [0, 0.25, 0.5, 0.75, 1].map(function (q) {
       var y = B - q * H;
-      return '<line x1="' + L + '" y1="' + y.toFixed(1) + '" x2="' + R + '" y2="' + y.toFixed(1) + '" stroke="#22262E" stroke-width="1"/>' +
-        '<text x="' + (L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="#6A7180" font-size="10" text-anchor="end">' +
+      return '<line x1="' + L + '" y1="' + y.toFixed(1) + '" x2="' + R + '" y2="' + y.toFixed(1) + '" stroke="#252220" stroke-width="1"/>' +
+        '<text x="' + (L - 6) + '" y="' + (y + 3.5).toFixed(1) + '" fill="#6C6760" font-size="10" text-anchor="end">' +
         (q === 0 ? '0' : UI.compact(maxVol * q)) + '</text>';
     }).join('');
     var xt = '';
     for (i = 0; i <= 6; i++) {
       var bb = (i / 6) * bMax;
-      xt += '<text x="' + vx(bb).toFixed(1) + '" y="164" fill="#6A7180" font-size="10" text-anchor="middle">$' + bb.toFixed(2) + '</text>';
+      xt += '<text x="' + vx(bb).toFixed(1) + '" y="164" fill="#6C6760" font-size="10" text-anchor="middle">$' + bb.toFixed(2) + '</text>';
     }
 
     return {
       volume: UI.compact(vol(bid)),
       topBid: '$' + bid.toFixed(2),
       winRate: Math.min(62, 6 + (vol(bid) / Math.max(1, maxVol)) * 56).toFixed(1) + '%',
-      svg: '<svg width="100%" height="176" viewBox="0 0 1104 176" fill="none" font-family="Archivo, sans-serif" aria-label="Available volume by bid">' +
-        grid + '<path d="' + area + '" fill="#8368F7" fill-opacity="0.10"/>' +
-        '<polyline points="' + line + '" fill="none" stroke="#8368F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
-        '<line x1="' + vx(bid).toFixed(1) + '" y1="14" x2="' + vx(bid).toFixed(1) + '" y2="144" stroke="#A48FFF" stroke-width="1" stroke-dasharray="3 3"/>' +
-        '<circle cx="' + vx(bid).toFixed(1) + '" cy="' + vy(vol(bid)).toFixed(1) + '" r="4.5" fill="#8368F7" stroke="#13161C" stroke-width="2"/>' +
+      svg: '<svg width="100%" height="176" viewBox="0 0 1104 176" fill="none" font-family="IBM Plex Mono, monospace" aria-label="Available volume by bid">' +
+        grid + '<path d="' + area + '" fill="#F0B13F" fill-opacity="0.10"/>' +
+        '<polyline points="' + line + '" fill="none" stroke="#F0B13F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<line x1="' + vx(bid).toFixed(1) + '" y1="14" x2="' + vx(bid).toFixed(1) + '" y2="144" stroke="#FECB74" stroke-width="1" stroke-dasharray="3 3"/>' +
+        '<circle cx="' + vx(bid).toFixed(1) + '" cy="' + vy(vol(bid)).toFixed(1) + '" r="4.5" fill="#F0B13F" stroke="#12100E" stroke-width="2"/>' +
         xt + '</svg>'
     };
   }
@@ -134,7 +134,7 @@
     d.schedule.forEach(function (row, di) {
       out += '<div class="grid-r"><div class="dd">' + days[di] + '</div>';
       row.forEach(function (on, hi) {
-        var bg = on ? (hi >= 18 ? '#8368F7' : 'rgba(131,104,247,0.42)') : '#1C1F25';
+        var bg = on ? (hi >= 18 ? '#F0B13F' : 'rgba(240,177,63,0.40)') : '#1C1A17';
         out += '<div class="cellh" style="background:' + bg + '" data-act="cell" data-arg="' + di + '-' + hi + '"></div>';
       });
       out += '</div>';
@@ -279,7 +279,7 @@
               geoPicker() +
               '<div class="minbid">' + icon('up', 12, 2.2) + 'Minimum bid — $' + m.min.toFixed(2) + ' ' + m.unit + '</div>' +
             '</div>' +
-            '<div style="border-top:1px solid #23272F;padding-top:18px">' +
+            '<div style="border-top:1px solid #252220;padding-top:18px">' +
               '<div class="chart-h"><div>' +
                 '<div style="font-size:13px;font-weight:600">Available volume at your bid</div>' +
                 '<div class="hint">For the selected source, quality and targeting</div></div>' +
@@ -301,7 +301,7 @@
             '<div class="card-b">' +
               '<div class="field">' +
                 '<div style="display:flex;flex-direction:column;gap:8px">' + presetRows + '</div>' +
-                '<div class="hint">Presets are managed on the <span style="color:#A48FFF;cursor:pointer" data-go="zones">Placements</span> screen.</div></div>' +
+                '<div class="hint">Presets are managed on the <span style="color:#FECB74;cursor:pointer" data-go="zones">Placements</span> screen.</div></div>' +
             '</div></div>' +
 
           '<div class="card"><div class="card-h"><div class="card-n">05</div><div class="card-t">Budget</div></div>' +

@@ -12,7 +12,7 @@
     { key: 'archived', label: 'Archived' }
   ];
   var MODELS = ['all', 'CPA', 'Pure CPA', 'CPM', 'Smart CPM', 'CPC'];
-  var COLS = '34px 72px minmax(170px,1fr) 84px 108px 74px 66px 80px 70px 64px 122px';
+  var COLS = '34px 68px minmax(170px,1fr) 88px 116px 74px 66px 82px 72px 66px 118px';
   var MINW = 'min-width:1076px';
 
   /* Архив живёт на своей вкладке и не мешается в общем списке. */
@@ -53,10 +53,10 @@
         '<div class="cmeta"><span class="cid">' + esc(c.format) + '</span>' +
         '<span class="tag' + (c.adult ? ' tag-18' : '') + '">' + esc(c.vertical) + '</span></div></div>' +
       '<div><span class="model">' + esc(c.model) + '</span></div>' +
-      '<div class="status"><span class="dot' + (c.status === 'review' ? ' pulse' : '') +
+      '<div style="min-width:0"><div class="status"><span class="dot' + (c.status === 'review' ? ' pulse' : '') +
         '" style="background:' + meta.color + '"></span>' +
-        '<span style="color:' + meta.ink + '">' + meta.label + '</span>' +
-        (c.status === 'review' ? '<span class="cid">starting</span>' : '') + '</div>' +
+        '<span style="color:' + meta.ink + '">' + meta.label + '</span></div>' +
+        (c.status === 'review' ? '<div class="cid" style="margin-top:2px">starting itself…</div>' : '') + '</div>' +
       '<div class="cell muted r">' + dash(m.impr) + '</div>' +
       '<div class="cell w r">' + dash(m.conv) + '</div>' +
       '<div class="cell w r">' + dash(m.cost) + '</div>' +
@@ -103,11 +103,20 @@
           (m === 'all' ? 'All models' : m) + '</div>';
       }).join('');
 
-      var kpi = function (lab, val, sub, color) {
-        return '<div class="kpi tight"><div class="kpi-lab">' + lab + '</div>' +
-          '<div class="kpi-val num"' + (color ? ' style="color:' + color + '"' : '') + '>' + val + '</div>' +
-          '<div class="hint">' + sub + '</div></div>';
+      var stat = function (k, v, sub) {
+        return '<div class="stat"><span class="k">' + k + '</span><span class="v">' + v + '</span>' +
+          (sub ? '<span class="d">' + sub + '</span>' : '') + '</div>';
       };
+      var statbar = '<div class="statbar">' +
+        '<div class="stat hero"><span class="k">ROI · last 7 days</span>' +
+          '<span class="v" style="color:' + tm.roiColor + '">' + tm.roi + '</span>' +
+          '<span class="d">' + tm.profit + ' profit on ' + tm.cost + ' spend</span></div>' +
+        stat('Revenue', tm.revenue, 'reported via postback') +
+        stat('Conversions', tm.conv, 'avg CPA ' + tm.cpa) +
+        stat('Impressions', tm.impr, 'avg CPM ' + tm.cpm) +
+        stat('Win rate', tm.win, 'auctions won') +
+        stat('Campaigns', String(s.campaigns.length), tabCount('active') + ' running now') +
+      '</div>';
 
       var heads = ['', 'ID', 'Campaign', 'Model', 'Status', 'Impr.', 'Conv.', 'Cost', 'ROI', 'CPA', ''];
       var align = ['', '', '', '', '', 'r', 'r', 'r', 'r', 'r', ''];
@@ -121,14 +130,7 @@
             icon('plus', 14, 2.4) + 'Create campaign</button>' +
         '</div>' +
 
-        '<div class="kpis k6">' +
-          kpi('Cost', tm.cost, 'last 7 days') +
-          kpi('Revenue', tm.revenue, 'reported via postback') +
-          kpi('Profit', tm.profit, 'revenue minus cost', tm.profitColor) +
-          kpi('ROI', tm.roi, 'across all campaigns', tm.roiColor) +
-          kpi('Conversions', tm.conv, 'avg CPA ' + tm.cpa) +
-          kpi('Win rate', tm.win, 'avg CPM ' + tm.cpm) +
-        '</div>' +
+        statbar +
 
         '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
           '<div class="segs">' + tabs + '</div>' +

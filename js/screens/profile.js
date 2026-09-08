@@ -101,7 +101,7 @@
 
   function files() {
     return '<div style="display:flex;flex-direction:column;gap:14px">' +
-      '<div style="display:flex;align-items:center;gap:12px;padding:18px;border:1px dashed #2E323B;border-radius:10px;background:#0B0D13;flex-wrap:wrap">' +
+      '<div style="display:flex;align-items:center;gap:12px;padding:18px;border:1px dashed #312F2C;border-radius:10px;background:#171310;flex-wrap:wrap">' +
         icon('upload', 20) +
         '<div><div class="doc-n">Upload a file</div>' +
         '<div class="doc-d">Icons and creatives: PNG, JPG, up to 200 KB. Other files up to 10 MB.</div></div>' +

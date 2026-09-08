@@ -21,12 +21,12 @@
   ];
 
   var STATUS = {
-    active: { label: 'Active',        color: '#0ca30c', ink: '#EEF2FA' },
-    test:   { label: 'Test',          color: '#8368F7', ink: '#EEF2FA' },
-    review: { label: 'Auto-check',    color: '#fab219', ink: '#EEF2FA' },
-    paused: { label: 'Stopped',       color: '#6A7180', ink: '#9AA1AE' },
-    done:     { label: 'Finished', color: '#2E323B', ink: '#6A7180' },
-    archived: { label: 'Archived', color: '#2E323B', ink: '#6A7180' }
+    active: { label: 'Active',        color: '#3FA96B', ink: '#F2ECE4' },
+    test:   { label: 'Test',          color: '#F0B13F', ink: '#F2ECE4' },
+    review: { label: 'Auto-check',    color: '#E8A33C', ink: '#F2ECE4' },
+    paused: { label: 'Stopped',       color: '#6C6760', ink: '#A49F98' },
+    done:     { label: 'Finished', color: '#312F2C', ink: '#6C6760' },
+    archived: { label: 'Archived', color: '#312F2C', ink: '#6C6760' }
   };
 
   /* Campaign figures — last 7 days. Everything else scales from this base. */
