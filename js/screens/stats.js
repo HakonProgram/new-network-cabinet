@@ -3,13 +3,6 @@
   'use strict';
   var icon = UI.icon, esc = UI.esc;
 
-  var RANGES = [7, 14, 30, 90];
-  var TABS = [
-    { k: 'zones',     label: 'By placement' },
-    { k: 'campaigns', label: 'By campaign' },
-    { k: 'geo',       label: 'By country' },
-    { k: 'days',      label: 'By day' }
-  ];
   var G = { L: 48, R: 524, T: 14, B: 150, W: 532, H: 184 };
 
   var M_HEADS = ['Impr.', 'Clicks', 'CTR', 'Conv.', 'CR', 'Cost', 'Revenue', 'Profit', 'ROI', 'CPA', 'CPM', 'CPC', 'Win rate'];
@@ -73,26 +66,98 @@
     return out;
   }
 
+  /* Кампания-фокус задаётся тем же фильтром, что и в панели. */
   function scopedCampaign() {
-    var s = Store.get();
-    if (!s.ui.statsCampaign) return null;
-    return s.campaigns.find(function (c) { return c.id === s.ui.statsCampaign; }) || null;
+    var s = Store.get(), id = s.ui.statsApplied.campaign;
+    if (!id) return null;
+    return s.campaigns.find(function (c) { return String(c.id) === String(id); }) || null;
+  }
+
+  /* ── период ──
+     Пресеты считаются от сегодняшней даты; произвольный период
+     берётся из полей From/To. Всё в UTC, как и у сервера. */
+  var PRESETS = [
+    { k: 'today',     label: 'Today' },
+    { k: 'yesterday', label: 'Yesterday' },
+    { k: 'last7',     label: 'Last 7 days' },
+    { k: 'thisWeek',  label: 'This week' },
+    { k: 'last30',    label: 'Last 30 days' },
+    { k: 'thisMonth', label: 'This month' },
+    { k: 'lastMonth', label: 'Last month' }
+  ];
+
+  function iso(dt) { return dt.toISOString().slice(0, 10); }
+
+  function presetRange(key) {
+    var now = new Date();
+    var today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    var from = new Date(today), to = new Date(today);
+    if (key === 'yesterday') { from.setUTCDate(from.getUTCDate() - 1); to = new Date(from); }
+    else if (key === 'last7') { from.setUTCDate(from.getUTCDate() - 6); }
+    else if (key === 'last30') { from.setUTCDate(from.getUTCDate() - 29); }
+    else if (key === 'thisWeek') { from.setUTCDate(from.getUTCDate() - ((from.getUTCDay() + 6) % 7)); }
+    else if (key === 'thisMonth') { from.setUTCDate(1); }
+    else if (key === 'lastMonth') {
+      from = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - 1, 1));
+      to = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 0));
+    }
+    return { from: iso(from), to: iso(to) };
+  }
+
+  function rangeOf(f) {
+    var r = f.from && f.to ? { from: f.from, to: f.to } : presetRange(f.preset || 'last30');
+    var days = Math.round((Date.parse(r.to) - Date.parse(r.from)) / 86400000) + 1;
+    return { from: r.from, to: r.to, days: Math.max(1, Math.min(90, days || 1)) };
   }
 
   function model() {
-    var s = Store.get(), n = s.ui.statsRange, k = n / DATA.BASE_DAYS;
+    var s = Store.get(), f = applied();
+    var per = rangeOf(f);
+    var n = per.days, k = n / DATA.BASE_DAYS;
     var scoped = scopedCampaign();
-    var base = UI.sum(scoped ? [scoped] : s.campaigns);
+    var list = campaignList(f);
+    var base = UI.sum(list);
     var accountCost = UI.sum(s.campaigns).cost;
-    /* Разрезы по площадкам и гео сужаются пропорционально доле кампании в расходе. */
-    var share = scoped ? (accountCost ? base.cost / accountCost : 0) : 1;
+    /* Разрезы по площадкам и гео сужаются пропорционально доле в расходе. */
+    var share = accountCost ? base.cost / accountCost : 0;
+    /* Фильтры без построчных данных сужают отчёт пропорционально доле трафика. */
+    var m = shareFactor(f);
+    if (f.country) {
+      var g = DATA.GEO.find(function (x) { return x.code === f.country; });
+      var geoTot = DATA.GEO.reduce(function (a, x) { return a + x.cost; }, 0) || 1;
+      m *= g ? g.cost / geoTot : 0;
+    }
+    if (f.zone) {
+      var z = DATA.ZONES.find(function (x) { return x.id === f.zone; });
+      var zoneTot = DATA.ZONES.reduce(function (a, x) { return a + x.cost; }, 0) || 1;
+      m *= z ? z.cost / zoneTot : 0;
+    }
     var tot = {
-      impr: base.impr * k, clicks: base.clicks * k, conv: base.conv * k,
-      cost: base.cost * k, revenue: base.revenue * k,
+      impr: base.impr * k * m, clicks: base.clicks * k * m, conv: base.conv * k * m,
+      cost: base.cost * k * m, revenue: base.revenue * k * m,
       winRate: base.cost ? base.wSum / base.cost : 0
     };
+    /* Delta — сравнение с таким же по длине периодом, сдвинутым назад.
+       Оба окна нарезаем из одного ряда, чтобы сравнение было честным. */
+    var deltaDays = Math.max(0, Math.min(90, Math.round(UI.num(f.delta) || 0)));
+    var prev = null;
+    if (deltaDays > 0) {
+      var len = n + deltaDays, sc = len / n;
+      var slice = function (arr, from, to) {
+        return arr.slice(from, to).reduce(function (a, x) { return a + x; }, 0);
+      };
+      var cs = UI.daily(len, 20260907, Math.round(tot.cost * sc));
+      var vs = UI.daily(len, 815, Math.round(tot.conv * sc));
+      var rs = UI.daily(len, 4471, Math.round(tot.revenue * sc));
+      prev = {
+        days: deltaDays,
+        cost: slice(cs, 0, n), conv: slice(vs, 0, n), revenue: slice(rs, 0, n),
+        curCost: slice(cs, len - n, len), curConv: slice(vs, len - n, len), curRevenue: slice(rs, len - n, len)
+      };
+    }
+
     return {
-      n: n, k: k, tot: tot, scoped: scoped, share: share,
+      n: n, k: k, tot: tot, scoped: scoped, share: share, period: per, list: list, prev: prev,
       cost: UI.daily(n, 20260907, Math.round(tot.cost)),
       conv: UI.daily(n, 815, Math.round(tot.conv)),
       revenue: UI.daily(n, 4471, Math.round(tot.revenue)),
@@ -187,88 +252,202 @@
       '<div class="tip" id="tip' + plotId + '"><div class="tip-d"></div><div class="tip-v"></div></div></div></div>';
   }
 
-  /* ── таблицы ── */
-  function table(d) {
-    var s = Store.get(), k = d.k, tab = s.ui.statsTab;
+  /* ══ фильтры и группировки ══════════════════════════════════
+     Разрезы делятся на два вида. По кампаниям, странам, площадкам и
+     дням есть построчные данные — там фильтр реально отбирает строки.
+     По платформе, ОС, браузеру, соединению, городу, ISP и типу теста
+     построчных данных нет: для них известна доля трафика, поэтому
+     фильтр сужает отчёт пропорционально, а группировка делит итог на
+     эти доли. Так цифры остаются согласованными между разрезами.
+     ══════════════════════════════════════════════════════════ */
 
-    if (tab === 'zones') {
-      var zr = DATA.ZONES.map(function (z) { return scale(z, k * d.share); });
+  var DIMS = [
+    { k: 'days',      label: 'Day' },
+    { k: 'campaigns', label: 'Campaign' },
+    { k: 'geo',       label: 'Country' },
+    { k: 'zones',     label: 'Placement' },
+    { k: 'format',    label: 'Format' },
+    { k: 'model',     label: 'Business model' },
+    { k: 'platform',  label: 'Platform' },
+    { k: 'os',        label: 'OS' },
+    { k: 'browser',   label: 'Browser' },
+    { k: 'connection',label: 'Connection' },
+    { k: 'city',      label: 'City' },
+    { k: 'isp',       label: 'ISP' }
+  ];
+  var DIM_LABEL = {};
+  DIMS.forEach(function (x) { DIM_LABEL[x.k] = x.label; });
+
+  /* Разрезы, у которых есть только доля трафика. */
+  var SHARE_DIMS = { platform: 1, os: 1, browser: 1, connection: 1, city: 1, isp: 1, cpaTest: 1 };
+
+  function applied() { return Store.get().ui.statsApplied; }
+
+  /* Множитель от фильтров, у которых нет построчных данных. */
+  function shareFactor(f) {
+    var m = 1;
+    Object.keys(SHARE_DIMS).forEach(function (key) {
+      var picked = f[key];
+      if (!picked) return;
+      var item = (DATA.SHARES[key] || []).find(function (x) { return x.id === picked; });
+      if (item) m *= item.w;
+    });
+    return m;
+  }
+
+  /* Кампании после фильтров: модель, формат, тип теста и выбор конкретной. */
+  function campaignList(f) {
+    var s = Store.get();
+    var scoped = scopedCampaign();
+    var list = scoped ? [scoped] : s.campaigns;
+    return list.filter(function (c) {
+      if (f.campaign && String(c.id) !== String(f.campaign)) return false;
+      if (f.model && c.model !== f.model) return false;
+      if (f.format && c.format !== f.format) return false;
+      if (f.cpaTest === 'paid' && c.model !== 'CPA') return false;
+      if (f.cpaTest === 'free' && c.model !== 'Pure CPA') return false;
+      if (f.cpaTest === 'none' && (c.model === 'CPA' || c.model === 'Pure CPA')) return false;
+      return true;
+    });
+  }
+
+  function zoneList(f) {
+    return DATA.ZONES.filter(function (z) { return !f.zone || z.id === f.zone; });
+  }
+
+  function geoList(f) {
+    return DATA.GEO.filter(function (g) { return !f.country || g.code === f.country; });
+  }
+
+  /* Метрики строки из доли в общем итоге. */
+  function fromWeight(tot, w) {
+    return { impr: tot.impr * w, clicks: tot.clicks * w, conv: tot.conv * w,
+             cost: tot.cost * w, revenue: tot.revenue * w, winRate: tot.winRate };
+  }
+
+  /* Элементы разреза: подпись, вес в расходе и — где есть — исходная строка. */
+  function dimItems(key, d, f) {
+    var i, out;
+    if (SHARE_DIMS[key]) {
+      var list = DATA.SHARES[key] || [];
+      var picked = f[key];
+      var use = picked ? list.filter(function (x) { return x.id === picked; }) : list;
+      var sum = use.reduce(function (a, x) { return a + x.w; }, 0) || 1;
+      return use.map(function (x) {
+        return { id: x.id, label: x.label, w: x.w / sum, cells: ['<div class="cell w">' + esc(x.label) + '</div>'] };
+      });
+    }
+    if (key === 'campaigns') {
+      var cs = campaignList(f), tc = cs.reduce(function (a, c) { return a + c.cost; }, 0) || 1;
+      return cs.map(function (c) {
+        return { id: c.id, label: c.name, w: c.cost / tc, row: c,
+          cells: ['<div class="cell w">' + esc(c.name) + '</div>',
+                  '<div><span class="model">' + esc(c.model) + '</span></div>'] };
+      });
+    }
+    if (key === 'geo') {
+      var gs = geoList(f), tg = gs.reduce(function (a, g) { return a + g.cost; }, 0) || 1;
+      return gs.map(function (g) {
+        return { id: g.code, label: g.name, w: g.cost / tg, row: g,
+          cells: ['<div class="cell w">' + esc(g.name) + '</div>',
+                  '<div class="cell mono muted">' + g.code + '</div>'] };
+      });
+    }
+    if (key === 'zones') {
       var cid = d.scoped ? d.scoped.id : null;
-      return {
-        cols: '104px 96px 110px ' + M_COLS + ' 128px 96px', minw: UI.gridMin('104px 96px 110px ' + M_COLS + ' 128px 96px'),
-        heads: ['Zone ID', 'Category', 'Vertical'].concat(M_HEADS).concat(['Status', '']),
-        align: ['', '', ''].concat(M_HEADS.map(function () { return 'r'; })).concat(['', '']),
-        tail: 2,
-        rows: DATA.ZONES.map(function (z, i) {
-          var st = Store.zoneState(z, cid), on = st === 'live';
-          return '<div class="cell mono w">' + z.id + '</div>' +
-            '<div class="cell"><span class="dot" style="background:' + (z.cat === 'Adult' ? '' + UI.color('--warn') + '' : '' + UI.color('--info') + '') + '"></span>' + z.cat + '</div>' +
-            '<div class="cell muted">' + z.vertical + '</div>' + metricCells(zr[i]) +
-            '<div><span class="' + ZSTATE[st].pill + '">' + ZSTATE[st].label + '</span></div>' +
-            '<div class="acts"><button class="btn btn-xs ' + (on ? 'btn-danger' : 'btn-up') +
-              '" data-act="toggleZone" data-arg="' + z.id + '">' + (on ? 'Turn off' : 'Turn on') + '</button></div>';
-        }),
-        totals: zr, totalLabel: DATA.ZONES.length + ' placements shown',
-        note: d.scoped
-          ? 'Turn a placement off right here — inside a campaign report it affects this campaign only.'
-          : 'Placement IDs are ours. Turning one off here applies to every campaign.',
-        foot: ['Showing ' + DATA.ZONES.length + ' of 1,482 placements', 'Robot switched off 214 placements this period']
-      };
+      var zs = zoneList(f), tz = zs.reduce(function (a, z) { return a + z.cost; }, 0) || 1;
+      return zs.map(function (z) {
+        var st = Store.zoneState(z, cid), on = st === 'live';
+        return { id: z.id, label: z.id, w: z.cost / tz, row: z,
+          cells: ['<div class="cell mono w">' + z.id + '</div>',
+                  '<div class="cell"><span class="dot" style="background:' +
+                    (z.cat === 'Adult' ? UI.color('--warn') : UI.color('--info')) + '"></span>' + z.cat + '</div>'],
+          tail: ['<div><span class="' + ZSTATE[st].pill + '">' + ZSTATE[st].label + '</span></div>',
+                 '<div class="acts"><button class="btn btn-xs ' + (on ? 'btn-danger' : 'btn-up') +
+                   '" data-act="toggleZone" data-arg="' + z.id + '">' + (on ? 'Turn off' : 'Turn on') + '</button></div>'] };
+      });
     }
-
-    if (tab === 'campaigns') {
-      var list = d.scoped ? [d.scoped] : s.campaigns;
-      var cr = list.map(function (c) { return scale(c, k); });
-      return {
-        cols: 'minmax(200px,1fr) 92px ' + M_COLS, minw: UI.gridMin('minmax(200px,1fr) 92px ' + M_COLS),
-        heads: ['Campaign', 'Model'].concat(M_HEADS),
-        align: ['', ''].concat(M_HEADS.map(function () { return 'r'; })),
-        rows: list.map(function (c, i) {
-          return '<div class="cell w">' + esc(c.name) + '</div>' +
-            '<div><span class="model">' + esc(c.model) + '</span></div>' + metricCells(cr[i]);
-        }),
-        totals: cr, totalLabel: list.length + ' ' + UI.plural(list.length, 'campaign', 'campaigns'),
-        note: 'All sources rolled into a single report.',
-        foot: ['Showing ' + list.length + ' of ' + s.campaigns.length + ' campaigns', 'Updated an hour ago']
-      };
+    if (key === 'format') {
+      var fl = {}, cl = campaignList(f);
+      cl.forEach(function (c) { fl[c.format] = (fl[c.format] || 0) + c.cost; });
+      var tf = Object.keys(fl).reduce(function (a, x) { return a + fl[x]; }, 0) || 1;
+      return Object.keys(fl).map(function (x) {
+        return { id: x, label: x, w: fl[x] / tf, cells: ['<div class="cell w">' + esc(x) + '</div>'] };
+      });
     }
-
-    if (tab === 'geo') {
-      var gr = DATA.GEO.map(function (g) { return scale(g, k * d.share); });
-      return {
-        cols: 'minmax(160px,1fr) 70px ' + M_COLS, minw: UI.gridMin('minmax(160px,1fr) 70px ' + M_COLS),
-        heads: ['Country', 'Code'].concat(M_HEADS),
-        align: ['', ''].concat(M_HEADS.map(function () { return 'r'; })),
-        rows: DATA.GEO.map(function (g, i) {
-          return '<div class="cell w">' + g.name + '</div><div class="cell mono muted">' + g.code + '</div>' +
-            metricCells(gr[i]);
-        }),
-        totals: gr, totalLabel: DATA.GEO.length + ' countries',
-        note: 'Targeting is set once per campaign and mirrored into every source.',
-        foot: ['Showing ' + DATA.GEO.length + ' of 34 countries', 'Updated an hour ago']
-      };
+    if (key === 'model') {
+      var ml = {}, cm = campaignList(f);
+      cm.forEach(function (c) { ml[c.model] = (ml[c.model] || 0) + c.cost; });
+      var tm2 = Object.keys(ml).reduce(function (a, x) { return a + ml[x]; }, 0) || 1;
+      return Object.keys(ml).map(function (x) {
+        return { id: x, label: x, w: ml[x] / tm2,
+                 cells: ['<div><span class="model">' + esc(x) + '</span></div>'] };
+      });
     }
-
+    /* по дням */
+    out = [];
     var shown = Math.min(14, d.n);
-    var imprPer = d.tot.cost ? d.tot.impr / d.tot.cost : 0;
-    var clickPer = d.tot.cost ? d.tot.clicks / d.tot.cost : 0;
-    var rows = [], totals = [], j;
-    for (j = 0; j < shown; j++) {
-      var i = d.n - 1 - j;
-      var row = {
-        impr: d.cost[i] * imprPer, clicks: d.cost[i] * clickPer, conv: d.conv[i],
-        cost: d.cost[i], revenue: d.revenue[i], winRate: d.win[i]
-      };
-      totals.push(row);
-      rows.push('<div class="cell w">' + UI.dayLabel(j) + '</div>' + metricCells(row));
+    var totalCost = d.cost.reduce(function (a, c) { return a + c; }, 0) || 1;
+    for (i = 0; i < shown; i++) {
+      var idx = d.n - 1 - i;
+      out.push({ id: 'd' + idx, label: UI.dayLabel(i), w: d.cost[idx] / totalCost,
+                 cells: ['<div class="cell w">' + UI.dayLabel(i) + '</div>'] });
     }
+    return out;
+  }
+
+  var DIM_HEADS = {
+    days: ['Date'], campaigns: ['Campaign', 'Model'], geo: ['Country', 'Code'],
+    zones: ['Zone ID', 'Category'], format: ['Format'], model: ['Model'],
+    platform: ['Platform'], os: ['OS'], browser: ['Browser'],
+    connection: ['Connection'], city: ['City'], isp: ['ISP']
+  };
+  var DIM_COLS = {
+    days: '120px', campaigns: 'minmax(190px,1fr) 92px', geo: 'minmax(150px,1fr) 70px',
+    zones: '104px 96px', format: '120px', model: '110px', platform: '110px',
+    os: '110px', browser: '150px', connection: '120px', city: '140px', isp: '170px'
+  };
+
+  function table(d) {
+    var f = applied();
+    var prim = dimItems(f.groupBy, d, f);
+    var sec = f.groupBy2 && f.groupBy2 !== f.groupBy ? dimItems(f.groupBy2, d, f) : null;
+
+    var cols = DIM_COLS[f.groupBy] + (sec ? ' ' + DIM_COLS[f.groupBy2] : '') + ' ' + M_COLS;
+    var heads = DIM_HEADS[f.groupBy].concat(sec ? DIM_HEADS[f.groupBy2] : []).concat(M_HEADS);
+    var lead = DIM_HEADS[f.groupBy].length + (sec ? DIM_HEADS[f.groupBy2].length : 0);
+    var withTail = f.groupBy === 'zones' && !sec;
+
+    var rows = [], totals = [];
+    prim.forEach(function (a) {
+      var pairs = sec ? sec.map(function (b) { return { w: a.w * b.w, cells: a.cells.concat(b.cells), tail: null }; })
+                      : [{ w: a.w, cells: a.cells, tail: a.tail }];
+      pairs.forEach(function (p) {
+        var m = fromWeight(d.tot, p.w);
+        totals.push(m);
+        rows.push(p.cells.join('') + metricCells(m) + (withTail && p.tail ? p.tail.join('') : ''));
+      });
+    });
+
+    if (withTail) { cols += ' 128px 96px'; heads = heads.concat(['Status', '']); }
+
+    var note = sec
+      ? DIM_LABEL[f.groupBy] + ' × ' + DIM_LABEL[f.groupBy2] + ' — every combination in the selected period.'
+      : (f.groupBy === 'zones'
+          ? (d.scoped ? 'Turn a placement off right here — inside a campaign report it affects this campaign only.'
+                      : 'Placement IDs are ours. Turning one off here applies to every campaign.')
+          : 'Grouped by ' + DIM_LABEL[f.groupBy].toLowerCase() + ' over the selected period.');
+
     return {
-      cols: '120px ' + M_COLS, minw: UI.gridMin('120px ' + M_COLS),
-      heads: ['Date'].concat(M_HEADS),
-      align: [''].concat(M_HEADS.map(function () { return 'r'; })),
-      rows: rows, totals: totals, totalLabel: shown + ' ' + UI.plural(shown, 'day', 'days'),
-      note: 'Most recent days of the selected period.',
-      foot: ['Showing ' + shown + ' of ' + d.n + ' days', 'Updated an hour ago']
+      cols: cols, minw: UI.gridMin(cols), heads: heads,
+      align: heads.map(function (h, i) { return i >= lead && i < lead + M_HEADS.length ? 'r' : ''; }),
+      tail: withTail ? 2 : 0,
+      rows: rows, totals: totals,
+      totalLabel: rows.length + ' ' + UI.plural(rows.length, 'row', 'rows'),
+      note: note,
+      foot: ['Showing ' + rows.length + ' ' + UI.plural(rows.length, 'row', 'rows') +
+             ' grouped by ' + DIM_LABEL[f.groupBy].toLowerCase() + (sec ? ' and ' + DIM_LABEL[f.groupBy2].toLowerCase() : ''),
+             'Updated an hour ago']
     };
   }
 
@@ -278,13 +457,90 @@
       var s = Store.get(), d = model(), t = table(d);
       var tm = UI.metrics(d.tot);
 
-      var ranges = RANGES.map(function (r) {
-        return '<div class="seg' + (s.ui.statsRange === r ? ' on' : '') + '" data-act="range" data-arg="' + r + '">' +
-          r + ' days</div>';
+      var form = s.ui.statsForm;
+      var dirty = JSON.stringify(form) !== JSON.stringify(s.ui.statsApplied);
+
+      var presets = PRESETS.map(function (x) {
+        var on = !form.from && !form.to && form.preset === x.k;
+        return '<div class="seg' + (on ? ' on' : '') + '" data-act="preset" data-arg="' + x.k + '">' +
+          x.label + '</div>';
       }).join('');
-      var tabs = TABS.map(function (x) {
-        return '<div class="seg' + (s.ui.statsTab === x.k ? ' on' : '') + '" data-act="tab" data-arg="' + x.k + '">' + x.label + '</div>';
-      }).join('');
+
+      /* Один и тот же вид у всех фильтров: подпись плюс выпадающий список. */
+      function field(label, name, options, wide) {
+        return '<div class="filt' + (wide ? ' wide' : '') + '"><label class="lab">' + label + '</label>' +
+          UI.selectKV(name, options, form[name] || '') + '</div>';
+      }
+      function anyOpts(list, allLabel) {
+        return [{ id: '', label: allLabel }].concat(list);
+      }
+
+      var campaignOpts = anyOpts(s.campaigns.map(function (c) {
+        return { id: c.id, label: 'NN-C-' + c.id + ' · ' + c.name };
+      }), 'All campaigns');
+      var countryOpts = anyOpts(DATA.GEO.map(function (g) { return { id: g.code, label: g.name }; }), 'All countries');
+      var zoneOpts = anyOpts(DATA.ZONES.slice(0, 36).map(function (z) {
+        return { id: z.id, label: z.id + ' · ' + z.cat };
+      }), 'All placements');
+      var shareOpts = function (key, allLabel) {
+        return anyOpts((DATA.SHARES[key] || []).map(function (x) { return { id: x.id, label: x.label }; }), allLabel);
+      };
+      var dimOpts = DIMS.map(function (x) { return { id: x.k, label: x.label }; });
+
+      var filters =
+        '<div class="card filters"><div class="card-b">' +
+          '<div class="filt-row">' +
+            '<div class="filt wide"><label class="lab">Period</label>' +
+              '<div class="segs wrap">' + presets + '</div></div>' +
+          '</div>' +
+          '<div class="filt-row">' +
+            '<div class="filt"><label class="lab">From</label>' +
+              '<input class="inp" type="date" value="' + esc(form.from || d.period.from) + '" data-inp="from"></div>' +
+            '<div class="filt"><label class="lab">To</label>' +
+              '<input class="inp" type="date" value="' + esc(form.to || d.period.to) + '" data-inp="to"></div>' +
+            '<div class="filt"><label class="lab">Delta</label>' +
+              '<input class="inp" type="text" placeholder="days back" value="' + esc(form.delta) + '" data-inp="delta">' +
+              '<span class="hint">Compare with the same span N days earlier</span></div>' +
+            field('Group by', 'groupBy', dimOpts) +
+            field('Then by', 'groupBy2', anyOpts(dimOpts, 'Nothing')) +
+          '</div>' +
+          '<div class="filt-row">' +
+            field('Campaigns', 'campaign', campaignOpts, true) +
+            field('Countries', 'country', countryOpts) +
+            field('Cities', 'city', shareOpts('city', 'All cities')) +
+            field('Platform', 'platform', shareOpts('platform', 'All platforms')) +
+          '</div>' +
+          '<div class="filt-row">' +
+            field('OSs', 'os', shareOpts('os', 'All systems')) +
+            field('Formats', 'format', anyOpts(DATA.FORMATS.map(function (x) { return { id: x, label: x }; }), 'All formats')) +
+            field('Business model', 'model', anyOpts(DATA.PAY_MODELS.map(function (m) { return { id: m.name, label: m.name }; }), 'All models')) +
+            field('Browsers', 'browser', shareOpts('browser', 'All browsers')) +
+          '</div>' +
+          '<div class="filt-row">' +
+            field('Connection', 'connection', shareOpts('connection', 'Any connection')) +
+            field('Zones', 'zone', zoneOpts) +
+            field('ISP', 'isp', shareOpts('isp', 'All networks')) +
+            field('CPA tests', 'cpaTest', shareOpts('cpaTest', 'All campaigns')) +
+          '</div>' +
+          '<div class="filt-foot">' +
+            '<span class="hint">System timezone is UTC · ' + esc(d.period.from) + ' — ' + esc(d.period.to) +
+              ' (' + d.n + ' ' + UI.plural(d.n, 'day', 'days') + ')</span>' +
+            '<button class="btn" data-act="resetFilters">Reset</button>' +
+            '<button class="btn" data-act="csv">' + icon('download', 14, 1.9) + 'CSV</button>' +
+            '<button class="btn btn-pri" data-act="applyFilters">' +
+              (dirty ? 'Get statistics' : 'Refresh') + '</button>' +
+          '</div>' +
+        '</div></div>';
+
+      /* Приписка «+12.4% vs 7d earlier» — только когда задан Delta. */
+      function chg(cur, was, invert) {
+        if (!d.prev || !was) return '';
+        var pct = (cur - was) / was * 100;
+        var good = invert ? pct < 0 : pct > 0;
+        return '<span style="color:' + (Math.abs(pct) < 0.05 ? UI.color('--text-3')
+          : UI.color(good ? '--pos' : '--neg')) + '"> ' +
+          (pct >= 0 ? '+' : '') + pct.toFixed(1) + '% vs ' + d.prev.days + 'd earlier</span>';
+      }
 
       var stat = function (k, v, sub, color) {
         return '<div class="stat"><span class="k">' + k + '</span>' +
@@ -307,18 +563,16 @@
             : 'Every source rolled into one report. Placements appear under our own numbering.') + '</p></div>' +
           (d.scoped ? '<div class="scope" style="margin-left:4px">' + esc(d.scoped.name) +
             '<span class="x" data-act="clearScope" title="Show the whole account">' + icon('close', 12, 2.4) + '</span></div>' : '') +
-          '<div style="margin-left:auto;display:flex;align-items:center;gap:10px">' +
-            '<div class="segs">' + ranges + '</div>' +
-            '<button class="btn" data-act="csv">' + icon('download', 14, 1.9) + 'Export CSV</button>' +
-          '</div>' +
         '</div>' +
 
+        filters +
+
         '<div class="stats s6">' +
-          stat('Spend', tm.cost, period) +
-          stat('Revenue', tm.revenue, 'reported via postback') +
+          stat('Spend', tm.cost, period + chg(d.prev ? d.prev.curCost : 0, d.prev ? d.prev.cost : 0, true)) +
+          stat('Revenue', tm.revenue, 'reported via postback' + chg(d.prev ? d.prev.curRevenue : 0, d.prev ? d.prev.revenue : 0)) +
           stat('Profit', tm.profit, 'revenue minus spend', tm.profitColor) +
           stat('ROI', tm.roi, 'return on ad spend', tm.roiColor) +
-          stat('Conversions', tm.conv, 'CR ' + tm.cr) +
+          stat('Conversions', tm.conv, 'CR ' + tm.cr + chg(d.prev ? d.prev.curConv : 0, d.prev ? d.prev.conv : 0)) +
           stat('Avg CPA', tm.cpa, 'target $11.50') +
         '</div>' +
 
@@ -334,8 +588,7 @@
         '</div>' +
 
         '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
-          '<div class="segs">' + tabs + '</div>' +
-          '<span class="sub" style="margin:0 0 0 4px">' + t.note + '</span>' +
+          '<span class="sub" style="margin:0">' + t.note + '</span>' +
         '</div>' +
 
         '<div class="table' + (t.tail === 2 ? ' pin-end' : '') + '"><div class="table-scroll">' +
@@ -372,19 +625,61 @@
     },
 
     actions: {
-      range: function (v) { Store.ui('statsRange', Number(v)); },
-      tab: function (v) { Store.ui('statsTab', v); },
+      /* Пресет периода очищает произвольные даты, иначе они бы его перебивали. */
+      preset: function (v) {
+        Store.set(function (s) {
+          s.ui.statsForm.preset = v;
+          s.ui.statsForm.from = '';
+          s.ui.statsForm.to = '';
+        });
+      },
+      /* Фильтры применяются кнопкой, а не на каждый чих: так же ведёт себя сервер. */
+      applyFilters: function () {
+        Store.set(function (s) {
+          s.ui.statsApplied = JSON.parse(JSON.stringify(s.ui.statsForm));
+        });
+        var f = Store.get().ui.statsApplied;
+        Api.reports.query({ dimension: f.groupBy, groupBy2: f.groupBy2, campaignId: f.campaign,
+                            from: f.from, to: f.to, preset: f.preset, delta: f.delta,
+                            country: f.country, city: f.city, platform: f.platform, os: f.os,
+                            format: f.format, model: f.model, browser: f.browser,
+                            connection: f.connection, zone: f.zone, isp: f.isp, cpaTest: f.cpaTest });
+      },
+      resetFilters: function () {
+        Store.set(function (s) {
+          s.ui.statsForm = Store.seedStatsFilters();
+          s.ui.statsApplied = Store.seedStatsFilters();
+        });
+        App.toast('Filters reset');
+      },
       csv: function () { App.toast('Export is not generated in this prototype'); },
-      clearScope: function () { Store.ui('statsCampaign', ''); },
+      clearScope: function () {
+        Store.set(function (s) { s.ui.statsForm.campaign = ''; s.ui.statsApplied.campaign = ''; });
+      },
       toggleZone: function (id) {
-        var cid = Store.get().ui.statsCampaign || null;
+        var cid = Store.get().ui.statsApplied.campaign || null;
         Api.placements.toggle(id, { campaignId: cid }).then(function (r) {
           var camp = cid ? scopedCampaign() : null;
           App.toast(id + (r.on ? ' turned on' : ' turned off') +
             (camp ? ' for \u201c' + camp.name + '\u201d' : ' across all campaigns'));
         });
       }
-    }
+    },
+
+    /* Все поля панели пишут в один и тот же черновик. */
+    inputs: (function () {
+      var out = {};
+      ['from', 'to', 'delta', 'groupBy', 'groupBy2', 'campaign', 'country', 'city', 'platform',
+       'os', 'format', 'model', 'browser', 'connection', 'zone', 'isp', 'cpaTest'
+      ].forEach(function (name) {
+        out[name] = function (v, arg, type) {
+          var write = function (s) { s.ui.statsForm[name] = v; };
+          /* Текстовые поля не перерисовываем на каждый символ. */
+          if (type === 'input') Store.patch(write); else Store.set(write);
+        };
+      });
+      return out;
+    })()
   };
 
   /* ── ховер ── */

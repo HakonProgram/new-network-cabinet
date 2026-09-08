@@ -14,6 +14,16 @@
     return out;
   }
 
+  /* Пустой набор фильтров отчёта. '' означает «все». */
+  function seedStatsFilters() {
+    return {
+      preset: 'last30', from: '', to: '', delta: '',
+      groupBy: 'zones', groupBy2: '',
+      campaign: '', country: '', city: '', platform: '', os: '',
+      format: '', model: '', browser: '', connection: '', zone: '', isp: '', cpaTest: ''
+    };
+  }
+
   function seedDraft() {
     return {
       name: '', url: '',
@@ -52,7 +62,8 @@
       ui: {
         campStatus: 'all', campModel: 'all', campSelection: [],
         geoPickerOpen: false, geoSearch: '', geoPick: [], geoTarget: 'new', geoBid: '', advancedOpen: false,
-        statsRange: 30, statsTab: 'zones', statsCampaign: '',
+        /* Черновик фильтров отчёта и то, что реально применено кнопкой. */
+        statsForm: seedStatsFilters(), statsApplied: seedStatsFilters(),
         zonesTab: 'all', zonesCat: 'all', zonesVertical: 'all', zonesSort: 'cost',
         openPreset: '',
         payMethod: 'card', payAmount: '5000', payTab: 'pay', payRange: '30',
@@ -180,6 +191,7 @@
   w.Store = {
     get: get, db: db, commit: commit, set: set, patch: patch, ui: ui, reset: reset,
     subscribe: subscribe, seedDraft: seedDraft, seedSchedule: seedSchedule,
+    seedStatsFilters: seedStatsFilters,
     zoneState: zoneState, zoneIsOn: zoneIsOn, setZone: setZone, toggleZone: toggleZone
   };
 })(window);

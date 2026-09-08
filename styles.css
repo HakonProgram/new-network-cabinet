@@ -577,3 +577,19 @@ select.sel-inp option { background:var(--surface); color:var(--text); }
 @media (prefers-reduced-motion: reduce) {
   .side { transition:none; }
 }
+
+/* ── панель фильтров отчёта ── */
+.filters .card-b { gap:var(--s4); }
+.filt-row { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--s4); align-items:end; }
+.filt { display:flex; flex-direction:column; gap:var(--s2); min-width:0; }
+.filt.wide { grid-column:span 2; }
+.filt .lab { font-size:var(--fs-2); color:var(--text-2); }
+.filt .hint { margin:0; }
+.segs.wrap { display:flex; flex-wrap:wrap; }
+.filt-foot { display:flex; align-items:center; gap:var(--s3); flex-wrap:wrap;
+  padding-top:var(--s4); border-top:1px solid var(--border); }
+.filt-foot .hint { margin-right:auto; }
+@media (max-width:1240px) { .filt-row { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media (max-width:900px)  { .filt-row { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:700px)  { .filt-row { grid-template-columns:minmax(0,1fr); }
+  .filt.wide { grid-column:span 1; } .filt-foot .hint { width:100%; margin:0 0 var(--s2); } }

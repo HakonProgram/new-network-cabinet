@@ -205,6 +205,17 @@
       }).join('') + '</select>';
   }
 
+  /* Список пар {id, label}: значением уходит id, подпись только на экране. */
+  function selectKV(name, options, value, arg) {
+    return '<select class="inp sel-inp" data-inp="' + name + '"' +
+      (arg ? ' data-arg="' + arg + '"' : '') + '>' +
+      options.map(function (o) {
+        return '<option value="' + esc(String(o.id)) + '"' +
+          (String(o.id) === String(value == null ? '' : value) ? ' selected' : '') + '>' +
+          esc(o.label) + '</option>';
+      }).join('') + '</select>';
+  }
+
   function cls() {
     return Array.prototype.filter.call(arguments, Boolean).join(' ');
   }
@@ -214,7 +225,7 @@
     pct: pct, cpa: cpa, cpm: cpm, cpc: cpc, winRate: winRate, profit: profit, roi: roi,
     color: color, tone: tone,
     metrics: metrics, sum: sum,
-    num: num, plural: plural, dayLabel: dayLabel, dateShort: dateShort,
+    num: num, plural: plural, dayLabel: dayLabel, dateShort: dateShort, selectKV: selectKV,
     daily: daily, ticks: ticks, cls: cls, gridMin: gridMin, select: select
   };
 })(window);

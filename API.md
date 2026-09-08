@@ -29,7 +29,7 @@ Requests carry `Authorization: Bearer <token>` when a token is set and
 | PATCH | `/campaigns/:id` | inline edits | partial campaign |
 | POST | `/campaigns/bulk` | row and bulk controls | `{ action, ids[] }` |
 | POST | `/campaigns/:id/auto-check` | robot event | — |
-| GET | `/reports/:dimension` | statistics | `?range=&campaignId=` |
+| GET | `/reports/:dimension` | statistics | `?from=&to=&preset=&delta=&groupBy2=&campaignId=` `&country=&city=&platform=&os=&format=&model=&browser=&connection=&zone=&isp=&cpaTest=` |
 | GET | `/placements` | placements, reports | `?category=&campaignId=` |
 | POST | `/placements/:id/toggle` | on/off button | `{ campaignId? }` |
 | PUT | `/placements/:id/state` | explicit set | `{ on, campaignId? }` |
@@ -53,7 +53,11 @@ Requests carry `Authorization: Bearer <token>` when a token is set and
 `restore`, `duplicate`. The response is `{ affected, campaign }`, where
 `campaign` is the last one touched — the UI uses it for the confirmation text.
 
-`:dimension` on `/reports` is `zones`, `campaigns`, `geo` or `days`.
+`:dimension` on `/reports` is the primary grouping — `days`, `campaigns`, `geo`, `zones`,
+`format`, `model`, `platform`, `os`, `browser`, `connection`, `city` or `isp`. `groupBy2`
+takes the same values and asks for a second breakdown, giving one row per combination.
+`delta` is a number of days: the report is compared against the same span that many days
+earlier. Every filter is optional and an empty value means no filtering.
 
 ## Campaign payload
 

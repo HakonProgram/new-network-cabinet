@@ -79,7 +79,10 @@
   /* Провалиться в кампанию: отчёт, сужённый до неё. */
   function openReport(id) {
     var c = Store.get().campaigns.find(function (x) { return x.id === id; });
-    Store.set(function (s) { s.ui.statsCampaign = id; });
+    Store.set(function (s) {
+      s.ui.statsForm.campaign = id;
+      s.ui.statsApplied.campaign = id;
+    });
     App.go('stats');
     App.toast('Report for ' + (c ? c.name : 'NN-C-' + id));
   }

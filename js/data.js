@@ -229,6 +229,67 @@
     iPadOS:      ['13', '14', '15', '16', '17', '18', '26']
   };
 
+  /* ── разрезы, по которым нет построчных данных ──
+     Для них храним долю трафика: фильтр по такому разрезу сужает
+     отчёт пропорционально, а группировка делит итог на эти доли.
+     Доли внутри каждого набора дают единицу. */
+  var SHARES = {
+    platform: [
+      { id: 'Mobile', label: 'Mobile', w: 0.71 },
+      { id: 'Desktop', label: 'Desktop', w: 0.22 },
+      { id: 'Tablet', label: 'Tablet', w: 0.07 }
+    ],
+    os: [
+      { id: 'Android', label: 'Android', w: 0.52 },
+      { id: 'iOS', label: 'iOS', w: 0.19 },
+      { id: 'Windows', label: 'Windows', w: 0.18 },
+      { id: 'macOS', label: 'macOS', w: 0.06 },
+      { id: 'iPadOS', label: 'iPadOS', w: 0.03 },
+      { id: 'Linux', label: 'Linux', w: 0.02 }
+    ],
+    browser: [
+      { id: 'Chrome', label: 'Chrome', w: 0.58 },
+      { id: 'Safari', label: 'Safari', w: 0.21 },
+      { id: 'Samsung Internet', label: 'Samsung Internet', w: 0.09 },
+      { id: 'Firefox', label: 'Firefox', w: 0.06 },
+      { id: 'Opera', label: 'Opera', w: 0.04 },
+      { id: 'Edge', label: 'Edge', w: 0.02 }
+    ],
+    connection: [
+      { id: 'Wi-Fi', label: 'Wi-Fi', w: 0.46 },
+      { id: 'Cellular', label: 'Cellular', w: 0.51 },
+      { id: 'Unknown', label: 'Unknown', w: 0.03 }
+    ],
+    isp: [
+      { id: 'Deutsche Telekom', label: 'Deutsche Telekom', w: 0.14 },
+      { id: 'Vodafone', label: 'Vodafone', w: 0.12 },
+      { id: 'Orange', label: 'Orange', w: 0.10 },
+      { id: 'Comcast', label: 'Comcast', w: 0.09 },
+      { id: 'AT&T', label: 'AT&T', w: 0.08 },
+      { id: 'Jio', label: 'Jio', w: 0.07 },
+      { id: 'Telefonica', label: 'Telefonica', w: 0.06 },
+      { id: 'Other', label: 'Other networks', w: 0.34 }
+    ],
+    city: [
+      { id: 'Berlin', label: 'Berlin', w: 0.06 },
+      { id: 'Hamburg', label: 'Hamburg', w: 0.04 },
+      { id: 'Munich', label: 'Munich', w: 0.04 },
+      { id: 'New York', label: 'New York', w: 0.05 },
+      { id: 'Los Angeles', label: 'Los Angeles', w: 0.04 },
+      { id: 'London', label: 'London', w: 0.05 },
+      { id: 'Paris', label: 'Paris', w: 0.04 },
+      { id: 'Madrid', label: 'Madrid', w: 0.03 },
+      { id: 'Rome', label: 'Rome', w: 0.03 },
+      { id: 'Warsaw', label: 'Warsaw', w: 0.03 },
+      { id: 'Other', label: 'Other cities', w: 0.59 }
+    ],
+    cpaTest: [
+      { id: 'paid', label: 'Paid test (CPA)', w: 0.34 },
+      { id: 'free', label: 'Free test (Pure CPA)', w: 0.18 },
+      { id: 'none', label: 'Not a CPA test', w: 0.48 }
+    ]
+  };
+
   var COUNTRIES = [
     { code: 'DE', name: 'Germany' },        { code: 'US', name: 'United States' },
     { code: 'GB', name: 'United Kingdom' }, { code: 'FR', name: 'France' },
@@ -252,7 +313,7 @@
 
   w.DATA = {
     PAY_MODELS: PAY_MODELS, STATUS: STATUS, CAMPAIGNS: CAMPAIGNS,
-    PLATFORM_OS: PLATFORM_OS, OS_ORDER: OS_ORDER, OS_VERSIONS: OS_VERSIONS,
+    PLATFORM_OS: PLATFORM_OS, OS_ORDER: OS_ORDER, OS_VERSIONS: OS_VERSIONS, SHARES: SHARES,
     ZONES: buildZones(), GEO: GEO, GEO_POOL: GEO_POOL, PRESETS: PRESETS,
     PAY_METHODS: PAY_METHODS, PAYMENTS: PAYMENTS, INVOICES: INVOICES,
     NOTIFICATIONS: NOTIFICATIONS, DOCS: DOCS, FILES: FILES, PAYOUT: PAYOUT,
