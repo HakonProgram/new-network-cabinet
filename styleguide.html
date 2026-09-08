@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en" data-skin="graphite" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>New Network — design directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&family=Martian+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="skins.css?v=1">
+<link rel="stylesheet" href="styleguide.css?v=1">
+</head>
+<body>
+
+<div class="bar">
+  <b>Direction</b>
+  <div class="sw" id="skins">
+    <button data-skin="graphite" aria-pressed="true">Graphite</button>
+    <button data-skin="paper" aria-pressed="false">Paper</button>
+    <button data-skin="terminal" aria-pressed="false">Terminal</button>
+  </div>
+  <span class="lab" id="about">Radix slate + teal · Geist · плотная сетка</span>
+  <div class="sw" id="themes" style="margin-left:auto">
+    <button data-theme="dark" aria-pressed="true">Dark</button>
+    <button data-theme="light" aria-pressed="false">Light</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <aside class="side">
+    <div class="logo"><span class="mark">N</span> New Network</div>
+    <nav class="nav">
+      <a href="#"><i></i>Statistics</a>
+      <a href="#" class="on"><i></i>Campaigns</a>
+      <a href="#"><i></i>Traffic volumes</a>
+      <a href="#"><i></i>Postback</a>
+      <a href="#"><i></i>Billing</a>
+      <a href="#"><i></i>Profile</a>
+    </nav>
+    <div class="bal"><div class="k">Balance</div><div class="v">$12,480.50</div></div>
+  </aside>
+
+  <main class="main">
+    <div class="head">
+      <div><h1 class="h1">Campaigns</h1><p class="sub">9 campaigns · last 7 days</p></div>
+      <div class="btns"><button class="btn">Export</button><button class="btn pri">New campaign</button></div>
+    </div>
+
+    <div class="cards">
+      <div class="card"><div class="k">Spend</div><div class="v">$21,164</div><div class="d up">+12.4% vs prev</div></div>
+      <div class="card"><div class="k">Conversions</div><div class="v">1,883</div><div class="d up">+8.1%</div></div>
+      <div class="card"><div class="k">Blended CPA</div><div class="v">$11.24</div><div class="d down">+3.0%</div></div>
+      <div class="card"><div class="k">ROI</div><div class="v up">+34.8%</div><div class="d">$28,530 revenue</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h"><span class="panel-t">Spend and revenue</span>
+        <div class="chips"><span class="chip on">7 days</span><span class="chip">30 days</span><span class="chip">Custom</span></div>
+      </div>
+      <div class="chart">
+        <svg viewBox="0 0 640 150" preserveAspectRatio="none">
+          <polyline fill="none" stroke="var(--accent)" stroke-width="2" points="0,108 91,96 182,101 273,74 364,66 455,44 546,52 640,26"/>
+          <polyline fill="none" stroke="var(--text-3)" stroke-width="2" stroke-dasharray="4 4" opacity="0.55" points="0,124 91,118 182,120 273,104 364,99 455,88 546,92 640,78"/>
+        </svg>
+      </div>
+      <div class="legend"><span><i class="key" style="background:var(--accent)"></i>Revenue</span>
+        <span><i class="key" style="background:var(--text-3)"></i>Spend</span></div>
+    </div>
+
+    <div class="panel">
+      <div class="tr thead">
+        <div></div><div class="th">Campaign</div><div class="th r">Impr.</div><div class="th r">Conv.</div>
+        <div class="th r">Cost</div><div class="th r">ROI</div><div class="th">Status</div>
+      </div>
+      <div class="tr row">
+        <div class="play">▶</div>
+        <div><div class="cname">iPhone 17 Giveaway</div><div class="cid">NN-C-4821 · Smart CPM</div></div>
+        <div class="num r">4.21M</div><div class="num r">612</div><div class="num r">$6,880</div>
+        <div class="num r up">+41.2%</div><div><span class="pill ok"><i class="dot"></i>Active</span></div>
+      </div>
+      <div class="tr row">
+        <div class="play">▶</div>
+        <div><div class="cname">Casino DE — mainstream</div><div class="cid">NN-C-4790 · CPA</div></div>
+        <div class="num r">2.98M</div><div class="num r">407</div><div class="num r">$4,512</div>
+        <div class="num r up">+28.6%</div><div><span class="pill ok"><i class="dot"></i>Active</span></div>
+      </div>
+      <div class="tr row">
+        <div class="play">❚❚</div>
+        <div><div class="cname">Forex EU — retarget</div><div class="cid">NN-C-4655 · CPM</div></div>
+        <div class="num r">1.14M</div><div class="num r">96</div><div class="num r">$1,284</div>
+        <div class="num r down">−6.4%</div><div><span class="pill wait"><i class="dot"></i>Pending</span></div>
+      </div>
+      <div class="note" style="padding-top:12px">Controls stay put while the metrics scroll.</div>
+    </div>
+
+    <div class="two">
+      <div class="panel">
+        <div class="panel-h"><span class="panel-t">Traffic quality</span></div>
+        <div class="field">
+          <div class="tiles">
+            <div class="tile on"><b>Fresh users</b><s>$3.00 recommended</s></div>
+            <div class="tile on"><b>Regular users</b><s>$2.40 recommended</s></div>
+            <div class="tile"><b>Aged users</b><s>$1.92 recommended</s></div>
+            <div class="tile"><b>Remnant traffic</b><s>$1.44 recommended</s></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span class="panel-t">Your bid</span></div>
+        <div class="field">
+          <div><div class="lab">Max bid per 1,000 impressions</div>
+            <input class="inp" value="2.40" style="font-family:var(--mono)"></div>
+          <div class="acts" style="justify-content:flex-start">
+            <button class="btn xs">Reset</button><button class="btn xs dgr">Turn off</button>
+            <button class="btn xs pri">Apply</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  var ABOUT = {
+    graphite: 'Radix slate + teal · Geist · плотная сетка, радиус 8',
+    paper:    'Radix sand + orange · Instrument Sans · воздух, радиус 14, строка 58',
+    terminal: 'Radix gray + lime · Space Grotesk + Martian Mono · радиус 2, строка 40'
+  };
+  function bind(id, attr) {
+    document.getElementById(id).addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      document.documentElement.setAttribute('data-' + attr, b.dataset[attr]);
+      [].forEach.call(this.querySelectorAll('button'), function (x) {
+        x.setAttribute('aria-pressed', String(x === b));
+      });
+      if (attr === 'skin') document.getElementById('about').textContent = ABOUT[b.dataset.skin];
+    });
+  }
+  bind('skins', 'skin'); bind('themes', 'theme');
+</script>
+</body>
+</html>

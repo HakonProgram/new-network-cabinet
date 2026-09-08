@@ -1,0 +1,70 @@
+/* Три направления кабинета.
+   Значения взяты из Radix Colors (MIT, https://github.com/radix-ui/colors):
+   шкалы slate / sand / gray + teal / orange / lime, светлые и тёмные пары.
+   Ступени по назначению: 1-3 подложки, 6-8 рамки, 9 заливка, 11 текст, 12 заголовок. */
+
+[data-skin="graphite"], [data-skin="graphite"][data-theme="light"] {
+  --bg:#f9f9fb; --surface:#ffffff; --surface-2:#f0f0f3; --surface-3:#e8e8ec;
+  --border:#d9d9e0; --border-strong:#b9bbc6;
+  --text:#1c2024; --text-2:#60646c; --text-3:#60646c;
+  --accent:#008573; --accent-solid:#12a594; --accent-soft:#e0f8f3; --accent-line:#83cdc1;
+  --pos:#2a7e3b; --pos-soft:#e9f6e9; --neg:#ce2c31; --neg-soft:#feebec;
+  --warn:#ab6400; --warn-soft:#fff7c2; --info:#0d74ce;
+  --font:'Geist', system-ui, sans-serif; --mono:'Geist Mono', monospace;
+  --r:8px; --r-sm:6px; --row:46px; --pad:16px; --track:0;
+}
+
+[data-skin="graphite"][data-theme="dark"] {
+  --bg:#111113; --surface:#18191b; --surface-2:#212225; --surface-3:#272a2d;
+  --border:#363a3f; --border-strong:#5a6169;
+  --text:#edeef0; --text-2:#b0b4ba; --text-3:#b0b4ba;
+  --accent:#0bd8b6; --accent-solid:#12a594; --accent-soft:#0d2d2a; --accent-line:#1c6961;
+  --pos:#71d083; --pos-soft:#1b2a1e; --neg:#ff9592; --neg-soft:#3b1219;
+  --warn:#ffca16; --warn-soft:#302008; --info:#70b8ff;
+  --font:'Geist', system-ui, sans-serif; --mono:'Geist Mono', monospace;
+  --r:8px; --r-sm:6px; --row:46px; --pad:16px; --track:0;
+}
+
+[data-skin="paper"], [data-skin="paper"][data-theme="light"] {
+  --bg:#f9f9f8; --surface:#ffffff; --surface-2:#f1f0ef; --surface-3:#e9e8e6;
+  --border:#dad9d6; --border-strong:#bcbbb5;
+  --text:#21201c; --text-2:#63635e; --text-3:#63635e;
+  --accent:#cc4e00; --accent-solid:#f76b15; --accent-soft:#ffefd6; --accent-line:#f5ae73;
+  --pos:#2a7e3b; --pos-soft:#e9f6e9; --neg:#ce2c31; --neg-soft:#feebec;
+  --warn:#ab6400; --warn-soft:#fff7c2; --info:#0d74ce;
+  --font:'Instrument Sans', system-ui, sans-serif; --mono:'IBM Plex Mono', monospace;
+  --r:14px; --r-sm:10px; --row:58px; --pad:20px; --track:0;
+}
+
+[data-skin="paper"][data-theme="dark"] {
+  --bg:#111110; --surface:#191918; --surface-2:#222221; --surface-3:#2a2a28;
+  --border:#3b3a37; --border-strong:#62605b;
+  --text:#eeeeec; --text-2:#b5b3ad; --text-3:#b5b3ad;
+  --accent:#ffa057; --accent-solid:#f76b15; --accent-soft:#331e0b; --accent-line:#7e451d;
+  --pos:#71d083; --pos-soft:#1b2a1e; --neg:#ff9592; --neg-soft:#3b1219;
+  --warn:#ffca16; --warn-soft:#302008; --info:#70b8ff;
+  --font:'Instrument Sans', system-ui, sans-serif; --mono:'IBM Plex Mono', monospace;
+  --r:14px; --r-sm:10px; --row:58px; --pad:20px; --track:0;
+}
+
+[data-skin="terminal"], [data-skin="terminal"][data-theme="light"] {
+  --bg:#f9f9f9; --surface:#ffffff; --surface-2:#f0f0f0; --surface-3:#e8e8e8;
+  --border:#d9d9d9; --border-strong:#bbbbbb;
+  --text:#202020; --text-2:#646464; --text-3:#646464;
+  --accent:#5c7c2f; --accent-solid:#bdee63; --accent-soft:#eef6d6; --accent-line:#abc978;
+  --pos:#2a7e3b; --pos-soft:#e9f6e9; --neg:#ce2c31; --neg-soft:#feebec;
+  --warn:#ab6400; --warn-soft:#fff7c2; --info:#0d74ce;
+  --font:'Space Grotesk', system-ui, sans-serif; --mono:'Martian Mono', monospace;
+  --r:3px; --r-sm:2px; --row:40px; --pad:12px; --track:0.02em;
+}
+
+[data-skin="terminal"][data-theme="dark"] {
+  --bg:#111111; --surface:#191919; --surface-2:#222222; --surface-3:#2a2a2a;
+  --border:#3a3a3a; --border-strong:#606060;
+  --text:#eeeeee; --text-2:#b4b4b4; --text-3:#b4b4b4;
+  --accent:#bde56c; --accent-solid:#bdee63; --accent-soft:#1f2917; --accent-line:#496231;
+  --pos:#71d083; --pos-soft:#1b2a1e; --neg:#ff9592; --neg-soft:#3b1219;
+  --warn:#ffca16; --warn-soft:#302008; --info:#70b8ff;
+  --font:'Space Grotesk', system-ui, sans-serif; --mono:'Martian Mono', monospace;
+  --r:3px; --r-sm:2px; --row:40px; --pad:12px; --track:0.02em;
+}
