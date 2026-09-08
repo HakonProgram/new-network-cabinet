@@ -47,8 +47,12 @@
 
           (signup
             ? '<div class="auth-form">' +
+                '<div class="af-row">' +
+                  field('First name', 'firstName', 'text', 'Anton', f.firstName) +
+                  field('Last name', 'lastName', 'text', 'Sokolov', f.lastName) +
+                '</div>' +
+                field('Work email', 'email', 'email', 'you@company.com', f.email) +
                 field('Company', 'company', 'text', 'Nexora Media', f.company) +
-                field('Email', 'email', 'email', 'you@company.com', f.email) +
                 field('Password', 'password', 'password', 'At least 8 characters', f.password) +
                 (f.error ? '<div class="auth-err">' + icon('alert', 15) + esc(f.error) + '</div>' : '') +
                 '<button class="btn btn-pri btn-lg" data-act="signup">Create account</button>' +
@@ -84,19 +88,38 @@
       },
       signup: function () {
         var f = form();
-        if (!f.email.trim() || !f.password.trim()) {
-          Store.set(function (s) { s.ui.auth.error = 'Email and password are required.'; });
+        /* Проверяем всё разом и называем недостающее, а не первое попавшееся. */
+        var missing = [];
+        if (!f.firstName.trim()) missing.push('first name');
+        if (!f.lastName.trim()) missing.push('last name');
+        if (!f.email.trim()) missing.push('work email');
+        if (!f.company.trim()) missing.push('company');
+        if (!f.password.trim()) missing.push('password');
+        if (missing.length) {
+          Store.set(function (s) {
+            s.ui.auth.error = 'Fill in the ' + missing.join(', ') + '.';
+          });
           return;
         }
-        Store.signIn(f.company.trim() || f.email.trim(), 'fresh');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.trim())) {
+          Store.set(function (s) { s.ui.auth.error = 'That email address does not look right.'; });
+          return;
+        }
+        if (f.password.trim().length < 8) {
+          Store.set(function (s) { s.ui.auth.error = 'The password needs at least 8 characters.'; });
+          return;
+        }
+        Store.signIn(f.company.trim(), 'fresh', {
+          firstName: f.firstName.trim(), lastName: f.lastName.trim(), email: f.email.trim()
+        });
         App.go('campaigns');
-        App.toast('Account created — welcome aboard');
+        App.toast('Account created — welcome, ' + f.firstName.trim());
       }
     },
 
     inputs: (function () {
       var out = {};
-      ['login', 'password', 'email', 'company'].forEach(function (name) {
+      ['login', 'password', 'email', 'company', 'firstName', 'lastName'].forEach(function (name) {
         out[name] = function (v) { Store.patch(function (s) { s.ui.auth[name] = v; }); };
       });
       return out;

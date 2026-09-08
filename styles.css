@@ -743,3 +743,5 @@ select.sel-inp option { background:var(--surface); color:var(--text); }
 .blank-t { font-size:var(--fs-4); font-weight:600; }
 .blank-d { font-size:var(--fs-2); color:var(--text-2); max-width:44ch; }
 .blank .btn { margin-top:var(--s2); }
+.af-row { display:grid; grid-template-columns:1fr 1fr; gap:var(--s3); }
+@media (max-width:480px) { .af-row { grid-template-columns:minmax(0,1fr); } }

@@ -21,7 +21,9 @@
   function html() {
     var list = steps();
     var done = list.filter(function (x) { return x.done; }).length;
-    var user = (Store.get().session || {}).user || 'there';
+    var ses = Store.get().session || {};
+    /* Здороваемся по имени человека, а не по названию компании. */
+    var user = ses.firstName || ses.user || 'there';
 
     var rows = list.map(function (x, i) {
       return '<div class="wstep' + (x.done ? ' done' : '') + '">' +

@@ -80,7 +80,8 @@
         volFormat: 'Popunder', volPlatform: 'Mobile', volCat: 'Mainstream',
         volRegion: 'Europe', volModel: 'Smart CPM', volBid: '2.40',
         postbackTested: false,
-        auth: { tab: 'signin', login: '', password: '', email: '', company: '', error: '' }
+        auth: { tab: 'signin', login: '', password: '', email: '',
+                company: '', firstName: '', lastName: '', error: '' }
       }
     };
   }
@@ -201,9 +202,9 @@
 
   /* Вход: аккаунт пересобирается под выбранный режим, поэтому демо и
      пустой кабинет никогда не смешиваются между собой. */
-  function signIn(user, mode) {
+  function signIn(user, mode, person) {
     state = seed(mode);
-    state.session = { user: user, mode: mode, since: Date.now() };
+    state.session = Object.assign({ user: user, mode: mode, since: Date.now() }, person || {});
     save();
     listeners.forEach(function (l) { l(); });
   }
