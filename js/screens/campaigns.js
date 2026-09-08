@@ -7,7 +7,7 @@
     { key: 'all',      label: 'All' },
     { key: 'active',   label: 'Active' },
     { key: 'test',     label: 'Test' },
-    { key: 'review',   label: 'Auto-check' },
+    { key: 'review',   label: 'Pending' },
     { key: 'paused',   label: 'Stopped' },
     { key: 'archived', label: 'Archived' }
   ];
@@ -43,7 +43,7 @@
     var picked = selected().indexOf(c.id) >= 0;
     var runCls = !controllable ? 'act act-off' : (running ? 'act act-stop' : 'act act-run');
     var runTitle = !controllable
-      ? (c.status === 'review' ? 'Starts by itself once the auto-check passes' : 'Controls unavailable')
+      ? (c.status === 'review' ? 'Pending the auto-check — starts by itself once it passes' : 'Controls unavailable')
       : (running ? 'Stop campaign' : 'Start campaign');
 
     return '<div class="tr row clickable' + (running ? '' : ' off') + (picked ? ' picked' : '') +

@@ -23,7 +23,7 @@
   var STATUS = {
     active:   { label: 'Active',     tone: 'pos' },
     test:     { label: 'Test',       tone: 'accent' },
-    review:   { label: 'Auto-check', tone: 'warn' },
+    review:   { label: 'Pending', tone: 'warn' },
     paused:   { label: 'Stopped',    tone: 'muted' },
     done:     { label: 'Finished',   tone: 'muted' },
     archived: { label: 'Archived',   tone: 'muted' }

@@ -381,7 +381,7 @@
         /* 07 */
         '<div class="card"><div class="card-h"><div class="card-n">07</div>' +
           '<div class="card-t">Auto-check and launch</div>' +
-          '<div class="card-s">Runs the moment you hit launch — no manager involved</div></div>' +
+          '<div class="card-s">The campaign goes to Pending and runs these checks itself — no manager involved</div></div>' +
           '<div class="card-b">' +
             '<div class="g2">' +
               '<div style="display:flex;flex-direction:column;gap:8px">' + checks.slice(0, 2).join('') + '</div>' +
@@ -568,7 +568,7 @@
           s.ui.advancedOpen = false;
         });
         App.go('campaigns');
-        App.toast('Campaign NN-C-' + newId + ' sent to the auto-check');
+        App.toast('Campaign NN-C-' + newId + ' created — pending the auto-check');
       }
     },
 
