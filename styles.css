@@ -792,3 +792,43 @@ select.sel-inp option { background:var(--surface); color:var(--text); }
   .umenu { max-width:calc(100vw - 24px); }
 }
 
+
+/* ═══════════════════════════════════════════════════════════
+   Форма кампании в анатомии PropellerAds: не набор карточек,
+   а белое полотно, где секции разделены линией, заголовки
+   крупные, а поля заметно выше и просторнее.
+   ═══════════════════════════════════════════════════════════ */
+.form-flat .card { background:none; border:0; border-radius:0;
+  border-top:1px solid var(--border); }
+.form-flat .card:first-of-type { border-top:0; }
+.form-flat .card-h { padding:var(--s7) 0 var(--s4); border-bottom:0; align-items:baseline; }
+.form-flat .card-n { display:none; }
+.form-flat .card-t { font-size:22px; font-weight:700; letter-spacing:-0.01em; }
+.form-flat .card-s { font-size:var(--fs-3); color:var(--text-2); }
+.form-flat .card-b { padding:0 0 var(--s6); gap:var(--s6); }
+.form-flat .lab { font-size:var(--fs-3); color:var(--text); }
+.form-flat .inp { height:48px; font-size:var(--fs-3); }
+.form-flat .sel-inp { height:48px; }
+
+/* Липкая навигация по секциям — как вкладки над формой. */
+.sectnav { position:sticky; top:60px; z-index:15; display:flex; gap:var(--s5); flex-wrap:wrap;
+  padding:var(--s3) 0; margin-bottom:var(--s2);
+  background:var(--bg); border-bottom:1px solid var(--border); }
+.sectnav-i { border:0; background:none; cursor:pointer; padding:6px 0; font-family:var(--sans);
+  font-size:var(--fs-3); color:var(--text-2); border-bottom:2px solid transparent; }
+.sectnav-i:hover { color:var(--accent); border-bottom-color:var(--accent-line); }
+@media (max-width:900px) {
+  .sectnav { top:0; gap:var(--s4); overflow-x:auto; flex-wrap:nowrap; }
+  .sectnav-i { white-space:nowrap; }
+}
+
+/* Сегментные группы: слитный блок, выбранный — белый с контуром. */
+.opts { display:inline-flex; gap:0; flex-wrap:wrap; padding:0;
+  border:1px solid var(--btn-line); border-radius:9px; overflow:hidden; background:var(--surface-2); }
+.opt { height:40px; padding:0 var(--s4); border:0; border-right:1px solid var(--btn-line);
+  border-radius:0; background:none; color:var(--text-2); }
+.opt:last-child { border-right:0; }
+.opt:hover { color:var(--text); background:var(--surface-3); border-color:var(--btn-line); }
+.opt.on { background:var(--surface); color:var(--text); font-weight:600; border-color:var(--btn-line); }
+:root[data-theme="light"] .opt.on { box-shadow:inset 0 0 0 1px var(--btn-line); }
+.sectnav-i.on { color:var(--accent); border-bottom-color:var(--accent); font-weight:600; }

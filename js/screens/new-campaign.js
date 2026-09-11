@@ -287,13 +287,19 @@
 
       var adv = s.ui.advancedOpen;
 
-      return '<div class="page">' +
+      var secNav = '<div class="sectnav">' + ["Basics", "Traffic", "Countries and bids", "Placements", "Budget", "Advanced", "Launch"].map(function (n, i) {
+        return '<button class="sectnav-i" data-act="goSection" data-arg="' + i + '">' + n + '</button>';
+      }).join('') + '</div>';
+
+      return '<div class="page form-flat">' +
         '<div class="head"><div>' +
           '<h1 class="h1">' + (d.editingId ? 'Edit campaign' : 'New campaign') + '</h1>' +
           '<p class="sub">One page. Fill it once — the campaign runs itself from there.</p></div>' +
           '<div style="margin-left:auto;display:flex;gap:10px">' +
             '<button class="btn btn-ghost" data-act="cancel">Cancel</button>' +
             '<button class="btn" data-act="draft">Save draft</button></div></div>' +
+
+        secNav +
 
         /* 01 */
         '<div class="card"><div class="card-h"><div class="card-n">01</div>' +
@@ -459,7 +465,40 @@
       '</div>';
     },
 
+    /* Подсветка текущей секции при прокрутке — вкладка ведёт себя как
+       указатель положения, а не просто как ссылка. */
+    mount: function (view) {
+      var nav = view.querySelector('.sectnav');
+      if (!nav) return;
+      var items = [].slice.call(nav.querySelectorAll('.sectnav-i'));
+      var cards = [].slice.call(view.querySelectorAll('.form-flat .card'));
+      if (!cards.length) return;
+      var spy = function () {
+        var line = nav.getBoundingClientRect().bottom + 8;
+        var active = 0;
+        cards.forEach(function (c, i) { if (c.getBoundingClientRect().top <= line) active = i; });
+        items.forEach(function (el, i) { el.classList.toggle('on', i === active); });
+      };
+      spy();
+      /* Наблюдатель вместо слушателя прокрутки: срабатывает независимо
+         от того, прокрутил ли страницу человек или код. */
+      if (w.__secObs) w.__secObs.disconnect();
+      if (window.IntersectionObserver) {
+        w.__secObs = new IntersectionObserver(spy, { threshold: [0, 0.01, 1] });
+        cards.forEach(function (c) { w.__secObs.observe(c); });
+      }
+      if (w.__secSpy) window.removeEventListener('scroll', w.__secSpy);
+      window.addEventListener('scroll', spy, { passive: true });
+      w.__secSpy = spy;
+    },
+
     actions: {
+      /* Навигация по форме: прокрутка к секции, без перерисовки. */
+      goSection: function (i) {
+        var cards = document.querySelectorAll('.form-flat .card');
+        var el = cards[Number(i)];
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
       cancel: function () { App.go('campaigns'); },
       draft: function () { App.toast('Draft saved'); },
       advanced: function () { Store.set(function (s) { s.ui.advancedOpen = !s.ui.advancedOpen; }); },
