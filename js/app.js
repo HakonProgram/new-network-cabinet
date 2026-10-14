@@ -33,17 +33,6 @@
 
   var current = 'campaigns';
 
-  function theme() {
-    return d.documentElement.getAttribute('data-theme') || 'dark';
-  }
-  function toggleTheme() {
-    var next = theme() === 'light' ? 'dark' : 'light';
-    d.documentElement.setAttribute('data-theme', next);
-    try { localStorage.setItem('nn-theme', next); } catch (e) {}
-    /* Шапка пересобирается целиком: в ней иконка темы. */
-    d.getElementById('app').innerHTML = shellHtml();
-    render();
-  }
 
   /* Боковое меню на узких экранах — выдвижная панель. Состояние держим
      на корневом элементе: оно эфемерное и переживать перезагрузку не должно. */
@@ -130,7 +119,7 @@
       '<aside class="side">' +
         '<div class="side-inner">' +
           '<div class="brand" data-go="campaigns">' + UI.brandMark(32) +
-            '<div><div class="brand-name">AdAnvil</div><div class="brand-sub">Advertiser</div></div>' +
+            '<div><div class="brand-name">noad<i>.network</i></div><div class="brand-sub">Advertiser</div></div>' +
           '</div>' +
           '<nav class="nav" id="nav">' + navHtml() + '</nav>' +
         '</div>' +
@@ -145,7 +134,6 @@
             '<button class="btn btn-pri btn-sm" data-go="payments">' + icon('plus', 13) +
               '<span>Add funds</span></button>' +
           '</div>' +
-          '<div class="icon-btn" data-act="theme" title="Switch theme">' + icon(theme() === 'light' ? 'moon' : 'sun', 16) + '</div>' +
           '<div class="icon-btn" data-go="notifications" title="Notifications">' + icon('bell', 16) +
             (badges().unread !== '0' ? '<span class="bell-dot"></span>' : '') + '</div>' +
           userHtml() +
@@ -295,7 +283,6 @@
       }
       var actEl = ev.target.closest('[data-act]');
       if (!actEl) return;
-      if (actEl.dataset.act === 'theme') { ev.preventDefault(); toggleTheme(); return; }
       if (actEl.dataset.act === 'openNav') { ev.preventDefault(); nav(true); return; }
       if (actEl.dataset.act === 'userMenu') {
         ev.preventDefault();

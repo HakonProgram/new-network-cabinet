@@ -23,11 +23,13 @@
       return '<div class="auth">' +
         '<div class="auth-side">' +
           '<div class="auth-brand">' + UI.brandMark(34) +
-            '<div><div class="brand-name">AdAnvil</div>' +
+            '<div><div class="brand-name">noad<i>.network</i></div>' +
             '<div class="brand-sub">Advertiser cabinet</div></div></div>' +
-          '<h1 class="auth-h">Buy traffic <span class="hl">without the back and forth</span>.</h1>' +
-          '<p class="auth-sub">One request and a bid — the network finds the working ' +
-            'combination itself. No manager in the loop, no waiting for approval.</p>' +
+          '<h1 class="auth-h">We are <span class="no">no</span> <s>ad network</s>.</h1>' +
+          '<p class="auth-sub">No inventory to sort. No manager to chase. You set the goal ' +
+            'and the bid — the result is our problem.</p>' +
+          '<ul class="nolist"><li>no setup fee</li><li>no onboarding call</li>' +
+            '<li>no account manager</li><li>no minimum test</li></ul>' +
         '</div>' +
 
         '<div class="auth-card">' +

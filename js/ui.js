@@ -87,13 +87,14 @@
     menu:    { f: '<rect x="3" y="5.2" width="18" height="2.6" rx="1.3"/><rect x="3" y="10.7" width="18" height="2.6" rx="1.3"/><rect x="3" y="16.2" width="18" height="2.6" rx="1.3"/>' }
   };
 
-  /* Знак бренда: три растущих столбика — показы, клики, конверсии.
-     Наковальню пробовали: в 32px её силуэт схлопывается в блок. */
+  /* Знак бренда noad.network: перечёркнутый круг — «no» как графика.
+     Тот же, что в шапке лендинга. */
   function brandMark(size) {
     size = size || 30;
     return '<svg class="mark" width="' + size + '" height="' + size + '" viewBox="0 0 32 32" aria-hidden="true">' +
-      '<rect width="32" height="32" rx="9" fill="var(--accent-solid)"/>' +
-      '<g fill="var(--on-accent)">' + '<rect x="7" y="17.5" width="4.4" height="7.5" rx="2.2" opacity="0.55"/><rect x="13.8" y="13" width="4.4" height="12" rx="2.2" opacity="0.8"/><rect x="20.6" y="7" width="4.4" height="18" rx="2.2"/>' + '</g></svg>';
+      '<rect width="32" height="32" rx="9" fill="var(--surface-2)"/>' +
+      '<circle cx="16" cy="16" r="9" fill="none" stroke="var(--accent)" stroke-width="3"/>' +
+      '<line x1="9.6" y1="22.4" x2="22.4" y2="9.6" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/></svg>';
   }
 
   /* Спарклайн: заливка под кривой плюс сама кривая. Ширина в процентах,
